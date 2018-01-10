@@ -1,0 +1,22 @@
+{
+  "extensionDescription": {
+    "message": "Lightweight bookmarking for the avid reader.",
+    "description": "Pressing the Pile button puts a bookmark in a dedicated bookmark folder. A sidebar gives you quick access to its content. You can show/hide the sidebar via the sidebar button on the toolbar or by pressing a shortcut (Alt+Shift+S)."
+  },
+  "buttonTitle": {
+    "message": "Put it on the Pile",
+    "description": "Put a bookmark in the Pile's bookmark folder."
+  },
+  "ExecuteSidebarAction": {
+    "message": "Show/hide the Pile sidebar",
+    "description": "Show or hide the Pile sidebar."
+  },
+  "putOnPileMessage": {
+    "message": "Put the page on the Pile and close it.",
+    "description": "Close the tab and put a bookmark in the Pile bookmark folder."
+  },
+  "putAllOnPileMessage": {
+    "message": "Put ALL tabs on the Pile and close them.",
+    "description": "Close ALL tabs and put a bookmark for each of them in the Pile's bookmark folder."
+  }
+}

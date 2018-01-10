@@ -1,0 +1,399 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: #F2F2F2;
+}
+body {
+  font: caption;
+  background-color: #F2F2F2;
+}
+div#content {
+  background-color: #F2F2F2;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+ul#bookmarklist {
+  display: block;
+  height: 100vh;
+  width: calc(100% + 30px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background-color: #F2F2F2;
+  margin: 24px 0 0 0;
+  padding: 0 0 0 0;
+  scroll-behavior: smooth;
+}
+li.bookmark:last-child {
+  margin-bottom:39px;
+}
+li.bookmark:first-child {
+  margin-top:0px;
+}
+li.bookmark {
+  border-bottom: 1px solid #ECECEC;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 38px;
+  font-size: 12px;
+  display: flex;
+  position: relative;
+  z-index: 2;
+}
+ul#bookmarklist.adding li.bookmark {
+  animation-duration: 0.28s;
+  animation-name: slidein;
+  z-index: 2;
+  transition-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
+}
+@keyframes slidein {
+  from {
+    transform: translateY(-39px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+ul#bookmarklist.foldup li.bookmark {
+  transition: transform 0.38s ease-in-out;
+  transition-delay: 0.28s;
+  transform: translateY(38px);
+  z-index: 1;
+}
+ul#bookmarklist.foldup li.bookmark.beingdeleted ~ li.bookmark {
+  transition: none;
+  transform: none;
+}
+ul#bookmarklist:not(.foldup) li.bookmark.beingdeleted, li.bookmark.beingdeleted ~ li.bookmark {
+  transition: transform 0.38s ease-in-out;
+  transition-delay: 0.28s;
+  transform: translateY(-38px);
+  z-index: 1;
+}
+li.bookmark:last-child.beingdeleted {
+  border-bottom: none;
+}
+li.bookmark.beingdeleted .deletebutton {
+  opacity: 0;
+  transition: opacity 0.08s linear;
+  transition-delay: 0;
+}
+li.bookmark.beingdeleted a.link {
+  opacity: 0;
+  transition: opacity 0.08s linear;
+  transition-delay: 0;
+}
+a.link {
+  display: block;
+  background-color: #F6F6F6;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 8px;
+  padding-right: 44px;
+  text-decoration: none;
+  z-index: 0;
+}
+a.link, a.link:visited {
+  color: #3B3B3B;
+}
+.bookmark > a.link:hover {
+  color: #4D4D4D;
+  background-color: #FAFAFA;
+}
+.bookmark > a.link:active {
+  background-color: #E8EFF1 !important;
+  color: #000;
+}
+.bookmark.shaking {
+  animation: shake 0.42s linear;
+  z-index: 3;
+}
+@keyframes shake {
+  8%, 41% {
+      transform: translateY(-1px);
+  }
+  25%, 58% {
+      transform: translateY(2px);
+  }
+  75% {
+      transform: translateY(-1px);
+  }
+  92% {
+      transform: translateY(1px);
+  }
+  0%, 100% {
+      transform: translateY(0);
+  }
+}
+
+#addbookmarkcontainer.shaking {
+  animation: addbuttonshake 0.42s linear;
+}
+@keyframes addbuttonshake {
+  8%, 41% {
+    padding-right: 0px;
+  }
+  25%, 58% {
+    padding-right: 4px;
+  }
+  75% {
+    padding-right: 0px;
+  }
+  92% {
+    padding-right: 2px;
+  }
+  0%, 100% {
+    padding: 0;
+  }
+}
+
+button.deletebutton {
+  z-index: 1;
+  display: block;
+  position: absolute;
+  width: 21px;
+  height: 21px;
+  right: 20px;
+  top: 8px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 21px;
+  text-align: center;
+  text-decoration: none;
+  color: #999;
+  background: no-repeat center url("close_button.svg");
+}
+button.deletebutton, button.deletebutton:visited {
+  color: #999;
+}
+button.deletebutton:hover {
+  background:url("close_button_hover.svg");
+  background-repeat: no-repeat;
+}
+button.deletebutton:active {
+  background:url("close_button_active.svg");
+  background-repeat: no-repeat;
+}
+
+/* the toolbar */
+#toolbar {
+  position: fixed;
+  z-index: 4;
+  width: 100%;
+  height: 24px;
+  background-image: linear-gradient( #D8E8E8, #CADFDF);
+  box-shadow: 0px 2px 3px 0px rgba(100, 100, 100, 0.65), inset 0 0 0px #CADDDD;
+}
+#searchinputfield {
+  display: block;
+  float: left;
+  height: 24px;
+  line-height: 24px;  
+  width: 1px;
+  font-size: 11px;
+  font-weight: 400;
+  border: 0;
+  padding: 0 0 0 5px;
+}
+#searchshowhidebutton {
+  display: block;
+  float: left;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0px;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+  background-color: rgba(186,226,230,0);
+  transition: background-color 0.08s ease;
+}
+button#addbookmark {
+  height: 24px;
+  line-height: 24px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #3C3C3C;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border: 0;
+  border-radius: 0px;
+  border-left: solid 1px rgb(179, 179, 179);
+  background-color: var(--bgcolorButton);
+  transition: background-color 0.28s ease;
+}
+button#addbookmark:hover {
+  background-color: var(--bgcolorButtonHover);
+  transition: background-color 0.08s ease;
+}
+button#addbookmark:active {
+  background-color: var(--bgcolorButtonActive);
+}
+
+/* searchfield variables */
+#toolbar {
+  --timeSearchFieldHiding: 0.44s;
+  --bgcolorButton: rgba(186,226,230,0);
+  --bgcolorButtonHover: rgba(167, 215, 208, 0.23);
+  --bgcolorButtonActive: rgba(142,181,199,0.29);
+}
+
+/* the searchfield is shown, add button is small */
+#toolbar.showsearchfield input#searchinputfield {
+  animation-name: transition_field_show;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  width: calc(100% - 91px);
+}
+#toolbar.showsearchfield button#searchshowhidebutton {
+  background-image: none;
+  background: no-repeat center url("close_button.svg") #fff;
+  animation-name: transition_button_close;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+#toolbar.showsearchfield button#searchshowhidebutton:hover {
+  background: no-repeat center url("close_button_hover.svg") #fff;
+}
+#toolbar.showsearchfield button#searchshowhidebutton:active {
+  background: no-repeat center url("close_button_active.svg") #fff;
+}
+#toolbar.showsearchfield button#addbookmark {
+  width: 70px;
+  animation-name: transition_button_add_small;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+
+/* the searchfield is hidden, add button is big*/
+#toolbar:not(.showsearchfield) input#searchinputfield {
+  animation-name: transition_field_hide;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  width: 1px;
+  padding-left: 0px;
+  color: transparent;
+  background-color: transparent;
+}
+#toolbar:not(.showsearchfield) button#searchshowhidebutton {
+  animation-name: transition_button_search;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  background: no-repeat center url("search_button.svg") transparent;
+}
+#toolbar:not(.showsearchfield) button#searchshowhidebutton:hover {
+  background: no-repeat center url("search_button.svg") var(--bgcolorButtonHover);
+}
+ #toolbar:not(.showsearchfield) button#searchshowhidebutton:active {
+  background: no-repeat center url("search_button.svg") var(--bgcolorButtonActive);
+}
+#toolbar:not(.showsearchfield) button#addbookmark {
+  width: calc(100% - 22px);
+  animation-name: transition_button_add_large;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+
+/* animations */
+/* suppress all animations during page load */
+body.noanimations * {
+  animation-duration: 0s !important;
+}
+
+/* searchfield transitions */
+/* unfolding */
+@keyframes transition_button_close {
+  0% {
+    background: none center var(--bgcolorButtonActive);
+  }
+  20% {
+    background: none center transparent;
+  }
+  50% {
+    background: none center transparent;
+  }
+  80% {
+    background: none center #fff;
+  }
+  100% {
+    background: no-repeat center url("close_button.svg") #fff;
+  }
+}
+@keyframes transition_field_show {
+  0% {
+    width: 1px;
+    padding-left: 0px;
+    background-color: var(--bgcolorButtonActive);
+    color: transparent;
+  }
+  50% {
+    padding-left: 5px;
+    width: calc(100% - 91px);
+    background-color: var(--bgcolorButtonActive);
+    color: transparent;
+  }
+  80% {
+    background-color: #FFF;
+    color: #3B3B3B;
+  }
+  100% {
+    background-color: #FFF;
+  }
+}
+@keyframes transition_button_add_small {
+  0% {
+    width: calc(100% - 22px);
+  }
+  50% {
+    width: 70px;
+  }
+  100% {
+    width: 70px;
+  }
+}
+
+/* folding */
+@keyframes transition_button_search {
+  0% {
+    background: none center #fff;
+  }
+  80% {
+    background: none center transparent;
+  }
+  100% {
+    background: no-repeat center url("search_button.svg") transparent;
+  }
+}
+@keyframes transition_field_hide {
+  0% {
+    width: calc(100% - 91px);
+    color: transparent;
+    background: none #fff;
+  }
+  80% {
+    width: 1px;
+    padding-left: 0px;
+    background: none transparent;
+  }
+}
+@keyframes transition_button_add_large {
+  0% {
+    width: 70px;
+  }
+  80% {
+    width: calc(100% - 22px);
+  }
+}

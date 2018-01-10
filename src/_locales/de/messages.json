@@ -1,0 +1,22 @@
+{
+    "extensionDescription": {
+      "message": "Unkompliziertes Bookmarking für umtriebige Leser.",
+      "description": ""
+    },
+    "buttonTitle": {
+      "message": "Auf Pile legen",
+      "description": ""
+    },
+    "ExecuteSidebarAction": {
+      "message": "Pile-Seitenleiste zeigen/verbergen",
+      "description": ""
+    },
+    "putOnPileMessage": {
+      "message": "Tab schließen + auf Pile legen",
+      "description": ""
+    },
+    "putAllOnPileMessage": {
+      "message": "ALLE Tabs schließen + auf Pile legen",
+      "description": ""
+    }
+  }
