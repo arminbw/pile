@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Pile - lightweight bookmarking",
   "description": "__MSG_extensionDescription__",
-  "version": "1.4",
+  "version": "1.5",
   "default_locale": "en",
   "applications": {
     "gecko": {
@@ -16,7 +16,12 @@
   "browser_action": {
     "browser_style": false,
     "default_icon": "icons/pile.svg",
-    "default_title": "__MSG_buttonTitle__"
+    "default_title": "__MSG_buttonTitle__",
+    "theme_icons": [{
+      "dark": "icons/pile.svg",
+      "light": "icons/pile_light.svg",
+      "size": 32
+    }]
   },
   "sidebar_action": {
     "default_icon": "icons/pile.svg",

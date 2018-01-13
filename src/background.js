@@ -65,6 +65,7 @@ function initBookmarksListener() {
 /* ------------------------------------------------ */
 // Contextual Menu
 /* ------------------------------------------------ */
+
 // clicking on the contextual menu
 browser.contextMenus.onClicked.addListener((info, tab) => {
   switch(info.menuItemId) {
@@ -104,6 +105,7 @@ browser.contextMenus.create({
 /* ------------------------------------------------ */
 // Core functionality
 /* ------------------------------------------------ */
+
 // get the pile bookmark folder node, or create one if there is none
 // returns a Promise
 function getBookmarkFolderId() {
@@ -300,7 +302,7 @@ function addBookmarkandClose(tab) {
 // TODO: check if some bookmarks couldn't be added and change the badge accordingly
 function addAllBookmarksandClose(windowId) {
   // get the bookmark folder and the an array of all tabs
-  // Todo: promise.all overkill. use wait instead?
+  // TODO: promise.all overkill. use wait instead?
   Promise.all([getBookmarkFolderId(), browser.tabs.query({windowId: windowId})])
   .then(values => {
     let tabs = values[1];

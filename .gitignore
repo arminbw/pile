@@ -8,3 +8,9 @@
 
 node_modules
 build
+package-lock.json
+
+testdata
+test
+testBuild
+testBuildReal
