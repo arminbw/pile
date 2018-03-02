@@ -211,18 +211,14 @@ function filterList(terms) {
     searchStyle.sheet.deleteRule(0);
     searchStyle.sheet.deleteRule(0);
   }
-  if (!terms) {
-    return;
-  }
-  let rule = "";
-  let searchTerms = terms.toLowerCase().split(" ");
-  for (let term of searchTerms) {
-    if (term !== "") {
-      rule = rule + "[data-title*=\"" + term + "\"]";
-    }
-  }
-  rule = "li.bookmark" + rule + " { display: flex; }";
-  searchStyle.sheet.insertRule(rule);
+  if (!terms) return;
+  const searchTerms = terms.toLowerCase().split(" ");
+  let rules = searchTerms.reduce((accumulator, term) => {
+    if (term !== "") accumulator += "[data-title*=\"" + term + "\"]";
+    return accumulator;
+  }, "li.bookmark");
+  rules += " { display: flex; }";
+  searchStyle.sheet.insertRule(rules);
   searchStyle.sheet.insertRule("li.bookmark { display: none; }");
 }
 
