@@ -278,7 +278,7 @@ button#addbookmark:active {
   animation-timing-function: ease-out;
 }
 
-/* the searchfield is hidden, add button is big*/
+/* the searchfield is hidden, add button is big */
 #toolbar:not(.showsearchfield) input#searchinputfield {
   animation-name: transition_field_hide;
   animation-duration: var(--timeSearchFieldHiding);
@@ -319,11 +319,8 @@ body.noanimations * {
   0% {
     background: none center var(--bgcolorButtonActive);
   }
-  20% {
-    background: none center transparent;
-  }
   50% {
-    background: none center transparent;
+    background: none center var(--bgcolorButtonActive);
   }
   80% {
     background: none center #fff;

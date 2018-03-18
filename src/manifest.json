@@ -19,7 +19,7 @@
     "default_title": "__MSG_buttonTitle__",
     "theme_icons": [{
       "dark": "icons/pile.svg",
-      "light": "icons/pile_light.svg",
+      "light": "icons/pile.svg",
       "size": 32
     }]
   },

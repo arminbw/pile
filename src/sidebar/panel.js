@@ -236,7 +236,7 @@ browser.windows.getCurrent({populate: true})
   // the noanimations css class suppresses all animations after page load
   setTimeout(() => {
     document.body.className="";
-  }, 450);
+  }, 650);
 
   // create a new stylesheet for the search/filter (see filterList())
   searchStyle = document.createElement("style");

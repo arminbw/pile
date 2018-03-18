@@ -1,21 +1,18 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<svg version="1.1" id="pileicon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 96 96" style="enable-background:new 0 0 96 96;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#4D4D4D;}
-</style>
-<g>
-	<path class="st0" d="M52.8,52.2c-0.5,0.2-1.3,0.6-1.8,0.9l-2.1,1c-0.5,0.2-1.3,0.2-1.8,0l-2.1-1c-0.5-0.2-1.3-0.6-1.8-0.9l-25-11.9
-		c-0.5-0.2-1.3-0.2-1.8,0l-15.4,7c-0.5,0.2-0.5,0.6,0,0.8l46.1,22c0.5,0.2,1.3,0.2,1.8,0l46.2-22.4c0.5-0.2,0.5-0.6,0-0.8L79.6,40
-		c-0.5-0.2-1.3-0.2-1.8,0L52.8,52.2z"/>
-</g>
-<g>
-	<path class="st0" d="M48.9,0.4c-0.5-0.2-1.3-0.2-1.8,0L0.9,21.2c-0.5,0.2-0.5,0.6,0,0.8l46.1,22c0.5,0.2,1.3,0.2,1.8,0l46.2-22.4
-		c0.5-0.2,0.5-0.6,0-0.8L48.9,0.4z"/>
-</g>
-<g>
-	<path class="st0" d="M52.8,77.7c-0.5,0.2-1.3,0.6-1.8,0.9l-2.1,1c-0.5,0.2-1.3,0.2-1.8,0l-2.1-1c-0.5-0.2-1.3-0.6-1.8-0.9l-25-11.9
-		c-0.5-0.2-1.3-0.2-1.8,0l-15.4,7c-0.5,0.2-0.5,0.6,0,0.8l46.1,22c0.5,0.2,1.3,0.2,1.8,0l46.2-22.4c0.5-0.2,0.5-0.6,0-0.8l-15.4-6.8
-		c-0.5-0.2-1.3-0.2-1.8,0L52.8,77.7z"/>
-</g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<style>.cls-1{fill:#565656;}.cls-2{fill:#a5a5a5;}.cls-3{fill:#727272;}.cls-4{fill:#515151;}.cls-5{fill:#575757;}.cls-6{fill:#7daaa5;}.cls-7{fill:#608787;}.cls-8{fill:#6b6b6b;}</style>
+<symbol id="a" data-name="New Symbol 2" viewBox="0 0 95.89 95.73">
+<polygon class="cls-1" points="48 43.1 0.12 61.07 48 81.21 95.89 61.07"/>
+<polygon class="cls-2" points="0.12 61.07 0.11 75.58 48 95.73 48 81.21"/>
+<polygon class="cls-3" points="95.88 61.09 95.88 75.54 48 95.73 48 81.21"/>
+<polygon class="cls-4" points="65.6 49.73 37.93 60.01 68.11 72.76 95.88 61.09"/>
+<polygon class="cls-5" points="48 0 0.11 17.97 48 38.11 95.88 17.97"/>
+<polygon class="cls-6" points="0.11 17.97 0 48.06 47.88 68.21 48 38.11"/>
+<polygon class="cls-7" points="95.88 17.97 95.88 48.06 48 68.25 48 38.11"/>
+<polygon class="cls-8" points="68.11 72.76 68.11 87.22 95.88 75.53 95.88 61.07"/>
+</symbol>
+</defs>
+<title>pile</title>
+<use transform="translate(0 .13)" width="95.89" height="95.73" data-name="New Symbol 2" xlink:href="#a"/>
 </svg>
