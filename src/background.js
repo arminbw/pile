@@ -295,7 +295,6 @@ async function addAllBookmarksandClose(windowId) {
 /* ------------------------------------------------ */
 // Initialization
 /* ------------------------------------------------ */
-
 browser.tabs.query({active: true, currentWindow: true})
 .then(() => {
   updateBookmarkListNode();

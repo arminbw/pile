@@ -67,14 +67,14 @@ function updateBookmarkListNode() {
     sidebarBookmarkList = document.getElementById("bookmarklist");
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
     sidebarBookmarkList = document.querySelector("#bookmarklist");
-      // add drag&drop event listeners
+      // TODO: Experimental drag&drop event listeners
       for (let li of sidebarBookmarkList.children) {
         li.setAttribute("draggable", "true");
         li.setAttribute("dragstart", function() { li.classList.add("dragged") });
         li.setAttribute("dragover", () => { console.log("Blo");});
-        console.log(li);
+        // console.log(li);
       }
-      console.log(sidebarBookmarkList);
+      // console.log(sidebarBookmarkList);
   
     updateCounter = backgroundscript.updateCounter;
   } else {
@@ -169,37 +169,29 @@ function playCssAnimation(htmlElement, cssClass, animationName) {
 
 // add a bookmark and show an animation
 // do not rebuild the whole list
-function addBookmark() {
-  browser.tabs.query({active: true, currentWindow: true})
-  .then((tabs) => {
-    // check if the page is already bookmarked and on top of the pile
-    if (sidebarBookmarkList.firstChild !== null) {
-      let topEntry = sidebarBookmarkList.firstChild;
-      if (tabs[0].url === topEntry.firstChild.href) {
-        // the page to be added already sits on top of the pile
-        playCssAnimation(topEntry, "shaking", "shake");
-        return;
-      }
+async function addBookmark() {
+  let tabs = await browser.tabs.query({active: true, currentWindow: true})
+  // check if the page is already bookmarked and on top of the pile
+  if (sidebarBookmarkList.firstChild !== null) {
+    let topEntry = sidebarBookmarkList.firstChild;
+    if (tabs[0].url === topEntry.firstChild.href) {
+      playCssAnimation(topEntry, "shaking", "shake");
+      return;
     }
-    if (tabs[0].url !== false) {
-      console.log(sidebarBookmarkList);
-      console.log("tabs[0])");
-      console.log(tabs[0]);
-      updateCounter++;
-      backgroundscript.addBookmark(tabs[0])
-      .then((newbookmark) => {
-        let bookmarkNode = backgroundscript.createBookmarkNode(newbookmark);
-        playCssAnimation(sidebarBookmarkList, "adding", "slidein");
-        sidebarBookmarkList.prepend(bookmarkNode);
-      })
-      .catch(error => {
-        logError("addBookmark/create", error);
-        let errorHtmlElement = document.getElementById('addbookmarkcontainer');
-        playCssAnimation(errorHtmlElement, "shaking", "addbuttonshake");
-      });
-    }
-  })
-  .catch(error => logError("addBookmark/tabs query", error));
+  }
+  if (tabs[0].url !== false) {
+    updateCounter++;
+    try {
+      let newbookmark = await backgroundscript.addBookmark(tabs[0]);
+      let bookmarkNode = backgroundscript.createBookmarkNode(newbookmark);
+      playCssAnimation(sidebarBookmarkList, "adding", "slidein");
+      sidebarBookmarkList.prepend(bookmarkNode);
+    } catch(error) {
+      logError("addBookmark/create", error);
+      let errorHtmlElement = document.getElementById('addbookmarkcontainer');
+      playCssAnimation(errorHtmlElement, "shaking", "addbuttonshake");
+    };
+  }
 }
 
 function toggleSearch() {
@@ -242,15 +234,14 @@ function dragstartHandler(e) {
 /* ------------------------------------------------ */
 // Initialization
 /* ------------------------------------------------ */
-
-// When the sidebar loads, get the ID of its window and fetch the content.
-browser.windows.getCurrent({populate: true})
-.then((windowInfo) => {
-  myWindowId = windowInfo.id;
+async function init() {
+  // When the sidebar loads, get the ID of its window and fetch the content.
+  let windowInfo = await browser.windows.getCurrent({populate: true});
+  let myWindowId = windowInfo.id;
   sidebarBookmarkList = document.querySelector("#bookmarklist");
   contentArea = document.querySelector("#content");
 
-  // the noanimations css class suppresses all animations after page load
+  // the noanimations css class temporarily suppresses all animations after page load
   setTimeout(() => {
     document.body.className="";
   }, 650);
@@ -260,20 +251,21 @@ browser.windows.getCurrent({populate: true})
   searchStyle.appendChild(document.createTextNode(""));
   document.head.appendChild(searchStyle);
 
-  let backgroundPagePromise = browser.runtime.getBackgroundPage()
-  .then((script) => {
-    // remove right click context menu from add button and blank content area
-    contentArea.addEventListener("contextmenu", function(e) {
-      if (e.target.className !== "link") {
-        e.preventDefault();
-      }
-    }, false);
-    browser.runtime.onMessage.addListener(handleMessage);
-    backgroundscript = script;
-    console.log(`panel of window ${myWindowId}: waiting for a first update`);
-    updateBookmarkListNode(); // fetch the list
-    // if the backgroundscript is still building its list, just wait for the update message
-  });
-  return backgroundPagePromise;
-})
-.catch(error => logError("browser.windows.getCurrent", error));
+  // remove right click context menu from add button and blank content area
+  contentArea.addEventListener("contextmenu", function(e) {
+    if (e.target.className !== "link") {
+      e.preventDefault();
+    }
+  }, false);
+
+  // register message handler
+  browser.runtime.onMessage.addListener(handleMessage);
+  console.log(`panel of window ${myWindowId} ready: waiting for a first update`);
+
+  // get the backgroundscript and update the bookmark list
+  backgroundscript = await browser.runtime.getBackgroundPage();
+  updateBookmarkListNode(); // fetch the list
+  // if the backgroundscript is still building its list, just wait for the update message
+}
+
+init();
