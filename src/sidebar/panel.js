@@ -252,7 +252,8 @@ function dragstartHandler(e) {
 async function init() {
   // When the sidebar loads, get the ID of its window and fetch the content.
   let windowInfo = await browser.windows.getCurrent({populate: true});
-  let myWindowId = windowInfo.id;
+  console.log(windowInfo);
+  myWindowId = windowInfo.id;
   sidebarBookmarkList = document.querySelector("#bookmarklist");
   contentArea = document.querySelector("#content");
 

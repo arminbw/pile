@@ -25,18 +25,34 @@ browser.browserAction.onClicked.addListener((activeTab) => {
 });
 
 // changing bookmarks (e.g. via the bookmarks manager)
-// todo: only update if anything changed within the pile folder?
 function initBookmarksListener() {
-  browser.bookmarks.onCreated.addListener(() => {
+  browser.bookmarks.onCreated.addListener(async (id, createdBookmark) => {
     console.log("background: onCreated");
-    semaphore.updateWhenPossible()});
-  browser.bookmarks.onRemoved.addListener(() => {
+    updateIfPiledBookmark(createdBookmark.parentId);
+  });
+  browser.bookmarks.onRemoved.addListener(async (id, removedObject) => {
     console.log("background: onRemoved");
-    semaphore.updateWhenPossible()});
-  browser.bookmarks.onChanged.addListener((e) => {
+    updateIfPiledBookmark(removedObject.parentId);
+  });
+  browser.bookmarks.onChanged.addListener(async (id) => {
     console.log("background: onChanged");
-    semaphore.updateWhenPossible()});
+    let bookmarks = await browser.bookmarks.get(id);
+    updateIfPiledBookmark(bookmarks[0].parentId);
+  });
+  browser.bookmarks.onMoved.addListener(async (id, movedObject) => {
+    console.log("background: onMoved");
+    updateIfPiledBookmark(movedObject.parentId);
+  });
 }
+
+// helper function for browser.bookmarks event listeners
+async function updateIfPiledBookmark(parentId) {
+  let bookmarkFolderId = await getBookmarkFolderId();
+  if (parentId === bookmarkFolderId) {
+    semaphore.updateWhenPossible();
+  }
+}
+
 
 // TODO: browser.bookmarks.onChildrenReordered.addListener(updateContent); // not yet supported by FF
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/bookmarks/onChildrenReordered
