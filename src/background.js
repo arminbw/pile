@@ -4,37 +4,16 @@ window.bookmarkListNode = document.createElement("ul");
 window.updateCounter = 0;
 const bookmarkFolderName = "Pile";
 
+
+/* ------------------------------------------------ */
+// Debugging
+/* ------------------------------------------------ */
+
 function logError(functionName, error) {
   console.error(`Pile background error: ${functionName}, ${error}`);
   showErrorBadge();
 }
 
-// the semaphore rejects unnecessary updates of the bookmark list during more complex operations (e.g. several bookmarks are deleted or reordered at once)
-// registerChange: a bookmark change is going to happen. Increase the process counter.
-// changeFinished: one change has been executed. Update the list, but only if no other changes are currently being processed.
-class Semaphore {
-  constructor() {
-    this.processes = 0;
-  }
-  registerChange() {
-    this.processes++;
-    console.log("background semaphore: register change");
-  }
-  changeFinished() {
-    this.processes--;
-    this.updateWhenPossible();
-  }
-  updateWhenPossible() {
-    if (this.processes === 0) {
-      console.log(`background semaphore update: ${this.processes} processes`);
-      updateBookmarkListNode();
-    } else {
-      console.log("background semaphore: something is being processed. not updating html.");
-      console.log(this.processes);
-    }
-  }
-}
-let semaphore = new Semaphore();
 
 /* ------------------------------------------------ */
 // Browser event listeners
@@ -48,13 +27,13 @@ browser.browserAction.onClicked.addListener((activeTab) => {
 // changing bookmarks (e.g. via the bookmarks manager)
 // todo: only update if anything changed within the pile folder?
 function initBookmarksListener() {
-  browser.bookmarks.onCreated.addListener(() => { 
+  browser.bookmarks.onCreated.addListener(() => {
     console.log("background: onCreated");
     semaphore.updateWhenPossible()});
   browser.bookmarks.onRemoved.addListener(() => {
     console.log("background: onRemoved");
     semaphore.updateWhenPossible()});
-  browser.bookmarks.onChanged.addListener(() => {
+  browser.bookmarks.onChanged.addListener((e) => {
     console.log("background: onChanged");
     semaphore.updateWhenPossible()});
 }
@@ -62,11 +41,12 @@ function initBookmarksListener() {
 // TODO: browser.bookmarks.onChildrenReordered.addListener(updateContent); // not yet supported by FF
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/bookmarks/onChildrenReordered
 
+
 /* ------------------------------------------------ */
 // Contextual Menu
 /* ------------------------------------------------ */
 
-// clicking on the contextual menu
+// clicking on the contextual menu gives the user the option to bookmark and close tabs in one fell swoop
 browser.contextMenus.onClicked.addListener((info, tab) => {
   switch(info.menuItemId) {
     case "putOnPile":
@@ -102,37 +82,44 @@ browser.contextMenus.create({
   contexts: ["tab"]
 }, onCreatedErrorHandler);
 
+
 /* ------------------------------------------------ */
-// Core functionality
+// Data synchronisation
 /* ------------------------------------------------ */
 
-// get the pile bookmark folder node, or create one if there is none
-async function getBookmarkFolderId() {
-  let bookmarks = await browser.bookmarks.search({ title : bookmarkFolderName });
-  // check all bookmarks titled 'Pile'
-  if (bookmarks.length > 0) {
-    for (let bookmark of bookmarks) {
-      if (bookmark.hasOwnProperty('type')) {
-        if (bookmark.type === 'folder') {
-          return bookmark.id;
-        }
-      }
+// the semaphore rejects unnecessary updates of the bookmark list during more complex operations (e.g. several bookmarks are deleted or reordered at once)
+// registerChange: a bookmark change is going to happen. Increase the process counter.
+// changeFinished: one change has been executed. Update the list, but only if no other changes are currently being processed.
+class Semaphore {
+  constructor() {
+    this.processes = 0;
+  }
+  registerChange() {
+    this.processes++;
+    console.log("background semaphore: register change");
+  }
+  changeFinished() {
+    this.processes--;
+    this.updateWhenPossible();
+  }
+  updateWhenPossible() {
+    if (this.processes === 0) {
+      console.log(`background semaphore update: ${this.processes} processes`);
+      updateBookmarkListNode();
+    } else {
+      console.log("background semaphore: something is being processed. not updating html.");
+      console.log(this.processes);
     }
-  } else {
-    // No pile folder was found. Let's create one.
-    semaphore.registerChange();
-    console.log("background: creating bookmark folder");
-    let pileFolderBookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
-    .catch(error => {
-      logError("getBookmarkFolderId", error)
-      throw error; // TODO: DOES THAT WORK https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
-    });
-    semaphore.changeFinished();
-    return bookmark.id;
   }
 }
+let semaphore = new Semaphore();
 
-// rebuild the complete list of bookmarks shown in all sidebars
+
+/* ------------------------------------------------ */
+// Provide the html representation of pile bookmarks
+/* ------------------------------------------------ */
+
+// rebuild the complete list of bookmarks shown in all panels
 // when needed: inform the active panels of all windows to fetch it and update their html
 async function updateBookmarkListNode(bInformActivePanels = true) {
   console.log('background: updating html');
@@ -158,7 +145,7 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
     if (bInformActivePanels === true) {
       console.log("background: sending message");
       browser.runtime.sendMessage({
-        message: "update"
+        message: "updatePilePanel"
       });
     }
   } catch(error) {
@@ -187,27 +174,10 @@ function createBookmarkNode(bookmark) {
   return li;
 }
 
-// show a badge on the toolbar button
-function showBadge(badgeText) {
-  setTimeout(() => {
-    browser.browserAction.setBadgeBackgroundColor({color: "#5591FF"});
-    browser.browserAction.setBadgeText({text: badgeText});
-  }, 120);
-  setTimeout(() => {
-      browser.browserAction.setBadgeText({text: ""});
-  }, 3200);
-}
 
-// give error feedback on the toolbar button
-function showErrorBadge() {
-  setTimeout(() => {
-    browser.browserAction.setBadgeBackgroundColor({color: "#E36A40"});
-    browser.browserAction.setBadgeText({text: "ERR"});
-  }, 120);
-  setTimeout(() => {
-      browser.browserAction.setBadgeText({text: ""});
-  }, 3200);
-}
+/* ------------------------------------------------ */
+// Add or remove bookmarks
+/* ------------------------------------------------ */
 
 function removeBookmark(id) {
   return browser.bookmarks.remove(id);
@@ -239,7 +209,7 @@ async function addBookmark(tab) {
     showBadge(badgeText);
   } catch(error) {
     logError("addBookmark", error);
-    showErrorBadge(); // TODO: test error badge
+    showErrorBadge();
   }
   semaphore.changeFinished();
   return bookmark;
@@ -291,6 +261,65 @@ async function addAllBookmarksandClose(windowId) {
   semaphore.changeFinished();
   return true;
 }
+
+
+/* ------------------------------------------------ */
+// Visual feedback via badge
+/* ------------------------------------------------ */
+
+// show a badge on the toolbar button
+function showBadge(badgeText) {
+  setTimeout(() => {
+    browser.browserAction.setBadgeBackgroundColor({color: "#5591FF"});
+    browser.browserAction.setBadgeText({text: badgeText});
+  }, 120);
+  setTimeout(() => {
+      browser.browserAction.setBadgeText({text: ""});
+  }, 3200);
+}
+
+// give error feedback on the toolbar button
+function showErrorBadge() {
+  setTimeout(() => {
+    browser.browserAction.setBadgeBackgroundColor({color: "#E36A40"});
+    browser.browserAction.setBadgeText({text: "ERR"});
+  }, 120);
+  setTimeout(() => {
+      browser.browserAction.setBadgeText({text: ""});
+  }, 3200);
+}
+
+
+/* ------------------------------------------------ */
+// Helper functions
+/* ------------------------------------------------ */
+
+// get the pile bookmark folder node, or create one if there is none
+async function getBookmarkFolderId() {
+  let bookmarks = await browser.bookmarks.search({ title : bookmarkFolderName });
+  // check all bookmarks titled 'Pile'
+  if (bookmarks.length > 0) {
+    for (let bookmark of bookmarks) {
+      if (bookmark.hasOwnProperty('type')) {
+        if (bookmark.type === 'folder') {
+          return bookmark.id;
+        }
+      }
+    }
+  } else {
+    // No pile folder was found. Let's create one.
+    semaphore.registerChange();
+    console.log("background: creating bookmark folder");
+    let pileFolderBookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
+    .catch(error => {
+      logError("getBookmarkFolderId", error)
+      throw error; // TODO: DOES THAT WORK https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
+    });
+    semaphore.changeFinished();
+    return bookmark.id;
+  }
+}
+
 
 /* ------------------------------------------------ */
 // Initialization

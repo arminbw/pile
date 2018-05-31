@@ -2,14 +2,24 @@
 
 let myWindowId;
 let backgroundscript;
-let updateCounter = 0;    // only update when background script has new content
 let sidebarBookmarkList;
 let contentArea;
 let searchStyle;
 
+// every panel gets the html list of all bookmarks from the backgroundscript
+// to prevent unnecessary updates, we use a counter 
+// the counter gets incremented every time something is changed
+let updateCounter = 0;
+
+
+/* ------------------------------------------------ */
+// Debugging
+/* ------------------------------------------------ */
+
 function logError(functionName, error) {
   console.error(`Pile panel error: ${functionName}, ${error}`);
 }
+
 
 /* ------------------------------------------------ */
 // Event listeners
@@ -54,8 +64,9 @@ browser.tabs.onActivated.addListener((activatedTab) => {
   }
 });
 
+
 /* ------------------------------------------------ */
-// Core functionality
+// Update the list of pile bookmarks in the panel
 /* ------------------------------------------------ */
 
 // get the latest html representation of the bookmarks,
@@ -88,9 +99,9 @@ function updateBookmarkListNode() {
 }
 
 function handleMessage(request, sender, sendResponse) {
-  // Todo: add error handling, etc.
+  // TODO: add error handling, etc.
   console.log(`panel of window ${myWindowId} received message: ${request.message}`);
-  if (request.message === "update") {
+  if (request.message === "updatePilePanel") {
      // The timeout allows the css transition to end before
      // the background does update the list because of a double
      setTimeout(() => {
@@ -98,6 +109,7 @@ function handleMessage(request, sender, sendResponse) {
      }, 380);
   }
 }
+
 
 /* ------------------------------------------------ */
 // Sidebar user interaction
@@ -194,6 +206,7 @@ async function addBookmark() {
   }
 }
 
+// fold/unfold the search input field
 function toggleSearch() {
   let toolbar = document.getElementById('toolbar');
   const cssIDshowSearchField = "showsearchfield"; 
@@ -231,9 +244,11 @@ function dragstartHandler(e) {
   console.log(e);
 }
 
+
 /* ------------------------------------------------ */
 // Initialization
 /* ------------------------------------------------ */
+
 async function init() {
   // When the sidebar loads, get the ID of its window and fetch the content.
   let windowInfo = await browser.windows.getCurrent({populate: true});
@@ -264,7 +279,7 @@ async function init() {
 
   // get the backgroundscript and update the bookmark list
   backgroundscript = await browser.runtime.getBackgroundPage();
-  updateBookmarkListNode(); // fetch the list
+  updateBookmarkListNode();
   // if the backgroundscript is still building its list, just wait for the update message
 }
 
