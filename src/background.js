@@ -6,12 +6,12 @@ const bookmarkFolderName = "Pile";
 
 function logError(functionName, error) {
   console.error(`Pile background error: ${functionName}, ${error}`);
+  showErrorBadge();
 }
 
 // the semaphore rejects unnecessary updates of the bookmark list during more complex operations (e.g. several bookmarks are deleted or reordered at once)
-// registerChange: a bookmark change is going to happen
-//                 increase the process counter
-// changeFinished: one change has been executed. Update the list, if no other changes are being processed.
+// registerChange: a bookmark change is going to happen. Increase the process counter.
+// changeFinished: one change has been executed. Update the list, but only if no other changes are currently being processed.
 class Semaphore {
   constructor() {
     this.processes = 0;
@@ -107,65 +107,49 @@ browser.contextMenus.create({
 /* ------------------------------------------------ */
 
 // get the pile bookmark folder node, or create one if there is none
-// returns a Promise
-function getBookmarkFolderId() {
-  let bookmarkFolderPromise = new Promise((resolve, reject) => {
-    browser.bookmarks.search({ title : bookmarkFolderName })
-    .then(bookmarks => {
-      // check all bookmarks titled 'Pile'
-      if (bookmarks.length > 0) {
-        for (let bookmark of bookmarks) {
-          // FF version > 57 needed for this
-          if (bookmark.hasOwnProperty('type')) {
-            if (bookmark.type === 'folder') {
-              return resolve(bookmark.id);
-            }
-          }
+async function getBookmarkFolderId() {
+  let bookmarks = await browser.bookmarks.search({ title : bookmarkFolderName });
+  // check all bookmarks titled 'Pile'
+  if (bookmarks.length > 0) {
+    for (let bookmark of bookmarks) {
+      if (bookmark.hasOwnProperty('type')) {
+        if (bookmark.type === 'folder') {
+          return bookmark.id;
         }
-        // none of the found pile bookmarks is a folder
       }
-      // no pile folder available, let's create one
-      // Todo: folder icon pileIcon = request("images/pile.ico");
-      // Todo: proper error handling
-      semaphore.registerChange();
-      browser.bookmarks.create({ title: bookmarkFolderName })
-      .then((bookmarkFolder) => {
-        console.log("background: creating bookmark folder");
-        resolve(bookmarkFolder.id);
-        semaphore.changeFinished();
-      })
-      .catch(error => {
-        reject(error);
-        semaphore.changeFinished();
-      });
+    }
+  } else {
+    // No pile folder was found. Let's create one.
+    semaphore.registerChange();
+    console.log("background: creating bookmark folder");
+    let pileFolderBookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
+    .catch(error => {
+      logError("getBookmarkFolderId", error)
+      throw error; // TODO: DOES THAT WORK https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
     });
-  });
-  return bookmarkFolderPromise;
+    semaphore.changeFinished();
+    return bookmark.id;
+  }
 }
 
 // rebuild the complete list of bookmarks shown in all sidebars
 // when needed: inform the active panels of all windows to fetch it and update their html
-// returns a Promise
-function updateBookmarkListNode(bInformActivePanels = true) {
+async function updateBookmarkListNode(bInformActivePanels = true) {
   console.log('background: updating html');
-  // search for a bookmark folder called 'pile' and get the subtree of it
-  let updateBookmarkListNodesPromise = getBookmarkFolderId()
-  .then(bookmarkFolderId => {
+  try {
+    let bookmarkFolderId = await getBookmarkFolderId();
     // TODO: the node returned by .search does not have children, but the node returned by .subtree does.
     // remove this extra step, when clarified
-    return browser.bookmarks.getSubTree(bookmarkFolderId);
-  })
-  .then(bookMarkFolderTree => {
+    let piledBookmarksTree = await browser.bookmarks.getSubTree(bookmarkFolderId);
     // go through all the children of the pile folder
     window.bookmarkListNode = document.createElement("ul");
     window.bookmarkListNode.id = "bookmarklist";
-    if (bookMarkFolderTree[0].hasOwnProperty("children")) {
-      for (let bookmark of bookMarkFolderTree[0].children) {
+    if (piledBookmarksTree[0].hasOwnProperty("children")) {
+      for (let bookmark of piledBookmarksTree[0].children) {
         window.bookmarkListNode.appendChild(createBookmarkNode(bookmark));
       }
     }
-    // the updateCounter helps to the panel.js to check, if it needs an update or not
-    // TODO: remove this complexity and just deal with the extra copy?
+    // the updateCounter allows panel.js to check if it needs to update its DOM or not
     window.updateCounter++;
     if (window.updateCounter > 1023) { 
       window.updateCounter = 0;
@@ -177,10 +161,10 @@ function updateBookmarkListNode(bInformActivePanels = true) {
         message: "update"
       });
     }
-    return;
-  })
-  .catch(error => logError("updateBookmarkListNode", error));
-  return updateBookmarkListNodesPromise;
+  } catch(error) {
+    logError("updateBookmarkListNode", error);
+  }
+  return; 
 }
 
 // return html code representing a single bookmark 
@@ -200,7 +184,7 @@ function createBookmarkNode(bookmark) {
   button.setAttribute("title", "remove");
   li.appendChild(a);
   li.appendChild(button);
-  return li; 
+  return li;
 }
 
 // show a badge on the toolbar button
@@ -230,97 +214,82 @@ function removeBookmark(id) {
 }
 
 // add a bookmark
-// returns a Promise with a newly added BookmarkTreeNode
-function addBookmark(tab) {
+// returns the promise of a newly added BookmarkTreeNode
+async function addBookmark(tab) {
   let badgeText = "+1";
-  semaphore.registerChange();
-  let addBookmarkPromise = getBookmarkFolderId()
-  .then((bookmarkFolderId) => {
-    // check if the bookmarks already exists
-    let createBookmarkPromise = browser.bookmarks.search({url: tab.url})
-    .then((bookmarks) => {
-        if (bookmarks.length > 0) {
-          // delete doubles if they exist and change the badgeText
-          for (let bookmark of bookmarks) {
-            if (bookmarkFolderId === bookmark.parentId) {
-              removeBookmark(bookmark.id);
-              window.updateCounter++;
-            }
-            badgeText = "⬆";
-          }
+  let bookmark = undefined;
+  try {
+    semaphore.registerChange();
+    let bookmarkFolderId = await getBookmarkFolderId();
+    // check if the bookmark already exists
+    let bookmarks = await browser.bookmarks.search({url: tab.url})
+    if (bookmarks.length > 0) {
+      // delete doubles if they exist and change the badgeText
+      for (let bookmark of bookmarks) {
+        if (bookmarkFolderId === bookmark.parentId) {
+          removeBookmark(bookmark.id);
+          window.updateCounter++;
         }
-        return;
-    })
-    .then(() => {
-      return browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId});
-    })
-    return createBookmarkPromise;
-  })
-  .then((newbookmark) => {
+        badgeText = "⬆";
+      }
+    }
+    console.log("adding");
+    bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId});
+    console.log(bookmark);
     showBadge(badgeText);
-    semaphore.changeFinished();
-    return newbookmark;
-  })
-  .catch(error => {
+  } catch(error) {
     logError("addBookmark", error);
-    showErrorBadge(badgeText);
-    semaphore.changeFinished();
-    return error;
-  });
-  return addBookmarkPromise;
+    showErrorBadge(); // TODO: test error badge
+  }
+  semaphore.changeFinished();
+  return bookmark;
 }
 
 // add a bookmark and close the tab
-// returns a promise
-function addBookmarkandClose(tab) {
-  semaphore.registerChange();
-  let addBookmarkAndClosePromise = addBookmark(tab)
-  .then(() => {
-    return browser.tabs.query({ windowId: tab.windowId });
-  })
-  .then((tabs) => {
+async function addBookmarkandClose(tab) {
+  try {
+    semaphore.registerChange();
+    let bookmark = await addBookmark(tab);
+    let tabs = await browser.tabs.query({ windowId: tab.windowId });
     if (tabs.length === 1) { 
-      browser.tabs.create({})
-      .then(() => {
-        return browser.tabs.remove(tab.id);
-      });
+      await browser.tabs.create({});
+      await browser.tabs.remove(tab.id);
     } else {
-      return browser.tabs.remove(tab.id);
+      await browser.tabs.remove(tab.id);
     }
-  })
-  .then(() => {
-    semaphore.changeFinished();
-  })
-  .catch(error => {
+  } catch(error) {
     logError("addBookmarkandClose", error);
     semaphore.changeFinished();
-  });
-  return addBookmarkAndClosePromise;
+    return false;
+  }
+  semaphore.changeFinished();
+  return true;
 }
 
 // close all tabs and bookmark all urls before
-// TODO: check if some bookmarks couldn't be added and change the badge accordingly
-function addAllBookmarksandClose(windowId) {
+async function addAllBookmarksandClose(windowId) {
   // get the bookmark folder and the an array of all tabs
-  // TODO: promise.all overkill. use wait instead?
-  Promise.all([getBookmarkFolderId(), browser.tabs.query({windowId: windowId})])
-  .then(values => {
-    let tabs = values[1];
-    // now create bookmarks and close tabs in parallel
+  let bookmarkFolderId = await getBookmarkFolderId();
+  let tabs = await browser.tabs.query({windowId: windowId});
+  try {
     semaphore.registerChange();
-    Promise.all(tabs.map(tab => {
-      return addBookmarkandClose(tab);
-    }))
-    .then(() => {
-      showBadge(`+${tabs.length}`);
-      console.log("all closed");
-      semaphore.changeFinished();
-    })
-    .catch(error => {
-      logError("addAllBookmarksandClose", error);
-      semaphore.changeFinished();
-    });  
-  })
+    let counter = 0;
+    // create bookmarks and close tabs in parallel
+    await Promise.all(tabs.map(tab => {
+      if (addBookmarkandClose(tab)) {
+        counter++;
+      }
+    }));
+    // TODO: test badge
+    showBadge(`+${counter}`);
+    console.log("all closed");
+  } catch(error) {
+    logError("addBookmarkandClose", error);
+    semaphore.changeFinished();
+    return false;
+  }
+  semaphore.changeFinished();
+  return true;
 }
 
 /* ------------------------------------------------ */

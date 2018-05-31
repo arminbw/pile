@@ -67,6 +67,15 @@ function updateBookmarkListNode() {
     sidebarBookmarkList = document.getElementById("bookmarklist");
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
     sidebarBookmarkList = document.querySelector("#bookmarklist");
+      // add drag&drop event listeners
+      for (let li of sidebarBookmarkList.children) {
+        li.setAttribute("draggable", "true");
+        li.setAttribute("dragstart", function() { li.classList.add("dragged") });
+        li.setAttribute("dragover", () => { console.log("Blo");});
+        console.log(li);
+      }
+      console.log(sidebarBookmarkList);
+  
     updateCounter = backgroundscript.updateCounter;
   } else {
     console.log(`panel of window ${myWindowId}: no need to update`);
@@ -174,6 +183,7 @@ function addBookmark() {
     }
     if (tabs[0].url !== false) {
       console.log(sidebarBookmarkList);
+      console.log("tabs[0])");
       console.log(tabs[0]);
       updateCounter++;
       backgroundscript.addBookmark(tabs[0])
@@ -220,6 +230,13 @@ function filterList(terms) {
   rules += " { display: flex; }";
   searchStyle.sheet.insertRule(rules);
   searchStyle.sheet.insertRule("li.bookmark { display: none; }");
+}
+
+// TODO: experimental!
+function dragstartHandler(e) {
+  e.stopPropagation();
+  console.log("dragstart");
+  console.log(e);
 }
 
 /* ------------------------------------------------ */
