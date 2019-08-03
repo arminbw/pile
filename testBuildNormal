@@ -1,1 +1,0 @@
-web-ext run --source-dir build --firefox=/Applications/Firefox.app/Contents/MacOS/firefox-bin --firefox-profile=testdata/ff-dev-profile --browser-console --verbose
