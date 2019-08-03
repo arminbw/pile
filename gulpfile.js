@@ -1,7 +1,7 @@
 
 /* File: gulpfile.js */
 
-// grab gulp packages
+// grab gulp 3 packages
 const gulp  = require('gulp'),
     gutil = require('gulp-util'),
     decomment = require('gulp-decomment');
