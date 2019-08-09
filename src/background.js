@@ -66,7 +66,7 @@ async function updateIfPiledBookmark(parentId) {
 browser.contextMenus.onClicked.addListener((info, tab) => {
   switch(info.menuItemId) {
     case "putOnPile":
-      addBookmarkandClose(tab);
+      addBookmarkandClose(tab, true);
       break;
     case "putAllOnPile":
       addAllBookmarksandClose(tab.windowId);
@@ -104,7 +104,7 @@ browser.contextMenus.create({
 /* ------------------------------------------------ */
 
 // the semaphore rejects unnecessary updates of the bookmark list during more complex operations (e.g. several bookmarks are deleted or reordered at once)
-// registerChange: a bookmark change is going to happen. Increase the process counter.
+// registerChange: one or more bookmark changes are going to happen. Increase the process counter.
 // changeFinished: one change has been executed. Update the list, but only if no other changes are currently being processed.
 class Semaphore {
   constructor() {
@@ -207,6 +207,10 @@ async function addBookmark(tab) {
   try {
     semaphore.registerChange();
     let bookmarkFolderId = await getBookmarkFolderId();
+    // do not add empty "about:blank" (new empty tab) bookmarks
+    if (tab.url === 'about:blank') {
+      throw "Not adding about:blank page";
+    }
     // check if the bookmark already exists
     let bookmarks = await browser.bookmarks.search({url: tab.url})
     if (bookmarks.length > 0) {
@@ -232,16 +236,21 @@ async function addBookmark(tab) {
 }
 
 // add a bookmark and close the tab
-async function addBookmarkandClose(tab) {
+async function addBookmarkandClose(tab, removePinned) {
   try {
     semaphore.registerChange();
-    let bookmark = await addBookmark(tab);
     let tabs = await browser.tabs.query({ windowId: tab.windowId });
-    if (tabs.length === 1) { 
-      await browser.tabs.create({});
-      await browser.tabs.remove(tab.id);
-    } else {
-      await browser.tabs.remove(tab.id);
+    // only remove pinned tabs when the user explicitly says so
+    console.log("PINNED?");
+    console.log(tab.pinned);
+    if ((removePinned === true) || (tab.pinned === false)) {
+      let bookmark = await addBookmark(tab);
+      if (tabs.length === 1) {
+        await browser.tabs.create({});
+        await browser.tabs.remove(tab.id);
+      } else {
+        await browser.tabs.remove(tab.id);
+      }
     }
   } catch(error) {
     logError("addBookmarkandClose", error);
@@ -262,7 +271,7 @@ async function addAllBookmarksandClose(windowId) {
     let counter = 0;
     // create bookmarks and close tabs in parallel
     await Promise.all(tabs.map(tab => {
-      if (addBookmarkandClose(tab)) {
+      if (addBookmarkandClose(tab, false)) {
         counter++;
       }
     }));
@@ -298,7 +307,7 @@ function showBadge(badgeText) {
 function showErrorBadge() {
   setTimeout(() => {
     browser.browserAction.setBadgeBackgroundColor({color: "#E36A40"});
-    browser.browserAction.setBadgeText({text: "ERR"});
+    browser.browserAction.setBadgeText({text: "X"});
   }, 120);
   setTimeout(() => {
       browser.browserAction.setBadgeText({text: ""});

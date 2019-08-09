@@ -16,7 +16,7 @@
     "description": "Close the tab and put a bookmark in the Pile bookmark folder."
   },
   "putAllOnPileMessage": {
-    "message": "Put ALL tabs on the Pile and close them.",
-    "description": "Close ALL tabs and put a bookmark for each of them in the Pile's bookmark folder."
+    "message": "Put ALL unpinned tabs on the Pile and close them.",
+    "description": "Close ALL unpinned tabs and put a bookmark for each of them in the Pile's bookmark folder."
   }
 }

@@ -12,11 +12,11 @@
       "description": ""
     },
     "putOnPileMessage": {
-      "message": "Tab schließen + auf Pile legen",
+      "message": "Tab schließen und auf Pile legen",
       "description": ""
     },
     "putAllOnPileMessage": {
-      "message": "ALLE Tabs schließen + auf Pile legen",
+      "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen",
       "description": ""
     }
   }
