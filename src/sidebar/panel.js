@@ -48,6 +48,11 @@ window.addEventListener("click", (event) => {
       toggleSearch();
       return;
     }
+    // switch to delete-all mode
+    if (event.target.dataset.functionname === "startcleanup") {
+      startCleanupMode();
+      return;
+    }
   }
 });
 
@@ -200,7 +205,9 @@ async function addBookmark() {
       sidebarBookmarkList.prepend(bookmarkNode);
     } catch(error) {
       logError("addBookmark/create", error);
-      let errorHtmlElement = document.getElementById('addbookmarkcontainer');
+      console.log('shaking');
+      // TODO: no shake. css class seems to have low priority
+      let errorHtmlElement = document.getElementById('addbookmark');
       playCssAnimation(errorHtmlElement, "shaking", "addbuttonshake");
     };
   }
@@ -208,7 +215,7 @@ async function addBookmark() {
 
 // fold/unfold the search input field
 function toggleSearch() {
-  let toolbar = document.getElementById('toolbar');
+  const toolbar = document.getElementById('toolbar');
   const cssIDshowSearchField = "showsearchfield"; 
   if (toolbar.classList.contains(cssIDshowSearchField)) {
     document.getElementById('searchinputfield').value = "";
@@ -237,11 +244,11 @@ function filterList(terms) {
   searchStyle.sheet.insertRule("li.bookmark { display: none; }");
 }
 
-// TODO: experimental!
-function dragstartHandler(e) {
-  e.stopPropagation();
-  console.log("dragstart");
-  console.log(e);
+// switch to cleanup mode
+function startCleanupMode() {
+  console.log("cleanup mode");
+  const content = document.getElementById('content');
+  content.classList.add("cleanupmode");
 }
 
 

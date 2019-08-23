@@ -131,7 +131,7 @@ a.link, a.link:visited {
   }
 }
 
-#addbookmarkcontainer.shaking {
+#addbookmark.shaking {
   animation: addbuttonshake 0.42s linear;
 }
 @keyframes addbuttonshake {
@@ -148,7 +148,7 @@ a.link, a.link:visited {
     padding-right: 2px;
   }
   0%, 100% {
-    padding: 0;
+    padding-right: 0px;
   }
 }
 
@@ -216,6 +216,23 @@ button.deletebutton:active {
   background-color: rgba(186,226,230,0);
   transition: background-color 0.08s ease;
 }
+button#cleanupbutton {
+  display: block;
+  float: left;
+  border: 0;
+  border-left: solid 1px rgb(179, 179, 179);
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0px;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+  background-color: rgba(186,226,230,0);
+  background: no-repeat center url("cleanup_button.svg");
+  transition: background-color 0.08s ease;
+}
 button#addbookmark {
   height: 24px;
   line-height: 24px;
@@ -230,7 +247,7 @@ button#addbookmark {
   text-align: center;
   text-decoration: none;
   border: 0;
-  border-radius: 0px;
+  border-radius: 0px; 
   border-left: solid 1px rgb(179, 179, 179);
   background-color: var(--bgcolorButton);
   transition: background-color 0.28s ease;
@@ -256,10 +273,9 @@ button#addbookmark:active {
   animation-name: transition_field_show;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
-  width: calc(100% - 91px);
-}
+  width: calc(100% - 112px);
+} 
 #toolbar.showsearchfield button#searchshowhidebutton {
-  background-image: none;
   background: no-repeat center url("close_button.svg") #fff;
   animation-name: transition_button_close;
   animation-duration: var(--timeSearchFieldHiding);
@@ -301,7 +317,7 @@ button#addbookmark:active {
   background: no-repeat center url("search_button.svg") var(--bgcolorButtonActive);
 }
 #toolbar:not(.showsearchfield) button#addbookmark {
-  width: calc(100% - 22px);
+  width: calc(100% - 43px);
   animation-name: transition_button_add_large;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
@@ -338,7 +354,7 @@ body.noanimations * {
   }
   50% {
     padding-left: 5px;
-    width: calc(100% - 91px);
+    width: calc(100% - 112px);
     background-color: var(--bgcolorButtonActive);
     color: transparent;
   }
@@ -352,7 +368,7 @@ body.noanimations * {
 }
 @keyframes transition_button_add_small {
   0% {
-    width: calc(100% - 22px);
+    width: calc(100% - 43px);
   }
   50% {
     width: 70px;
@@ -376,7 +392,7 @@ body.noanimations * {
 }
 @keyframes transition_field_hide {
   0% {
-    width: calc(100% - 91px);
+    width: calc(100% - 112px);
     color: transparent;
     background: none #fff;
   }
@@ -391,10 +407,23 @@ body.noanimations * {
     width: 70px;
   }
   80% {
-    width: calc(100% - 22px);
+    width: calc(100% - 43px);
   }
 }
 
-.dragged {
-  background-color: red !important;
+/* cleanup mode */
+#content.cleanupmode #toolbar {
+  height: 48px;
+}
+
+#content.cleanupmode #bookmarklist {
+  margin-top: 48px;
+}
+
+#content.cleanupmode #cleanupbutton {
+  display: none;
+}
+
+#content.cleanupmode #addbookmarkcontainer {
+  display: none;
 }

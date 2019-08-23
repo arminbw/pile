@@ -13,6 +13,7 @@
     <div id="toolbar">
       <input type="search" placeholder="search" id="searchinputfield"/>
       <button data-functionname="togglesearch" id="searchshowhidebutton"></button>
+      <button data-functionname="startcleanup" id="cleanupbutton"></button>
       <div id="addbookmarkcontainer"><button data-functionname="addbookmark" id="addbookmark">ADD PAGE</button></div>
     </div>
     <ul id="bookmarklist">
@@ -21,6 +22,14 @@
         <button class="deletebutton" data-deleteid=""></button>
       </li>
     </ul>
+    <div id="cleanupbutton" data-functionname="startcleanup">
+      DEL
+    </div>
+    <div id="bottombar">
+      <div>200 bookmarks will be deleted</div>
+      <div class="cancelbutton">cancel</div>
+      <div><a class="link" href="http://www.arminbwagner.com">armin</a></div>
+    </div>
   </div>
   <script src="panel.js"></script>
 </body>
