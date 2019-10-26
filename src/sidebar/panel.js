@@ -274,20 +274,6 @@ function startCleanupMode() {
 // turn off cleanup mode
 function stopCleanupMode() {
   console.log("cleanup mode stopping");
-  const content = document.getElementById('content');
-  content.classList.remove("cleanupmode");
-  //hideSearch();
-  let cleanupbar = document.getElementById('cleanupbar');
-  cleanupbar.classList.add("test");
-  console.log(cleanupbar);
-  /*playCssAnimation(cleanupbar, 'foldcleanupbar', 'transition_cleanupbar_fold');
-  let endCleanupMode = function(event) {
-    if (event.animationName === 'transition_cleanupbar_fold') {
-      document.getElementById('content').classList.remove("cleanupmode");
-      cleanupbar.removeEventListener("animationend", endCleanupMode);
-    }
-  }
-  cleanupbar.addEventListener("animationend", endCleanupMode, false);*/
   document.getElementById('content').classList.remove("cleanupmode");
 }
 
