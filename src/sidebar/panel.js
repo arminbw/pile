@@ -48,9 +48,14 @@ window.addEventListener("click", (event) => {
       toggleSearch();
       return;
     }
-    // switch to delete-all mode
+    // switch to cleanup mode
     if (event.target.dataset.functionname === "startcleanup") {
       startCleanupMode();
+      return;
+    }
+    // cancel cleanup
+    if (event.target.dataset.functionname === "cancelcleanup") {
+      stopCleanupMode();
       return;
     }
   }
@@ -175,6 +180,9 @@ function getBookmarkListElement(bookmarkid) {
 function playCssAnimation(htmlElement, cssClass, animationName) {
   htmlElement.classList.add(cssClass);
   console.log("playing css animation");
+  console.log(htmlElement);
+  console.log(cssClass);
+  console.log(animationName);
   let stopAnimation = function(event) {
     if (event.animationName === animationName) {
       htmlElement.classList.remove(cssClass);
@@ -218,13 +226,25 @@ function toggleSearch() {
   const toolbar = document.getElementById('toolbar');
   const cssIDshowSearchField = "showsearchfield"; 
   if (toolbar.classList.contains(cssIDshowSearchField)) {
-    document.getElementById('searchinputfield').value = "";
-    filterList("");
-    toolbar.classList.remove(cssIDshowSearchField);
+    hideSearch();
   } else {
-    toolbar.classList.add(cssIDshowSearchField);
-    document.getElementById('searchinputfield').focus();
+    showSearch();
   }
+}
+
+function showSearch() {
+  const toolbar = document.getElementById('toolbar');
+  const cssIDshowSearchField = "showsearchfield";
+  toolbar.classList.add(cssIDshowSearchField);
+  document.getElementById('searchinputfield').focus(); 
+}
+
+function hideSearch() {
+  const toolbar = document.getElementById('toolbar');
+  const cssIDshowSearchField = "showsearchfield";
+  document.getElementById('searchinputfield').value = "";
+  filterList("");
+  toolbar.classList.remove(cssIDshowSearchField);
 }
 
 // hackish search/filter functionality (don't try this at home!)
@@ -246,11 +266,30 @@ function filterList(terms) {
 
 // switch to cleanup mode
 function startCleanupMode() {
-  console.log("cleanup mode");
+  console.log("cleanup mode starting");
   const content = document.getElementById('content');
   content.classList.add("cleanupmode");
 }
 
+// turn off cleanup mode
+function stopCleanupMode() {
+  console.log("cleanup mode stopping");
+  const content = document.getElementById('content');
+  content.classList.remove("cleanupmode");
+  //hideSearch();
+  let cleanupbar = document.getElementById('cleanupbar');
+  cleanupbar.classList.add("test");
+  console.log(cleanupbar);
+  /*playCssAnimation(cleanupbar, 'foldcleanupbar', 'transition_cleanupbar_fold');
+  let endCleanupMode = function(event) {
+    if (event.animationName === 'transition_cleanupbar_fold') {
+      document.getElementById('content').classList.remove("cleanupmode");
+      cleanupbar.removeEventListener("animationend", endCleanupMode);
+    }
+  }
+  cleanupbar.addEventListener("animationend", endCleanupMode, false);*/
+  document.getElementById('content').classList.remove("cleanupmode");
+}
 
 /* ------------------------------------------------ */
 // Initialization

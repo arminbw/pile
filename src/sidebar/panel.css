@@ -266,6 +266,8 @@ button#addbookmark:active {
   --bgcolorButton: rgba(186,226,230,0);
   --bgcolorButtonHover: rgba(167, 215, 208, 0.23);
   --bgcolorButtonActive: rgba(142,181,199,0.29);
+  --timeCleanupUnfold: 0.44s;
+  --timeCleanupFold: 0.44s;
 }
 
 /* the searchfield is shown, add button is small */
@@ -313,7 +315,7 @@ button#addbookmark:active {
 #toolbar:not(.showsearchfield) button#searchshowhidebutton:hover {
   background: no-repeat center url("search_button.svg") var(--bgcolorButtonHover);
 }
- #toolbar:not(.showsearchfield) button#searchshowhidebutton:active {
+#toolbar:not(.showsearchfield) button#searchshowhidebutton:active {
   background: no-repeat center url("search_button.svg") var(--bgcolorButtonActive);
 }
 #toolbar:not(.showsearchfield) button#addbookmark {
@@ -412,18 +414,293 @@ body.noanimations * {
 }
 
 /* cleanup mode */
+
+/* animation */
+
 #content.cleanupmode #toolbar {
   height: 48px;
+  animation-name: transition_toolbar_show_full_height;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+}
+@keyframes transition_toolbar_show_full_height {
+  0% {
+    height: 24px;
+  }
+  20% {
+    height: 24px;
+  }
+  75% {
+    height: 48px;
+  }
 }
 
-#content.cleanupmode #bookmarklist {
+/* folding back from cleanup mode */
+#content:not(.cleanupmode) #toolbar {
+  animation-name: transition_toolbar_reduce_height;
+  animation-duration: var(--timeCleanupFold);
+  animation-timing-function: ease-in;
+}
+@keyframes transition_toolbar_reduce_height {
+  0% {
+    height: 48px;
+  }
+  20% {
+    height: 48px;
+  }
+  75% {
+    height: 24px;
+  }
+  100% {
+    height: 24px,
+  }
+}
+
+#content.cleanupmode ul#bookmarklist {
   margin-top: 48px;
+  transition: all;
+  transition-duration: var(--timeCleanupUnfold);
 }
 
-#content.cleanupmode #cleanupbutton {
-  display: none;
+#content #cleanupbar {
+  opacity: 0;
+  transition: all;
+  transition-duration: 400ms;
+  transition-delay: 0s;
+}
+
+#content.cleanupmode #cleanupbar {
+  opacity: 1;
+  transition: all;
+  transition-delay: var(--timeCleanupUnfold);
+  transition-duration: 400ms;
+}
+
+.deleteselectedbutton,
+.cancelcleanupbutton {
+  opacity: 0;
+  transition: all;
+  transition-duration: 120ms;
+  transition-delay: 0s;
+}
+
+#content.cleanupmode .deleteselectedbutton,
+#content.cleanupmode .cancelcleanupbutton {
+  opacity: 1;
+  transition-duration: 100ms;
+  transition-delay: calc(var(--timeCleanupUnfold) + 40ms);
+}
+
+#content.cleanupmode .cancelcleanupbutton {
+  transition-delay: calc(var(--timeCleanupUnfold) + 120ms);
+}
+
+/* animation not done yet */
+
+#content.cleanupmode #selectallbutton {
+  display: block;
 }
 
 #content.cleanupmode #addbookmarkcontainer {
   display: none;
+}
+
+.cleanupcounter {
+  display: none;
+}
+
+#content.cleanupmode .cleanupcounter {
+  display: inline-block;
+}
+
+button#selectallbutton {
+  display: none;
+}
+
+/* actual stuff */
+
+#content #cleanupbar {
+  background-color: #B2D1D7;
+}
+
+.deleteselectedbutton {
+  display: inline-block;
+  text-align: center;
+  width: calc(50% - 6px);
+  height: 18px;
+  background-color: #E33F5B;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  margin: 3px 2px 3px 4px;
+  border-radius: 3px;
+}
+
+.cancelcleanupbutton {
+  display: inline-block;
+  text-align: center;
+  width: calc(50% - 6px);
+  height: 18px;
+  background-color: #38383D;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  margin: 3px 4px 3px 2px;
+  border-radius: 3px;
+}
+
+.cleanupcounter {
+  height: 24px;
+  font-size: 11px;
+  line-height: 24px;
+  padding: 0 5px 0 5px;
+}
+
+button#selectallbutton {
+  float: right;
+  text-align: center;
+  width: 42px;
+  height: 18px;
+  color: #797979;
+  font-size: 11px;
+  line-height: 16px;
+  border-radius: 3px;
+  border: solid 1px #797979;
+  padding: 0;
+  margin: 3px 4px 3px 4px;
+  text-align: center;
+  text-decoration: none;
+  background: none;
+  outline: none;
+}
+
+/*#content.cleanupmode #searchshowhidebutton {
+  display: none;
+}*/
+
+/*#content.cleanupmode #toolbar input#searchinputfield {
+  float: none;
+  width: 100%;
+}*/
+
+/* cleanup transitions */
+/* unfolding */
+/*#content.cleanupmode #toolbar.showsearchfield input#searchinputfield {
+  animation-name: transition_cleanup_field_expand_further;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+  width: 100%;
+}
+@keyframes transition_cleanup_field_expand_further {
+  0% {
+    border-right: solid 1px rgb(179, 179, 179);
+    width: calc(100% - 90px);
+  }
+  10% {
+    width: 100%;
+    border: 0;
+  }
+}*/
+
+#content.cleanupmode .selectedforcleanup {
+  animation-name: transition_cleanup_selected_text_fadein;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+}
+@keyframes transition_cleanup_selected_text_fadein {
+  0% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/*#content.cleanupmode #toolbar.showsearchfield #cleanupbutton {
+  animation-name: transition_cleanup_selected_text_fadein;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+  transform: translate(0,0);
+}*/
+
+/* unfolding if the searchbar is not shown already */
+/*#content.cleanupmode #toolbar:not(.showsearchfield) #cleanupbutton {
+  animation-name: transition_cleanup_icon_move;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+  display: block;
+  border: 0;
+  transform: translate(0px,0px);
+}
+@keyframes transition_cleanup_icon_move {
+  0% {
+    transform: translate(21px, -24px);
+  }
+  20% {
+    transform: translate(0px, -24px);
+  }
+  75% {
+    transform: translate(0px,0px);
+  }
+}
+
+#content.cleanupmode #toolbar:not(.showsearchfield) input#searchinputfield {
+  animation-name: transition_cleanup_field_fadein;
+  animation-duration: var(--timeCleanupUnfold);
+  animation-timing-function: ease-out;
+  width: 100%;
+}
+@keyframes transition_cleanup_field_fadein {
+  0% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}*/
+
+/*#cleanupbar.foldcleanupbar {
+  animation-name: transition_cleanupbar_fold;
+  animation-duration: var(--timeCleanupFold);
+  animation-timing-function: ease-in;
+}
+@keyframes transition_cleanupbar_fold {
+  0% {
+    opacity: 1;
+    transform: translate(0,0);
+  }
+  20% {
+    opacity: 0;
+    transform: translate(0,0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0,0);
+  }
+}*/
+
+#content:not(.cleanupmode) .cleanupcounter,
+#content:not(.cleanupmode) .deleteselectedbutton,
+#content:not(.cleanupmode) .cancelcleanupbutton,
+{
+  animation-name: transition_cleanup_fadeout;
+  animation-duration: var(--timeCleanupFold);
+  animation-timing-function: ease-out;
+}
+@keyframes transition_cleanup_fadeout {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
