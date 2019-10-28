@@ -185,8 +185,14 @@ function createBookmarkNode(bookmark) {
   button.classList.add("deletebutton");
   button.setAttribute("data-deleteid", bookmark.id);
   button.setAttribute("title", "remove");
+  let checkbox = document.createElement("input"); 
+  checkbox.classList.add("cleanupcheckbox");
+  checkbox.setAttribute("type", "checkbox");
+  checkbox.setAttribute("data-deleteid", bookmark.id);
+  checkbox.setAttribute("title", "mark for deletion");
   li.appendChild(a);
   li.appendChild(button);
+  li.appendChild(checkbox);
   return li;
 }
 

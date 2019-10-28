@@ -11,6 +11,8 @@ let searchStyle;
 // the counter gets incremented every time something is changed
 let updateCounter = 0;
 
+let cleanupMode = false;
+
 
 /* ------------------------------------------------ */
 // Debugging
@@ -27,11 +29,6 @@ function logError(functionName, error) {
 
 window.addEventListener("click", (event) => {
   if (event.which === 1) {
-    // delete bookmark by clicking on its close button
-    if (event.target.dataset.deleteid) {
-      deleteBookmark(event.target.dataset.deleteid);
-      return;
-    }
     // add bookmark by clicking on the add button
     if (event.target.dataset.functionname === "addbookmark") {
       // clear search before adding
@@ -57,6 +54,20 @@ window.addEventListener("click", (event) => {
     if (event.target.dataset.functionname === "cancelcleanup") {
       stopCleanupMode();
       return;
+    }
+    
+    if (cleanupMode) {
+      // highlight bookmark when checkbox is clicked
+      if (event.target.classList.contains('cleanupcheckbox')) {
+        event.target.parentElement.classList.toggle('selected');
+      }
+    }
+    else {
+      // delete bookmark when close button is clicked
+      if (event.target.dataset.deleteid) {
+        deleteBookmark(event.target.dataset.deleteid);
+        return;
+      }
     }
   }
 });
@@ -267,6 +278,7 @@ function filterList(terms) {
 // switch to cleanup mode
 function startCleanupMode() {
   console.log("cleanup mode starting");
+  cleanupMode = true;
   const content = document.getElementById('content');
   content.classList.add("cleanupmode");
 }
@@ -274,6 +286,7 @@ function startCleanupMode() {
 // turn off cleanup mode
 function stopCleanupMode() {
   console.log("cleanup mode stopping");
+  cleanupMode = false;
   document.getElementById('content').classList.remove("cleanupmode");
 }
 

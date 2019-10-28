@@ -28,16 +28,17 @@ ul#bookmarklist {
   scroll-behavior: smooth;
 }
 li.bookmark:last-child {
-  margin-bottom:39px;
+  margin-bottom: 63px;
 }
 li.bookmark:first-child {
-  margin-top:0px;
+  margin-top: 0px;
 }
 li.bookmark {
   border-bottom: 1px solid #ECECEC;
   height: 38px;
   margin: 0;
   padding: 0;
+  background-color: #F6F6F6;
   list-style: none;
   line-height: 38px;
   font-size: 12px;
@@ -90,7 +91,6 @@ li.bookmark.beingdeleted a.link {
 }
 a.link {
   display: block;
-  background-color: #F6F6F6;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -421,7 +421,7 @@ body.noanimations * {
   text-align: center;
   width: calc(50% - 6px);
   height: 18px;
-  background-color: #E33F5B;
+  background-color: #157A9F;
   color: #fff;
   font-size: 11px;
   line-height: 18px;
@@ -472,6 +472,64 @@ button#selectallbutton {
   text-decoration: none;
   background: none;
   outline: none;
+}
+
+input[type="checkbox"].cleanupcheckbox {
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  position: absolute;
+  right: 19px;
+  top: 7px;
+  width: 17px;
+  height: 17px;
+  border: solid 1px #999999;
+  border-radius: 3px;
+  background-color: none;
+  opacity: 0;
+  z-index: -1;
+}
+
+li.bookmark.selected {
+  background-color: #DAE7EC;
+  border-color: #CDDADF; 
+}
+
+li.bookmark.selected > a.link {
+  color: #157A9F;
+}
+
+li.bookmark.selected > a.link:hover {
+  background-color: #DFECF0;
+}
+
+
+#content.cleanupmode input.cleanupcheckbox {
+  opacity: 1;
+  transition: all;
+  transition-delay: 100ms;
+  transition-duration: 100ms;
+  z-index: 1;
+}
+
+#content.cleanupmode input[type="checkbox"].cleanupcheckbox:checked {
+  border: 1px solid #157A9F;
+  background-color: none;
+  transition-duration: 0s;
+  transition-delay: 0s;
+}
+
+#content.cleanupmode input[type="checkbox"].cleanupcheckbox:active {
+  border: 1px solid #157A9F;
+  background-color: none;
+  transition-duration: 0s;
+  transition-delay: 0s;
+}
+
+#content.cleanupmode button.deletebutton {
+  opacity: 0;
+  transition: all;
+  transition-duration: 100ms;
 }
 
 /* cleanup animation */
