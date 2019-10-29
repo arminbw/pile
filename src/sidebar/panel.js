@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 let myWindowId;
 let backgroundscript;
@@ -27,39 +27,42 @@ function logError(functionName, error) {
 // Event listeners
 /* ------------------------------------------------ */
 
-window.addEventListener("click", (event) => {
+window.addEventListener('click', (event) => {
   if (event.which === 1) {
     // add bookmark by clicking on the add button
-    if (event.target.dataset.functionname === "addbookmark") {
+    if (event.target.dataset.functionname === 'addbookmark') {
       // clear search before adding
-      if (document.getElementById('toolbar').classList.contains("showsearchfield")) {
-        document.getElementById('searchinputfield').value = "";
-        filterList("");
+      if (document.getElementById('toolbar').classList.contains('showsearchfield')) {
+        document.getElementById('searchinputfield').value = '';
+        filterList('');
         document.getElementById('searchinputfield').focus();
       }
       addBookmark();
       return;
     }
     // fold or unfold the searchfield
-    if (event.target.dataset.functionname === "togglesearch") {
+    if (event.target.dataset.functionname === 'togglesearch') {
       toggleSearch();
       return;
     }
     // switch to cleanup mode
-    if (event.target.dataset.functionname === "startcleanup") {
+    if (event.target.dataset.functionname === 'startcleanup') {
       startCleanupMode();
       return;
     }
     // cancel cleanup
-    if (event.target.dataset.functionname === "cancelcleanup") {
+    if (event.target.dataset.functionname === 'cancelcleanup') {
       stopCleanupMode();
       return;
     }
     
     if (cleanupMode) {
       // highlight bookmark when checkbox is clicked
-      if (event.target.classList.contains('cleanupcheckbox')) {
+      if (event.target.dataset.functionname === 'selectbookmark') {
         event.target.parentElement.classList.toggle('selected');
+      }
+      if (event.target.dataset.functionname === 'deleteselected') {
+        deleteSelectedBookmarks();
       }
     }
     else {
@@ -96,18 +99,9 @@ function updateBookmarkListNode() {
   console.log(`panel of window ${myWindowId} compares updateCounter: panel ${updateCounter} background ${backgroundscript.updateCounter}`);
   if (updateCounter < backgroundscript.updateCounter) {
     console.log(`panel of window ${myWindowId}: something to update`);
-    sidebarBookmarkList = document.getElementById("bookmarklist");
+    sidebarBookmarkList = document.getElementById('bookmarklist');
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
-    sidebarBookmarkList = document.querySelector("#bookmarklist");
-      // TODO: Experimental drag&drop event listeners
-      for (let li of sidebarBookmarkList.children) {
-        li.setAttribute("draggable", "true");
-        li.setAttribute("dragstart", function() { li.classList.add("dragged") });
-        li.setAttribute("dragover", () => { console.log("Blo");});
-        // console.log(li);
-      }
-      // console.log(sidebarBookmarkList);
-  
+    sidebarBookmarkList = document.querySelector('#bookmarklist');
     updateCounter = backgroundscript.updateCounter;
   } else {
     console.log(`panel of window ${myWindowId}: no need to update`);
@@ -122,7 +116,7 @@ function updateBookmarkListNode() {
 function handleMessage(request, sender, sendResponse) {
   // TODO: add error handling, etc.
   console.log(`panel of window ${myWindowId} received message: ${request.message}`);
-  if (request.message === "updatePilePanel") {
+  if (request.message === 'updatePilePanel') {
      // The timeout allows the css transition to end before
      // the background does update the list because of a double
      setTimeout(() => {
@@ -142,7 +136,7 @@ function deleteBookmark(id) {
   if (id) {
     console.log(`panel of window ${myWindowId} deleting ${id}`);
     let li = getBookmarkListElement(id);
-    li.classList.add("beingdeleted");
+    li.classList.add('beingdeleted');
     updateCounter++;
     // can the user scroll? (scrollHeight > offsetHeight)
     // only do the foldup if:
@@ -151,13 +145,13 @@ function deleteBookmark(id) {
     let scrollablePart = sidebarBookmarkList.scrollHeight - sidebarBookmarkList.offsetHeight;
     let distanceToBottom = scrollablePart - sidebarBookmarkList.scrollTop;
     if ((sidebarBookmarkList.scrollTopMax > 38) && (distanceToBottom < 38)) {
-      sidebarBookmarkList.classList.add("foldup");
-      li.addEventListener("transitionend", (event) => {
-        if (event.propertyName === "transform") {
+      sidebarBookmarkList.classList.add('foldup');
+      li.addEventListener('transitionend', (event) => {
+        if (event.propertyName === 'transform') {
           let scrollTop = sidebarBookmarkList.scrollTop - 38;
           sidebarBookmarkList.removeChild(li);
           backgroundscript.removeBookmark(id);
-          sidebarBookmarkList.classList.remove("foldup");
+          sidebarBookmarkList.classList.remove('foldup');
           sidebarBookmarkList.scrollTo(0,scrollTop);
         }
       }, false);
@@ -169,8 +163,8 @@ function deleteBookmark(id) {
         // solution: scroll to the top
         sidebarBookmarkList.scrollTo(0,0);
       }
-      li.addEventListener("transitionend", (event) => {
-        if (event.propertyName === "transform") {
+      li.addEventListener('transitionend', (event) => {
+        if (event.propertyName === 'transform') {
           sidebarBookmarkList.removeChild(li);
           backgroundscript.removeBookmark(id);
         }
@@ -179,9 +173,15 @@ function deleteBookmark(id) {
   }
 }
 
+function deleteSelectedBookmarks() {
+  // make a list of all the selected bookmarks
+  let selectedNodes = document.querySelectorAll('.selected');
+  console.log(selectedNodes);
+}
+
 // helper for deleteBookmark
 function getBookmarkListElement(bookmarkid) {
-  for (let li of sidebarBookmarkList.getElementsByClassName("bookmark")) {
+  for (let li of sidebarBookmarkList.getElementsByClassName('bookmark')) {
       if (li.dataset.bookmarkid === bookmarkid) return li;
   }
 }
@@ -190,17 +190,17 @@ function getBookmarkListElement(bookmarkid) {
 // add the class cssClass to htmlElement and remove it when played once
 function playCssAnimation(htmlElement, cssClass, animationName) {
   htmlElement.classList.add(cssClass);
-  console.log("playing css animation");
+  console.log('playing css animation');
   console.log(htmlElement);
   console.log(cssClass);
   console.log(animationName);
   let stopAnimation = function(event) {
     if (event.animationName === animationName) {
       htmlElement.classList.remove(cssClass);
-      htmlElement.removeEventListener("animationend", stopAnimation);
+      htmlElement.removeEventListener('animationend', stopAnimation);
     }
   }
-  htmlElement.addEventListener("animationend", stopAnimation, false);
+  htmlElement.addEventListener('animationend', stopAnimation, false);
 }
 
 // add a bookmark and show an animation
@@ -211,7 +211,7 @@ async function addBookmark() {
   if (sidebarBookmarkList.firstChild !== null) {
     let topEntry = sidebarBookmarkList.firstChild;
     if (tabs[0].url === topEntry.firstChild.href) {
-      playCssAnimation(topEntry, "shaking", "shake");
+      playCssAnimation(topEntry, 'shaking', 'shake');
       return;
     }
   }
@@ -220,14 +220,14 @@ async function addBookmark() {
     try {
       let newbookmark = await backgroundscript.addBookmark(tabs[0]);
       let bookmarkNode = backgroundscript.createBookmarkNode(newbookmark);
-      playCssAnimation(sidebarBookmarkList, "adding", "slidein");
+      playCssAnimation(sidebarBookmarkList, 'adding', 'slidein');
       sidebarBookmarkList.prepend(bookmarkNode);
     } catch(error) {
-      logError("addBookmark/create", error);
+      logError('addBookmark/create', error);
       console.log('shaking');
       // TODO: no shake. css class seems to have low priority
       let errorHtmlElement = document.getElementById('addbookmark');
-      playCssAnimation(errorHtmlElement, "shaking", "addbuttonshake");
+      playCssAnimation(errorHtmlElement, 'shaking', 'addbuttonshake');
     };
   }
 }
@@ -235,7 +235,7 @@ async function addBookmark() {
 // fold/unfold the search input field
 function toggleSearch() {
   const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = "showsearchfield"; 
+  const cssIDshowSearchField = 'showsearchfield'; 
   if (toolbar.classList.contains(cssIDshowSearchField)) {
     hideSearch();
   } else {
@@ -245,16 +245,16 @@ function toggleSearch() {
 
 function showSearch() {
   const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = "showsearchfield";
+  const cssIDshowSearchField = 'showsearchfield';
   toolbar.classList.add(cssIDshowSearchField);
   document.getElementById('searchinputfield').focus(); 
 }
 
 function hideSearch() {
   const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = "showsearchfield";
-  document.getElementById('searchinputfield').value = "";
-  filterList("");
+  const cssIDshowSearchField = 'showsearchfield';
+  document.getElementById('searchinputfield').value = '';
+  filterList('');
   toolbar.classList.remove(cssIDshowSearchField);
 }
 
@@ -265,29 +265,29 @@ function filterList(terms) {
     searchStyle.sheet.deleteRule(0);
   }
   if (!terms) return;
-  const searchTerms = terms.toLowerCase().split(" ");
+  const searchTerms = terms.toLowerCase().split(' ');
   let rules = searchTerms.reduce((accumulator, term) => {
-    if (term !== "") accumulator += "[data-title*=\"" + term + "\"]";
+    if (term !== '') accumulator += '[data-title*=\'' + term + '\']';
     return accumulator;
-  }, "li.bookmark");
-  rules += " { display: flex; }";
+  }, 'li.bookmark');
+  rules += ' { display: flex; }';
   searchStyle.sheet.insertRule(rules);
-  searchStyle.sheet.insertRule("li.bookmark { display: none; }");
+  searchStyle.sheet.insertRule('li.bookmark { display: none; }');
 }
 
 // switch to cleanup mode
 function startCleanupMode() {
-  console.log("cleanup mode starting");
+  console.log('cleanup mode starting');
   cleanupMode = true;
   const content = document.getElementById('content');
-  content.classList.add("cleanupmode");
+  content.classList.add('cleanupmode');
 }
 
 // turn off cleanup mode
 function stopCleanupMode() {
-  console.log("cleanup mode stopping");
+  console.log('cleanup mode stopping');
   cleanupMode = false;
-  document.getElementById('content').classList.remove("cleanupmode");
+  document.getElementById('content').classList.remove('cleanupmode');
 }
 
 /* ------------------------------------------------ */
@@ -299,22 +299,22 @@ async function init() {
   let windowInfo = await browser.windows.getCurrent({populate: true});
   console.log(windowInfo);
   myWindowId = windowInfo.id;
-  sidebarBookmarkList = document.querySelector("#bookmarklist");
-  contentArea = document.querySelector("#content");
+  sidebarBookmarkList = document.querySelector('#bookmarklist');
+  contentArea = document.querySelector('#content');
 
   // the noanimations css class temporarily suppresses all animations after page load
   setTimeout(() => {
-    document.body.className="";
+    document.body.className='';
   }, 650);
 
   // create a new stylesheet for the search/filter (see filterList())
-  searchStyle = document.createElement("style");
-  searchStyle.appendChild(document.createTextNode(""));
+  searchStyle = document.createElement('style');
+  searchStyle.appendChild(document.createTextNode(''));
   document.head.appendChild(searchStyle);
 
   // remove right click context menu from add button and blank content area
-  contentArea.addEventListener("contextmenu", function(e) {
-    if (e.target.className !== "link") {
+  contentArea.addEventListener('contextmenu', function(e) {
+    if (e.target.className !== 'link') {
       e.preventDefault();
     }
   }, false);

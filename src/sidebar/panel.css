@@ -578,12 +578,16 @@ li.bookmark.selected > a.link:hover {
   transform: translateY(0px);
 }
 
-.deleteselectedbutton,
-.cancelcleanupbutton {
+button.deleteselectedbutton,
+button.cancelcleanupbutton {
   opacity: 0;
   transition-property: opacity;
   transition-duration: 100ms;
   transition-delay: 120ms;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: none;
 }
 
 #content.cleanupmode .deleteselectedbutton {

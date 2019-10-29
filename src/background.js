@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-window.bookmarkListNode = document.createElement("ul");
+window.bookmarkListNode = document.createElement('ul');
 window.updateCounter = 0;
-const bookmarkFolderName = "Pile";
+const bookmarkFolderName = 'Pile';
 
 
 /* ------------------------------------------------ */
@@ -27,20 +27,20 @@ browser.browserAction.onClicked.addListener((activeTab) => {
 // changing bookmarks (e.g. via the bookmarks manager)
 function initBookmarksListener() {
   browser.bookmarks.onCreated.addListener(async (id, createdBookmark) => {
-    console.log("background: onCreated");
+    console.log('background: onCreated');
     updateIfPiledBookmark(createdBookmark.parentId);
   });
   browser.bookmarks.onRemoved.addListener(async (id, removedObject) => {
-    console.log("background: onRemoved");
+    console.log('background: onRemoved');
     updateIfPiledBookmark(removedObject.parentId);
   });
   browser.bookmarks.onChanged.addListener(async (id) => {
-    console.log("background: onChanged");
+    console.log('background: onChanged');
     let bookmarks = await browser.bookmarks.get(id);
     updateIfPiledBookmark(bookmarks[0].parentId);
   });
   browser.bookmarks.onMoved.addListener(async (id, movedObject) => {
-    console.log("background: onMoved");
+    console.log('background: onMoved');
     updateIfPiledBookmark(movedObject.parentId);
   });
 }
@@ -65,10 +65,10 @@ async function updateIfPiledBookmark(parentId) {
 // clicking on the contextual menu gives the user the option to bookmark and close tabs in one fell swoop
 browser.contextMenus.onClicked.addListener((info, tab) => {
   switch(info.menuItemId) {
-    case "putOnPile":
+    case 'putOnPile':
       addBookmarkandClose(tab, true);
       break;
-    case "putAllOnPile":
+    case 'putAllOnPile':
       addAllBookmarksandClose(tab.windowId);
       break;
   }
@@ -76,26 +76,26 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
 function onCreatedErrorHandler() {
   if (browser.runtime.lastError) {
-    logError("contextMenus.create", browser.runtime.lastError);
+    logError('contextMenus.create', browser.runtime.lastError);
   }
 }
 
 browser.contextMenus.create({
-  id: "putOnPile",
-  title: browser.i18n.getMessage("putOnPileMessage"),
-  contexts: ["page", "frame", "image"]
+  id: 'putOnPile',
+  title: browser.i18n.getMessage('putOnPileMessage'),
+  contexts: ['page', 'frame', 'image']
 }, onCreatedErrorHandler);
 
 browser.contextMenus.create({
-  id: "putOnPile",
-  title: browser.i18n.getMessage("putOnPileMessage"),
-  contexts: ["tab"]
+  id: 'putOnPile',
+  title: browser.i18n.getMessage('putOnPileMessage'),
+  contexts: ['tab']
 }, onCreatedErrorHandler);
 
 browser.contextMenus.create({
-  id: "putAllOnPile",
-  title: browser.i18n.getMessage("putAllOnPileMessage"),
-  contexts: ["tab"]
+  id: 'putAllOnPile',
+  title: browser.i18n.getMessage('putAllOnPileMessage'),
+  contexts: ['tab']
 }, onCreatedErrorHandler);
 
 
@@ -112,7 +112,7 @@ class Semaphore {
   }
   registerChange() {
     this.processes++;
-    console.log("background semaphore: register change");
+    console.log('background semaphore: register change');
   }
   changeFinished() {
     this.processes--;
@@ -123,7 +123,7 @@ class Semaphore {
       console.log(`background semaphore update: ${this.processes} processes`);
       updateBookmarkListNode();
     } else {
-      console.log("background semaphore: something is being processed. not updating html.");
+      console.log('background semaphore: something is being processed. not updating html.');
       console.log(this.processes);
     }
   }
@@ -145,9 +145,9 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
     // remove this extra step, when clarified
     let piledBookmarksTree = await browser.bookmarks.getSubTree(bookmarkFolderId);
     // go through all the children of the pile folder
-    window.bookmarkListNode = document.createElement("ul");
-    window.bookmarkListNode.id = "bookmarklist";
-    if (piledBookmarksTree[0].hasOwnProperty("children")) {
+    window.bookmarkListNode = document.createElement('ul');
+    window.bookmarkListNode.id = 'bookmarklist';
+    if (piledBookmarksTree[0].hasOwnProperty('children')) {
       for (let bookmark of piledBookmarksTree[0].children) {
         window.bookmarkListNode.appendChild(createBookmarkNode(bookmark));
       }
@@ -159,37 +159,37 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
     }
     console.log(`background: updateCounter: ${window.updateCounter}`);
     if (bInformActivePanels === true) {
-      console.log("background: sending message");
+      console.log('background: sending message');
       browser.runtime.sendMessage({
-        message: "updatePilePanel"
+        message: 'updatePilePanel'
       });
     }
   } catch(error) {
-    logError("updateBookmarkListNode", error);
+    logError('updateBookmarkListNode', error);
   }
   return; 
 }
 
 // return html code representing a single bookmark 
 function createBookmarkNode(bookmark) {
-  let li = document.createElement("li");
-  li.classList.add("bookmark");
-  li.setAttribute("data-bookmarkid", bookmark.id);
-  li.setAttribute("data-title", bookmark.title.toLowerCase());
-  li.setAttribute("title", bookmark.title);
-  let a = document.createElement("a");
-  a.classList.add("link");
-  a.setAttribute("href", bookmark.url);
+  let li = document.createElement('li');
+  li.classList.add('bookmark');
+  li.setAttribute('data-bookmarkid', bookmark.id);
+  li.setAttribute('data-title', bookmark.title.toLowerCase());
+  li.setAttribute('title', bookmark.title);
+  let a = document.createElement('a');
+  a.classList.add('link');
+  a.setAttribute('href', bookmark.url);
   a.appendChild(document.createTextNode(bookmark.title));
-  let button = document.createElement("button"); 
-  button.classList.add("deletebutton");
-  button.setAttribute("data-deleteid", bookmark.id);
-  button.setAttribute("title", "remove");
-  let checkbox = document.createElement("input"); 
-  checkbox.classList.add("cleanupcheckbox");
-  checkbox.setAttribute("type", "checkbox");
-  checkbox.setAttribute("data-deleteid", bookmark.id);
-  checkbox.setAttribute("title", "mark for deletion");
+  let button = document.createElement('button'); 
+  button.classList.add('deletebutton');
+  button.setAttribute('data-deleteid', bookmark.id);
+  button.setAttribute('title', 'remove');
+  let checkbox = document.createElement('input'); 
+  checkbox.classList.add('cleanupcheckbox');
+  checkbox.setAttribute('type', 'checkbox');
+  checkbox.setAttribute('data-functionname', 'selectbookmark');
+  checkbox.setAttribute('title', 'mark for deletion');
   li.appendChild(a);
   li.appendChild(button);
   li.appendChild(checkbox);
@@ -208,14 +208,14 @@ function removeBookmark(id) {
 // add a bookmark
 // returns the promise of a newly added BookmarkTreeNode
 async function addBookmark(tab) {
-  let badgeText = "+1";
+  let badgeText = '+1';
   let bookmark = undefined;
   try {
     semaphore.registerChange();
     let bookmarkFolderId = await getBookmarkFolderId();
-    // do not add empty "about:blank" (new empty tab) bookmarks
+    // do not add empty 'about:blank' (new empty tab) bookmarks
     if (tab.url === 'about:blank') {
-      throw "Not adding about:blank page";
+      throw 'Not adding about:blank page';
     }
     // check if the bookmark already exists
     let bookmarks = await browser.bookmarks.search({url: tab.url})
@@ -226,15 +226,15 @@ async function addBookmark(tab) {
           removeBookmark(bookmark.id);
           window.updateCounter++;
         }
-        badgeText = "⬆";
+        badgeText = '⬆';
       }
     }
-    console.log("adding");
+    console.log('adding');
     bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId});
     console.log(bookmark);
     showBadge(badgeText);
   } catch(error) {
-    logError("addBookmark", error);
+    logError('addBookmark', error);
     showErrorBadge();
   }
   semaphore.changeFinished();
@@ -247,7 +247,7 @@ async function addBookmarkandClose(tab, removePinned) {
     semaphore.registerChange();
     let tabs = await browser.tabs.query({ windowId: tab.windowId });
     // only remove pinned tabs when the user explicitly says so
-    console.log("PINNED?");
+    console.log('PINNED?');
     console.log(tab.pinned);
     if ((removePinned === true) || (tab.pinned === false)) {
       let bookmark = await addBookmark(tab);
@@ -259,7 +259,7 @@ async function addBookmarkandClose(tab, removePinned) {
       }
     }
   } catch(error) {
-    logError("addBookmarkandClose", error);
+    logError('addBookmarkandClose', error);
     semaphore.changeFinished();
     return false;
   }
@@ -283,9 +283,9 @@ async function addAllBookmarksandClose(windowId) {
     }));
     // TODO: test badge
     showBadge(`+${counter}`);
-    console.log("all closed");
+    console.log('all closed');
   } catch(error) {
-    logError("addBookmarkandClose", error);
+    logError('addBookmarkandClose', error);
     semaphore.changeFinished();
     return false;
   }
@@ -301,22 +301,22 @@ async function addAllBookmarksandClose(windowId) {
 // show a badge on the toolbar button
 function showBadge(badgeText) {
   setTimeout(() => {
-    browser.browserAction.setBadgeBackgroundColor({color: "#5591FF"});
+    browser.browserAction.setBadgeBackgroundColor({color: '#5591FF'});
     browser.browserAction.setBadgeText({text: badgeText});
   }, 120);
   setTimeout(() => {
-      browser.browserAction.setBadgeText({text: ""});
+      browser.browserAction.setBadgeText({text: ''});
   }, 3200);
 }
 
 // give error feedback on the toolbar button
 function showErrorBadge() {
   setTimeout(() => {
-    browser.browserAction.setBadgeBackgroundColor({color: "#E36A40"});
-    browser.browserAction.setBadgeText({text: "X"});
+    browser.browserAction.setBadgeBackgroundColor({color: '#E36A40'});
+    browser.browserAction.setBadgeText({text: 'X'});
   }, 120);
   setTimeout(() => {
-      browser.browserAction.setBadgeText({text: ""});
+      browser.browserAction.setBadgeText({text: ''});
   }, 3200);
 }
 
@@ -340,10 +340,10 @@ async function getBookmarkFolderId() {
   } else {
     // No pile folder was found. Let's create one.
     semaphore.registerChange();
-    console.log("background: creating bookmark folder");
+    console.log('background: creating bookmark folder');
     let pileFolderBookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
     .catch(error => {
-      logError("getBookmarkFolderId", error)
+      logError('getBookmarkFolderId', error)
       throw error; // TODO: DOES THAT WORK https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
     });
     semaphore.changeFinished();

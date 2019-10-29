@@ -11,8 +11,8 @@
 <body class="noanimations">
   <div id="content">
     <div id="toolbar">
-      <div class="toolbartop"><input type="search" placeholder="search" id="searchinputfield"/><button data-functionname="togglesearch" id="searchshowhidebutton"></button><button data-functionname="startcleanup" id="cleanupbutton"></button><div class="cleanupcounter">999 of 999</div><button id="selectallbutton">All</button><div id="addbookmarkcontainer"><button data-functionname="addbookmark" id="addbookmark">ADD PAGE</button></div></div>
-    <div id="cleanupconfirmation"><div class="deleteselectedbutton">Delete</div><div class="cancelcleanupbutton" data-functionname="cancelcleanup">Cancel</div></div>
+      <div class="toolbartop"><input type="search" placeholder="search" id="searchinputfield"/><button data-functionname="togglesearch" id="searchshowhidebutton"></button><button data-functionname="startcleanup" id="cleanupbutton"></button><div class="cleanupcounter">999 of 999</div><button id="selectallbutton" data-functionname="selectall">All</button><div id="addbookmarkcontainer"><button data-functionname="addbookmark" id="addbookmark">ADD PAGE</button></div></div>
+    <div id="cleanupconfirmation"><button class="deleteselectedbutton" data-functionname="deleteselected">Delete</button><button class="cancelcleanupbutton" data-functionname="cancelcleanup">Cancel</button></div>
     </div>
     <ul id="bookmarklist">
       <li class="bookmark" data-bookmarkid="">
@@ -20,9 +20,6 @@
         <button class="deletebutton" data-deleteid=""></button>
       </li>
     </ul>
-    <div id="cleanupbutton" data-functionname="startcleanup">
-      DEL
-    </div>
   </div>
   <script src="panel.js"></script>
 </body>
