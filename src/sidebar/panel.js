@@ -8,7 +8,7 @@ let searchStyle;
 
 // every panel gets the html list of all bookmarks from the backgroundscript
 // to prevent unnecessary updates, we use a counter 
-// the counter gets incremented every time something is changed
+// the updateCounter gets incremented every time something is changed
 let updateCounter = 0;
 
 let cleanupMode = false;
@@ -57,9 +57,16 @@ window.addEventListener('click', (event) => {
     }
     
     if (cleanupMode) {
-      // highlight bookmark when checkbox is clicked
       if (event.target.dataset.functionname === 'selectbookmark') {
+        // highlight bookmark when checkbox is clicked
         event.target.parentElement.classList.toggle('selected');
+        updateCleanupCounter();
+      }
+      if (event.target.dataset.functionname === 'selectall') {
+        selectAllBookmarks();
+      }
+      if (event.target.dataset.functionname === 'deselectall') {
+        deselectAllBookmarks();
       }
       if (event.target.dataset.functionname === 'deleteselected') {
         deleteSelectedBookmarks();
@@ -101,7 +108,7 @@ function updateBookmarkListNode() {
     console.log(`panel of window ${myWindowId}: something to update`);
     sidebarBookmarkList = document.getElementById('bookmarklist');
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
-    sidebarBookmarkList = document.querySelector('#bookmarklist');
+    sidebarBookmarkList = document.getElementById('bookmarklist'); // needed
     updateCounter = backgroundscript.updateCounter;
   } else {
     console.log(`panel of window ${myWindowId}: no need to update`);
@@ -174,16 +181,14 @@ function deleteBookmark(id) {
 }
 
 function deleteSelectedBookmarks() {
-  // make a list of all the selected bookmarks
+  // TODO: make a list of all the selected bookmarks
   let selectedNodes = document.querySelectorAll('.selected');
   console.log(selectedNodes);
 }
 
 // helper for deleteBookmark
 function getBookmarkListElement(bookmarkid) {
-  for (let li of sidebarBookmarkList.getElementsByClassName('bookmark')) {
-      if (li.dataset.bookmarkid === bookmarkid) return li;
-  }
+  return sidebarBookmarkList.querySelector('[data-bookmarkid="' + bookmarkid + '"]');
 }
 
 // play a css animation once
@@ -258,7 +263,7 @@ function hideSearch() {
   toolbar.classList.remove(cssIDshowSearchField);
 }
 
-// hackish search/filter functionality (don't try this at home!)
+// hackish search/filter functionality (don’t try this at home!)
 function filterList(terms) {
   if (searchStyle.sheet.cssRules.length > 1) {
     searchStyle.sheet.deleteRule(0);
@@ -281,6 +286,7 @@ function startCleanupMode() {
   cleanupMode = true;
   const content = document.getElementById('content');
   content.classList.add('cleanupmode');
+  updateCleanupCounter();
 }
 
 // turn off cleanup mode
@@ -288,6 +294,39 @@ function stopCleanupMode() {
   console.log('cleanup mode stopping');
   cleanupMode = false;
   document.getElementById('content').classList.remove('cleanupmode');
+}
+
+function updateCleanupCounter() {
+  let bookmarkCount = sidebarBookmarkList.children.length;
+  let selectedCount = document.querySelectorAll('.selected').length;
+  document.getElementById('cleanupcounter').firstChild.textContent = `${selectedCount} of ${bookmarkCount}`;
+  if (selectedCount === bookmarkCount) {
+    document.getElementById('selectallornonebutton').classList.add('none');
+  } else {
+    document.getElementById('selectallornonebutton').classList.remove('none');
+  }
+}
+
+function selectAllBookmarks() {
+  for (let bookmark of sidebarBookmarkList.children) {
+    let checkbox = bookmark.querySelector('.cleanupcheckbox');
+    if (!checkbox.checked) {
+      checkbox.checked = true;
+      bookmark.classList.add('selected');
+    }
+  }
+  document.getElementById('selectallornonebutton').classList.add('none');
+}
+
+function deselectAllBookmarks() {
+  for (let bookmark of sidebarBookmarkList.children) {
+    let checkbox = bookmark.querySelector('.cleanupcheckbox');
+    if (checkbox.checked) {
+      checkbox.checked = false;
+      bookmark.classList.remove('selected');
+    }
+  }
+  document.getElementById('selectallornonebutton').classList.remove('none');
 }
 
 /* ------------------------------------------------ */

@@ -456,9 +456,9 @@ body.noanimations * {
   white-space: nowrap;
 }
 
+button#selectnonebutton,
 button#selectallbutton {
   vertical-align:top;
-  float: right;
   width: 42px;
   height: 18px;
   color: #797979;
@@ -472,6 +472,22 @@ button#selectallbutton {
   text-decoration: none;
   background: none;
   outline: none;
+}
+
+button#selectnonebutton {
+  display: none;
+}
+
+#selectallornonebutton {
+  display: inline-block;
+}
+
+#selectallornonebutton.none button#selectnonebutton {
+  display: inline-block;
+}
+
+#selectallornonebutton.none button#selectallbutton {
+  display: none;
 }
 
 input[type="checkbox"].cleanupcheckbox {
@@ -618,13 +634,14 @@ button#addbookmark {
   transition-duration: 0s;
 }
 
-button#selectallbutton {
+#selectallornonebutton {
   z-index: -1;
   position: absolute;
   opacity: 0;
+  float: right;
 }
 
-#content.cleanupmode button#selectallbutton {
+#content.cleanupmode #selectallornonebutton {
   z-index: 1;
   position: relative;
   opacity: 1;
@@ -633,19 +650,19 @@ button#selectallbutton {
   transition-delay: 0;
 }
 
-.cleanupcounter {
+#cleanupcounter {
   z-index: -1;
   position: absolute;
   opacity: 0;
 }
 
-#content.cleanupmode .cleanupcounter {
+#content.cleanupmode #cleanupcounter {
   z-index: 1;
   position: relative;
   display: inline-block;
 }
 
-#content.cleanupmode .cleanupcounter {
+#content.cleanupmode #cleanupcounter {
   transition-property: all;
   transition-duration: 0s;
   transition-delay: var(--timeSearchFieldHiding);
@@ -653,9 +670,11 @@ button#selectallbutton {
   opacity: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 11px;
+  line-height: 24px;
 }
 
-#content.cleanupmode #toolbar.showsearchfield .cleanupcounter {
+#content.cleanupmode #toolbar.showsearchfield #cleanupcounter {
   transition-property: all;
   transition-delay: 0s;
   max-width: 20px;
