@@ -269,7 +269,7 @@ async function addBookmarkandClose(tab, removePinned) {
 
 // close all tabs and bookmark all urls before
 async function addAllBookmarksandClose(windowId) {
-  // get the bookmark folder and the an array of all tabs
+  // get the bookmark folder and an array of all tabs
   let bookmarkFolderId = await getBookmarkFolderId();
   let tabs = await browser.tabs.query({windowId: windowId});
   try {
@@ -284,6 +284,27 @@ async function addAllBookmarksandClose(windowId) {
     // TODO: test badge
     showBadge(`+${counter}`);
     console.log('all closed');
+  } catch(error) {
+    logError('addBookmarkandClose', error);
+    semaphore.changeFinished();
+    return false;
+  }
+  semaphore.changeFinished();
+  return true;
+}
+
+// receives an array of bookmark ids
+// removes said bookmarks in one fell swoop
+async function removeBookmarks(bookmarkIDs) {
+  try {
+    semaphore.registerChange();
+    let counter = 0;
+    await Promise.all(bookmarkIDs.map((id) => {
+      removeBookmark(id);
+      counter++;
+    }));
+    // TODO: test badge
+    console.log(counter);
   } catch(error) {
     logError('addBookmarkandClose', error);
     semaphore.changeFinished();

@@ -180,10 +180,11 @@ function deleteBookmark(id) {
   }
 }
 
+// delete all bookmarks that have been selected in cleanup mode
 function deleteSelectedBookmarks() {
-  // TODO: make a list of all the selected bookmarks
   let selectedNodes = document.querySelectorAll('.selected');
-  console.log(selectedNodes);
+  let bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid );
+  backgroundscript.removeBookmarks(bookmarkIDs);
 }
 
 // helper for deleteBookmark
@@ -316,6 +317,7 @@ function selectAllBookmarks() {
     }
   }
   document.getElementById('selectallornonebutton').classList.add('none');
+  updateCleanupCounter();
 }
 
 function deselectAllBookmarks() {
