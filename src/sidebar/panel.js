@@ -110,6 +110,7 @@ function updateBookmarkListNode() {
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
     sidebarBookmarkList = document.getElementById('bookmarklist'); // needed
     updateCounter = backgroundscript.updateCounter;
+    updateCleanupCounter();
   } else {
     console.log(`panel of window ${myWindowId}: no need to update`);
   }
@@ -282,8 +283,9 @@ function filterList(terms) {
 }
 
 // switch to cleanup mode
+// cleanup mode allows the user to select multiple bookmarks
+// and then delete them with one click
 function startCleanupMode() {
-  console.log('cleanup mode starting');
   cleanupMode = true;
   const content = document.getElementById('content');
   content.classList.add('cleanupmode');
@@ -292,11 +294,11 @@ function startCleanupMode() {
 
 // turn off cleanup mode
 function stopCleanupMode() {
-  console.log('cleanup mode stopping');
   cleanupMode = false;
   document.getElementById('content').classList.remove('cleanupmode');
 }
 
+// show the number of selectable and selected bookmarks in cleanup mode
 function updateCleanupCounter() {
   let bookmarkCount = sidebarBookmarkList.children.length;
   let selectedCount = document.querySelectorAll('.selected').length;

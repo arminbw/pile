@@ -506,17 +506,21 @@ input[type="checkbox"].cleanupcheckbox {
   z-index: -1;
 }
 
-li.bookmark.selected {
-  background-color: #DAE7EC;
-  border-color: #CDDADF; 
+input[type="checkbox"].cleanupcheckbox:checked {
+  background: no-repeat center url("checkmark.svg");
 }
 
-li.bookmark.selected > a.link {
+#content.cleanupmode li.bookmark.selected {
+  background-color: #E3EEF1;
+  border-color: #DFE7EA; 
+}
+
+#content.cleanupmode li.bookmark.selected > a.link {
   color: #157A9F;
 }
 
-li.bookmark.selected > a.link:hover {
-  background-color: #DFECF0;
+#content.cleanupmode li.bookmark.selected > a.link:hover {
+  background-color: #EFF6F8;
 }
 
 
