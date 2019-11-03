@@ -132,11 +132,12 @@ a.link, a.link:visited {
       transform: translateY(0);
   }
 }
-
+#content.cleanupmode #selectallornonebutton.shaking, 
 #addbookmark.shaking {
-  animation: addbuttonshake 0.42s linear;
+  animation: paddingrightshake 0.42s linear;
+  animation-delay: 0;
 }
-@keyframes addbuttonshake {
+@keyframes paddingrightshake {
   8%, 41% {
     padding-right: 0px;
   }
@@ -151,6 +152,27 @@ a.link, a.link:visited {
   }
   0%, 100% {
     padding-right: 0px;
+  }
+}
+#content.cleanupmode #cleanupcounter.shaking {
+  animation: paddingleftshake 0.42s linear;
+  animation-delay: 0;
+}
+@keyframes paddingleftshake {
+  8%, 41% {
+    padding-left: 0px;
+  }
+  25%, 58% {
+    padding-left: 4px;
+  }
+  75% {
+    padding-left: 0px;
+  }
+  92% {
+    padding-left: 2px;
+  }
+  0%, 100% {
+    padding-left: 0px;
   }
 }
 

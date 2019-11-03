@@ -184,6 +184,17 @@ function deleteBookmark(id) {
 // delete all bookmarks that have been selected in cleanup mode
 function deleteSelectedBookmarks() {
   let selectedNodes = document.querySelectorAll('.selected');
+  if (selectedNodes.length === 0) {
+    let bookmarkCount = sidebarBookmarkList.children.length;
+    if (bookmarkCount === 0) {
+      let feedbackEl = document.getElementById('cleanupcounter');
+      playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+    } else {
+      let feedbackEl = document.getElementById('selectallornonebutton');
+      playCssAnimation(feedbackEl, 'shaking', 'paddingrightshake');
+    }
+    return;
+  }
   let bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid );
   backgroundscript.removeBookmarks(bookmarkIDs);
 }
@@ -197,17 +208,13 @@ function getBookmarkListElement(bookmarkid) {
 // add the class cssClass to htmlElement and remove it when played once
 function playCssAnimation(htmlElement, cssClass, animationName) {
   htmlElement.classList.add(cssClass);
-  console.log('playing css animation');
-  console.log(htmlElement);
-  console.log(cssClass);
-  console.log(animationName);
   let stopAnimation = function(event) {
     if (event.animationName === animationName) {
       htmlElement.classList.remove(cssClass);
       htmlElement.removeEventListener('animationend', stopAnimation);
     }
   }
-  htmlElement.addEventListener('animationend', stopAnimation, false);
+  htmlElement.addEventListener('animationend', stopAnimation);
 }
 
 // add a bookmark and show an animation
@@ -231,10 +238,10 @@ async function addBookmark() {
       sidebarBookmarkList.prepend(bookmarkNode);
     } catch(error) {
       logError('addBookmark/create', error);
-      console.log('shaking');
+      console.log('error shake');
       // TODO: no shake. css class seems to have low priority
       let errorHtmlElement = document.getElementById('addbookmark');
-      playCssAnimation(errorHtmlElement, 'shaking', 'addbuttonshake');
+      playCssAnimation(errorHtmlElement, 'shaking', 'paddingrightshake');
     };
   }
 }
@@ -301,9 +308,15 @@ function stopCleanupMode() {
 // show the number of selectable and selected bookmarks in cleanup mode
 function updateCleanupCounter() {
   let bookmarkCount = sidebarBookmarkList.children.length;
+  // TODO: internationalize
+  if (bookmarkCount === 0) {
+    document.getElementById('cleanupcounter').firstChild.textContent = 'all cleaned up';
+    document.getElementById('selectallornonebutton').classList.remove('none');
+    return; 
+  }
   let selectedCount = document.querySelectorAll('.selected').length;
   document.getElementById('cleanupcounter').firstChild.textContent = `${selectedCount} of ${bookmarkCount}`;
-  if (selectedCount === bookmarkCount) {
+  if ((selectedCount === bookmarkCount) && (bookmarkCount !== 0)) {
     document.getElementById('selectallornonebutton').classList.add('none');
   } else {
     document.getElementById('selectallornonebutton').classList.remove('none');
@@ -311,6 +324,12 @@ function updateCleanupCounter() {
 }
 
 function selectAllBookmarks() {
+  let bookmarkCount = sidebarBookmarkList.children.length;
+  if (bookmarkCount === 0) {
+    let feedbackEl = document.getElementById('cleanupcounter');
+    playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+    return;
+  }
   for (let bookmark of sidebarBookmarkList.children) {
     let checkbox = bookmark.querySelector('.cleanupcheckbox');
     if (!checkbox.checked) {
