@@ -294,6 +294,7 @@ button#addbookmark:active {
   --bgcolorButton: rgba(186,226,230,0);
   --bgcolorButtonHover: rgba(167, 215, 208, 0.23);
   --bgcolorButtonActive: rgba(142,181,199,0.29);
+  --textColorToolbar: #3C3C3C;
 }
 
 /* the searchfield is shown, add button is small */
@@ -456,7 +457,7 @@ body.noanimations * {
   text-align: center;
   width: calc(50% - 6px);
   height: 18px;
-  background-color: #38383D;
+  background-color: var(--textColorToolbar);
   color: #fff;
   font-size: 11px;
   line-height: 18px;
@@ -483,11 +484,11 @@ button#selectallbutton {
   vertical-align:top;
   width: 42px;
   height: 18px;
-  color: #797979;
+  color: var(--textColorToolbar);
   font-size: 11px;
   line-height: 16px;
   border-radius: 3px;
-  border: solid 1px #797979;
+  border: solid 1px var(--textColorToolbar);
   padding: 0;
   margin: 3px 4px 3px 4px;
   text-align: center;
@@ -686,6 +687,7 @@ button#addbookmark {
   z-index: 1;
   position: relative;
   display: inline-block;
+  color: var(--textColorToolbar);
 }
 
 #content.cleanupmode #cleanupcounter {
