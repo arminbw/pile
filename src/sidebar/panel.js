@@ -29,55 +29,53 @@ function logError(functionName, error) {
 
 window.addEventListener('click', (event) => {
   if (event.which === 1) {
-    // add bookmark by clicking on the add button
-    if (event.target.dataset.functionname === 'addbookmark') {
-      // clear search before adding
-      if (document.getElementById('toolbar').classList.contains('showsearchfield')) {
-        document.getElementById('searchinputfield').value = '';
-        filterList('');
-        document.getElementById('searchinputfield').focus();
-      }
-      addBookmark();
-      return;
-    }
-    // fold or unfold the searchfield
-    if (event.target.dataset.functionname === 'togglesearch') {
-      toggleSearch();
-      return;
-    }
-    // switch to cleanup mode
-    if (event.target.dataset.functionname === 'startcleanup') {
-      startCleanupMode();
-      return;
-    }
-    // cancel cleanup
-    if (event.target.dataset.functionname === 'cancelcleanup') {
-      stopCleanupMode();
-      return;
-    }
-    
-    if (cleanupMode) {
-      if (event.target.dataset.functionname === 'selectbookmark') {
-        // highlight bookmark when checkbox is clicked
-        event.target.parentElement.classList.toggle('selected');
-        updateCleanupCounter();
-      }
-      if (event.target.dataset.functionname === 'selectall') {
-        selectAllBookmarks();
-      }
-      if (event.target.dataset.functionname === 'deselectall') {
-        deselectAllBookmarks();
-      }
-      if (event.target.dataset.functionname === 'deleteselected') {
-        deleteSelectedBookmarks();
-      }
-    }
-    else {
-      // delete bookmark when close button is clicked
-      if (event.target.dataset.deleteid) {
-        deleteBookmark(event.target.dataset.deleteid);
+    const fn = event.target.dataset.functionname;
+
+    switch (fn) {
+      case 'addbookmark':
+        // add bookmark by clicking on the add button
+        // clear search before adding
+        if (document.getElementById('toolbar').classList.contains('showsearchfield')) {
+          document.getElementById('searchinputfield').value = '';
+          filterList('');
+          document.getElementById('searchinputfield').focus();
+        }
+        addBookmark();
         return;
+      case 'togglesearch':
+        toggleSearch();
+        return;
+      case 'startcleanup':
+        startCleanupMode();
+        return;
+      case 'cancelcleanup':
+        stopCleanupMode();
+        return;
+    }
+
+    if (cleanupMode) {
+      switch (fn) {
+        case 'selectbookmark':
+          // highlight bookmark when checkbox is clicked
+          event.target.parentElement.classList.toggle('selected');
+          updateCleanupCounter();
+          return;
+        case 'selectall':
+          selectAllBookmarks();
+          return;
+        case 'deselectall':
+          deselectAllBookmarks();
+          return;
+        case 'deleteselected':
+          deleteSelectedBookmarks();
+          return;
       }
+    }
+
+    // delete bookmark when close button is clicked
+    if (event.target.dataset.deleteid) {
+      deleteBookmark(event.target.dataset.deleteid);
+      return;
     }
   }
 });
