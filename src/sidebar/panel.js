@@ -110,7 +110,7 @@ function updateBookmarkListNode() {
     contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
     sidebarBookmarkList = document.getElementById('bookmarklist'); // needed
     updateCounter = backgroundscript.updateCounter;
-    updateCleanupCounter();
+    if (cleanupMode) updateCleanupCounter();
   } else {
     console.log(`panel of window ${myWindowId}: no need to update`);
   }
@@ -181,24 +181,6 @@ function deleteBookmark(id) {
   }
 }
 
-// delete all bookmarks that have been selected in cleanup mode
-function deleteSelectedBookmarks() {
-  let selectedNodes = document.querySelectorAll('.selected');
-  if (selectedNodes.length === 0) {
-    let bookmarkCount = sidebarBookmarkList.children.length;
-    if (bookmarkCount === 0) {
-      let feedbackEl = document.getElementById('cleanupcounter');
-      playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
-    } else {
-      let feedbackEl = document.getElementById('selectallornonebutton');
-      playCssAnimation(feedbackEl, 'shaking', 'paddingrightshake');
-    }
-    return;
-  }
-  let bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid );
-  backgroundscript.removeBookmarks(bookmarkIDs);
-}
-
 // helper for deleteBookmark
 function getBookmarkListElement(bookmarkid) {
   return sidebarBookmarkList.querySelector('[data-bookmarkid="' + bookmarkid + '"]');
@@ -251,25 +233,13 @@ function toggleSearch() {
   const toolbar = document.getElementById('toolbar');
   const cssIDshowSearchField = 'showsearchfield'; 
   if (toolbar.classList.contains(cssIDshowSearchField)) {
-    hideSearch();
+    document.getElementById('searchinputfield').value = '';
+    filterList('');
+    toolbar.classList.remove(cssIDshowSearchField);
   } else {
-    showSearch();
+    toolbar.classList.add(cssIDshowSearchField);
+    document.getElementById('searchinputfield').focus(); 
   }
-}
-
-function showSearch() {
-  const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = 'showsearchfield';
-  toolbar.classList.add(cssIDshowSearchField);
-  document.getElementById('searchinputfield').focus(); 
-}
-
-function hideSearch() {
-  const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = 'showsearchfield';
-  document.getElementById('searchinputfield').value = '';
-  filterList('');
-  toolbar.classList.remove(cssIDshowSearchField);
 }
 
 // hackish search/filter functionality (don’t try this at home!)
@@ -289,17 +259,21 @@ function filterList(terms) {
   searchStyle.sheet.insertRule('li.bookmark { display: none; }');
 }
 
+
+/* ------------------------------------------------ */
+// Cleanup mode sidebar user interaction
+/* ------------------------------------------------ */
+
 // switch to cleanup mode
 // cleanup mode allows the user to select multiple bookmarks
 // and then delete them with one click
 function startCleanupMode() {
   cleanupMode = true;
-  const content = document.getElementById('content');
-  content.classList.add('cleanupmode');
+  document.getElementById('content').classList.add('cleanupmode');
   updateCleanupCounter();
 }
 
-// turn off cleanup mode
+// switch back from cleanup mode
 function stopCleanupMode() {
   cleanupMode = false;
   document.getElementById('content').classList.remove('cleanupmode');
@@ -307,22 +281,27 @@ function stopCleanupMode() {
 
 // show the number of selectable and selected bookmarks in cleanup mode
 function updateCleanupCounter() {
-  let bookmarkCount = sidebarBookmarkList.children.length;
-  // TODO: internationalize
+  const bookmarkCount = sidebarBookmarkList.children.length;
+  const selectedCount = document.querySelectorAll('.selected').length;
   if (bookmarkCount === 0) {
-    document.getElementById('cleanupcounter').firstChild.textContent = 'all cleaned up';
-    document.getElementById('selectallornonebutton').classList.remove('none');
+    let cleanupCounterEl =  document.getElementById('cleanupcounter');
+    let SelectAllOrNoneEl = document.getElementById('selectallornonebutton');
+    // TODO: internationalize
+    cleanupCounterEl.firstChild.textContent = 'all cleaned up';
+    SelectAllOrNoneEl.classList.remove('none');
     return; 
-  }
-  let selectedCount = document.querySelectorAll('.selected').length;
-  document.getElementById('cleanupcounter').firstChild.textContent = `${selectedCount} of ${bookmarkCount}`;
-  if ((selectedCount === bookmarkCount) && (bookmarkCount !== 0)) {
-    document.getElementById('selectallornonebutton').classList.add('none');
   } else {
-    document.getElementById('selectallornonebutton').classList.remove('none');
+    // TODO: internationalize
+    cleanupCounterEl.firstChild.textContent = `${selectedCount} of ${bookmarkCount}`;
+    if ((bookmarkCount !== 0) && (selectedCount === bookmarkCount)) {
+      SelectAllOrNoneEl.classList.add('none');
+    } else {
+      SelectAllOrNoneEl.classList.remove('none');
+    }
   }
 }
 
+// select all bookmarks in cleanup mode
 function selectAllBookmarks() {
   let bookmarkCount = sidebarBookmarkList.children.length;
   if (bookmarkCount === 0) {
@@ -331,9 +310,9 @@ function selectAllBookmarks() {
     return;
   }
   for (let bookmark of sidebarBookmarkList.children) {
-    let checkbox = bookmark.querySelector('.cleanupcheckbox');
-    if (!checkbox.checked) {
-      checkbox.checked = true;
+    let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
+    if (!checkboxEl.checked) {
+      checkboxEl.checked = true;
       bookmark.classList.add('selected');
     }
   }
@@ -341,15 +320,35 @@ function selectAllBookmarks() {
   updateCleanupCounter();
 }
 
+// deselect all bookmarks in cleanup mode
 function deselectAllBookmarks() {
   for (let bookmark of sidebarBookmarkList.children) {
-    let checkbox = bookmark.querySelector('.cleanupcheckbox');
-    if (checkbox.checked) {
-      checkbox.checked = false;
+    let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
+    if (checkboxEL.checked) {
+      checkboxEl.checked = false;
       bookmark.classList.remove('selected');
     }
   }
   document.getElementById('selectallornonebutton').classList.remove('none');
+  updateCleanupCounter();
+}
+
+// delete all bookmarks that have been selected in cleanup mode
+function deleteSelectedBookmarks() {
+  let selectedNodes = document.querySelectorAll('.selected');
+  if (selectedNodes.length === 0) {
+    const bookmarkCount = sidebarBookmarkList.children.length;
+    if (bookmarkCount === 0) {
+      const feedbackEl = document.getElementById('cleanupcounter');
+      playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+    } else {
+      const feedbackEl = document.getElementById('selectallornonebutton');
+      playCssAnimation(feedbackEl, 'shaking', 'paddingrightshake');
+    }
+  } else {
+    const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid );
+    backgroundscript.removeBookmarks(bookmarkIDs);
+  }
 }
 
 /* ------------------------------------------------ */

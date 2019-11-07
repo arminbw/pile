@@ -229,7 +229,6 @@ async function addBookmark(tab) {
         badgeText = '⬆';
       }
     }
-    console.log('adding');
     bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId});
     console.log(bookmark);
     showBadge(badgeText);
@@ -247,8 +246,6 @@ async function addBookmarkandClose(tab, removePinned) {
     semaphore.registerChange();
     let tabs = await browser.tabs.query({ windowId: tab.windowId });
     // only remove pinned tabs when the user explicitly says so
-    console.log('PINNED?');
-    console.log(tab.pinned);
     if ((removePinned === true) || (tab.pinned === false)) {
       let bookmark = await addBookmark(tab);
       if (tabs.length === 1) {
