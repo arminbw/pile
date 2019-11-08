@@ -83,13 +83,7 @@ function onCreatedErrorHandler() {
 browser.contextMenus.create({
   id: 'putOnPile',
   title: browser.i18n.getMessage('putOnPileMessage'),
-  contexts: ['page', 'frame', 'image']
-}, onCreatedErrorHandler);
-
-browser.contextMenus.create({
-  id: 'putOnPile',
-  title: browser.i18n.getMessage('putOnPileMessage'),
-  contexts: ['tab']
+  contexts: ['page', 'frame', 'image', 'page']
 }, onCreatedErrorHandler);
 
 browser.contextMenus.create({
@@ -184,12 +178,12 @@ function createBookmarkNode(bookmark) {
   let button = document.createElement('button'); 
   button.classList.add('deletebutton');
   button.setAttribute('data-deleteid', bookmark.id);
-  button.setAttribute('title', 'remove');
+  button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
   let checkbox = document.createElement('input'); 
   checkbox.classList.add('cleanupcheckbox');
   checkbox.setAttribute('type', 'checkbox');
   checkbox.setAttribute('data-functionname', 'selectbookmark');
-  checkbox.setAttribute('title', 'mark for deletion');
+  checkbox.setAttribute('title', browser.i18n.getMessage('markForDeletion'));
   li.appendChild(a);
   li.appendChild(button);
   li.appendChild(checkbox);

@@ -139,16 +139,16 @@ a.link, a.link:visited {
 }
 @keyframes paddingrightshake {
   8%, 41% {
-    padding-right: 0px;
+    transform: translateX(0px);
   }
   25%, 58% {
-    padding-right: 4px;
+    transform: translateX(2px);
   }
   75% {
-    padding-right: 0px;
+    transform: translateX(-1px);
   }
   92% {
-    padding-right: 2px;
+    transform: translateX(1px);
   }
   0%, 100% {
     padding-right: 0px;

@@ -281,16 +281,14 @@ function stopCleanupMode() {
 function updateCleanupCounter() {
   const bookmarkCount = sidebarBookmarkList.children.length;
   const selectedCount = document.querySelectorAll('.selected').length;
+  let cleanupCounterEl =  document.getElementById('cleanupcounter');
+  let SelectAllOrNoneEl = document.getElementById('selectallornonebutton');
   if (bookmarkCount === 0) {
-    let cleanupCounterEl =  document.getElementById('cleanupcounter');
-    let SelectAllOrNoneEl = document.getElementById('selectallornonebutton');
-    // TODO: internationalize
-    cleanupCounterEl.firstChild.textContent = 'all cleaned up';
+    cleanupCounterEl.firstChild.textContent = browser.i18n.getMessage("cleanedUp");
     SelectAllOrNoneEl.classList.remove('none');
-    return; 
   } else {
-    // TODO: internationalize
-    cleanupCounterEl.firstChild.textContent = `${selectedCount} of ${bookmarkCount}`;
+    let ofLan = browser.i18n.getMessage("of");
+    cleanupCounterEl.firstChild.textContent = `${selectedCount} ${ofLan} ${bookmarkCount}`;
     if ((bookmarkCount !== 0) && (selectedCount === bookmarkCount)) {
       SelectAllOrNoneEl.classList.add('none');
     } else {
@@ -305,24 +303,24 @@ function selectAllBookmarks() {
   if (bookmarkCount === 0) {
     let feedbackEl = document.getElementById('cleanupcounter');
     playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
-    return;
-  }
-  for (let bookmark of sidebarBookmarkList.children) {
-    let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
-    if (!checkboxEl.checked) {
-      checkboxEl.checked = true;
-      bookmark.classList.add('selected');
+  } else {
+    for (let bookmark of sidebarBookmarkList.children) {
+      let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
+      if (!checkboxEl.checked) {
+        checkboxEl.checked = true;
+        bookmark.classList.add('selected');
+      }
     }
+    document.getElementById('selectallornonebutton').classList.add('none');
+    updateCleanupCounter();
   }
-  document.getElementById('selectallornonebutton').classList.add('none');
-  updateCleanupCounter();
 }
 
 // deselect all bookmarks in cleanup mode
 function deselectAllBookmarks() {
   for (let bookmark of sidebarBookmarkList.children) {
     let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
-    if (checkboxEL.checked) {
+    if (checkboxEl.checked) {
       checkboxEl.checked = false;
       bookmark.classList.remove('selected');
     }
@@ -377,6 +375,12 @@ async function init() {
       e.preventDefault();
     }
   }, false);
+
+  // internationalize
+  /*document.querySelectorAll('[data-localize-text]').forEach(el => {
+    el.textContent = "browser.i18n.getMessage(elem.dataset.localize-text";
+  });
+  document.getElementById('searchinputfield').textContent = browser.i18n.getMessage('search');*/
 
   // register message handler
   browser.runtime.onMessage.addListener(handleMessage);

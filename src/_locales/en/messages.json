@@ -18,5 +18,45 @@
   "putAllOnPileMessage": {
     "message": "Put ALL unpinned tabs on the Pile and close them.",
     "description": "Close ALL unpinned tabs and put a bookmark for each of them in the Pile's bookmark folder."
+  },
+  "of": {
+    "message": "of",
+    "description": "Example: 1 of 10"
+  },
+  "cleanedUp": {
+    "message": "All cleanup up",
+    "description": "Nothing to delete"
+  },
+  "all": {
+    "message": "All",
+    "description": "All/None button label"
+  },
+  "none": {
+    "message": "None",
+    "description": "All/None button label"
+  },
+  "addPage": {
+    "message": "Add Page",
+    "description": "Add Page button label"
+  },
+  "delete": {
+    "message": "Delete",
+    "description": "Delete button label"
+  },
+  "cancel": {
+    "message": "Cancel",
+    "description": "Stop cleanup mode"
+  },
+  "search": {
+    "message": "Search",
+    "description": "Search placeholder text"
+  },
+  "deleteBookmark": {
+    "message": "Delete Bookmark",
+    "description": "remove bookmark"
+  },
+  "markForDeletion": {
+    "message": "Mark for deletion",
+    "description": "Mark bookmark for cleanup"
   }
 }

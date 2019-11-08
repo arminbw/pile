@@ -1,22 +1,47 @@
 {
     "extensionDescription": {
-      "message": "Unkompliziertes Bookmarking für umtriebige Leser.",
-      "description": ""
+      "message": "Niedrigschwelliges Bookmarking für umtriebige Leser."
     },
     "buttonTitle": {
-      "message": "Auf Pile legen",
-      "description": ""
+      "message": "Auf Pile legen"
     },
     "ExecuteSidebarAction": {
-      "message": "Pile-Seitenleiste zeigen/verbergen",
-      "description": ""
+      "message": "Pile-Seitenleiste zeigen/verbergen"
     },
     "putOnPileMessage": {
-      "message": "Tab schließen und auf Pile legen",
-      "description": ""
+      "message": "Tab schließen und auf Pile legen"
     },
     "putAllOnPileMessage": {
-      "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen",
-      "description": ""
+      "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen"
+    },
+    "of": {
+      "message": "von"
+    },
+    "cleanedUp": {
+      "message": "Alles sauber"
+    },
+    "all": {
+      "message": "Alle"
+    },
+    "none": {
+      "message": "Keine"
+    },
+    "addPage": {
+      "message": "Ablegen"
+    },
+    "delete": {
+      "message": "Löschen"
+    },
+    "cancel": {
+      "message": "Abbrechen"
+    },
+    "search": {
+      "message": "Suche"
+    },
+    "deleteBookmark": {
+      "message": "Lesezeichen löschen"
+    },
+    "markForDeletion": {
+      "message": "Lesezeichen auswählen"
     }
   }
