@@ -2,16 +2,34 @@ html, body {
   height: 100%;
   margin: 0;
   box-sizing: border-box;
-  background-color: #F2F2F2;
+  --colorBlack: #000;
+  --colorBackground: #F2F2F2;
+  --colorBlue1: #EFF6F8;
+  --colorBlue2: #E3EEF1;
+  --colorBlue3: #157A9F;
+  --colorBlue4: #1A6B88;
+  --colorBlue5: #17617C;
+  --colorGrey0: #F8F8F8;
+  --colorGrey1: #FAF8F5;
+  --colorGrey2: #ECECEC;
+  --colorGrey3: #D9D9D9;
+  --colorGrey4: #999999;
+  --colorGrey5: #444444;
+  --colorGrey6: #3A3A3A;
+  --colorGrey7: #2F2F2F;
+  --colorTurkese1: #D7E7E7;
+  --colorTurkese2: #CDE0E0;
+  --colorTurkese3: #B2D1D7;
+  background-color: var(--colorBackground);
 }
 body {
   font: caption;
-  background-color: #F2F2F2;
+  background-color: var(--colorBackground);
   --timeCleanupUnfold: 0.22s;
   --timeCleanupFold: 0.22s;
 }
 div#content {
-  background-color: #F2F2F2;
+  background-color: var(--colorBackground);
   height: 100%;
   overflow: hidden;
   width: 100%;
@@ -22,7 +40,7 @@ ul#bookmarklist {
   width: calc(100% + 30px);
   overflow-y: scroll;
   overflow-x: hidden;
-  background-color: #F2F2F2;
+  background-color: var(--colorBackground);
   margin: 24px 0 0 0;
   padding: 0 0 0 0;
   scroll-behavior: smooth;
@@ -34,11 +52,11 @@ li.bookmark:first-child {
   margin-top: 0px;
 }
 li.bookmark {
-  border-bottom: 1px solid #ECECEC;
+  border-bottom: 1px solid var(--colorGrey2);
   height: 38px;
   margin: 0;
   padding: 0;
-  background-color: #F6F6F6;
+  background-color: var(--colorGrey1);
   list-style: none;
   line-height: 38px;
   font-size: 12px;
@@ -101,15 +119,15 @@ a.link {
   z-index: 0;
 }
 a.link, a.link:visited {
-  color: #3B3B3B;
+  color: var(--colorGrey5);
 }
 .bookmark > a.link:hover {
-  color: #4D4D4D;
-  background-color: #FAFAFA;
+  color: var(--colorBlack);
+  background-color: var(--colorGrey0);
 }
 .bookmark > a.link:active {
-  background-color: #E8EFF1 !important;
-  color: #000;
+  color: var(--colorBlue5);
+  background-color: var(--colorBlue1) !important;
 }
 .bookmark.shaking {
   animation: shake 0.42s linear;
@@ -190,11 +208,11 @@ button.deletebutton {
   line-height: 21px;
   text-align: center;
   text-decoration: none;
-  color: #999;
+  color: var(--colorGrey5);
   background: no-repeat center url("close_button.svg");
 }
 button.deletebutton, button.deletebutton:visited {
-  color: #999;
+  color: var(--colorGrey4);
 }
 button.deletebutton:hover {
   background:url("close_button_hover.svg");
@@ -211,7 +229,7 @@ button.deletebutton:active {
   z-index: 4;
   width: 100%;
   height: 24px;
-  background-color: #B2D1D7;
+  background-color: var(--colorTurkese3);
   box-shadow: 0px 2px 3px 0px rgba(100, 100, 100, 0.65), inset 0 0 0px #CADDDD;
 }
 .toolbartop {
@@ -266,7 +284,7 @@ button#addbookmark {
   line-height: 24px;
   font-size: 11px;
   font-weight: 400;
-  color: #3C3C3C;
+  color: var(--colorGrey4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -277,24 +295,22 @@ button#addbookmark {
   border: 0;
   border-radius: 0px; 
   border-left: solid 1px rgb(179, 179, 179);
-  background-color: var(--bgcolorButton);
+  background-color: var(--colorTurkese1);
+  color: var(--colorGrey5);
   transition: background-color 0.28s ease;
 }
 button#addbookmark:hover {
-  background-color: var(--bgcolorButtonHover);
+  color: var(--colorBlack);
+  background-color: var(--colorTurkese2);
   transition: background-color 0.08s ease;
 }
 button#addbookmark:active {
-  background-color: var(--bgcolorButtonActive);
+  background-color: var(--colorTurkese3);
 }
 
 /* searchfield variables */
 #toolbar {
   --timeSearchFieldHiding: 0.4s;
-  --bgcolorButton: rgba(186,226,230,0);
-  --bgcolorButtonHover: rgba(167, 215, 208, 0.23);
-  --bgcolorButtonActive: rgba(142,181,199,0.29);
-  --textColorToolbar: #3C3C3C;
 }
 
 /* the searchfield is shown, add button is small */
@@ -340,10 +356,10 @@ button#addbookmark:active {
   background: no-repeat center url("search_button.svg") transparent;
 }
 #toolbar:not(.showsearchfield) button#searchshowhidebutton:hover {
-  background: no-repeat center url("search_button.svg") var(--bgcolorButtonHover);
+  background: no-repeat center url("search_button.svg") var(--colorTurkese2);
 }
 #toolbar:not(.showsearchfield) button#searchshowhidebutton:active {
-  background: no-repeat center url("search_button.svg") var(--bgcolorButtonActive);
+  background: no-repeat center url("search_button.svg") var(--colorTurkese3);
 }
 #toolbar:not(.showsearchfield) button#addbookmark {
   width: calc(100% - 43px);
@@ -360,10 +376,10 @@ body.noanimations * {
 /* searchfield unfolding */
 @keyframes transition_button_close {
   0% {
-    background: none center var(--bgcolorButtonActive);
+    background: none center var(--colorTurkese3);
   }
   50% {
-    background: none center var(--bgcolorButtonActive);
+    background: none center var(--colorTurkese3);
   }
   80% {
     background: none center #fff;
@@ -376,13 +392,13 @@ body.noanimations * {
   0% {
     width: 1px;
     padding-left: 0px;
-    background-color: var(--bgcolorButtonActive);
+    background-color: var(--colorTurkese3);
     color: transparent;
   }
   50% {
     padding-left: 5px;
     width: calc(100% - 112px);
-    background-color: var(--bgcolorButtonActive);
+    background-color: var(--colorTurkese3);
     color: transparent;
   }
   80% {
@@ -444,12 +460,22 @@ body.noanimations * {
   text-align: center;
   width: calc(50% - 6px);
   height: 18px;
-  background-color: #157A9F;
-  color: #fff;
+  background-color: var(--colorBlue3);
+  color: var(--colorGrey0);
   font-size: 11px;
   line-height: 18px;
   margin: 3px 2px 3px 4px;
   border-radius: 3px;
+}
+
+.deleteselectedbutton:hover {
+  background-color: var(--colorBlue4);
+  color: #FFF;
+}
+
+.deleteselectedbutton:active {
+  background-color: var(--colorBlue5);
+  color: #FFF;
 }
 
 .cancelcleanupbutton {
@@ -457,12 +483,22 @@ body.noanimations * {
   text-align: center;
   width: calc(50% - 6px);
   height: 18px;
-  background-color: var(--textColorToolbar);
-  color: #fff;
+  background-color: var(--colorGrey5);
+  color: var(--colorGrey0);
   font-size: 11px;
   line-height: 18px;
   margin: 3px 4px 3px 2px;
   border-radius: 3px;
+}
+
+.cancelcleanupbutton:hover {
+  background-color: var(--colorGrey6);
+  color: #FFF;
+}
+
+.cancelcleanupbutton:active {
+  background-color: var(--colorGrey7);
+  color: #FFF;
 }
 
 .cleanupcounter {
@@ -484,11 +520,11 @@ button#selectallbutton {
   vertical-align:top;
   width: 42px;
   height: 18px;
-  color: var(--textColorToolbar);
+  color: var(--colorGrey5);
   font-size: 11px;
   line-height: 16px;
   border-radius: 3px;
-  border: solid 1px var(--textColorToolbar);
+  border: solid 1px var(--colorGrey5);
   padding: 0;
   margin: 3px 4px 3px 4px;
   text-align: center;
@@ -539,11 +575,11 @@ input[type="checkbox"].cleanupcheckbox:checked {
 }
 
 #content.cleanupmode li.bookmark.selected > a.link {
-  color: #157A9F;
+  color: var(--colorBlue3);
 }
 
 #content.cleanupmode li.bookmark.selected > a.link:hover {
-  background-color: #EFF6F8;
+  background-color: var(--colorBlue2);
 }
 
 
@@ -687,7 +723,7 @@ button#addbookmark {
   z-index: 1;
   position: relative;
   display: inline-block;
-  color: var(--textColorToolbar);
+  color: var(--colorGrey5);
 }
 
 #content.cleanupmode #cleanupcounter {
