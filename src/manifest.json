@@ -33,7 +33,7 @@
       "background.js"
     ]
   },
-  "permissions": ["bookmarks", "contextMenus", "<all_urls>", "activeTab", "tabs", "storage"],
+  "permissions": ["bookmarks", "contextMenus", "activeTab", "tabs", "storage"],
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
