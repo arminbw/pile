@@ -233,7 +233,8 @@ button.deletebutton:active {
   box-shadow: 0px 2px 3px 0px rgba(100, 100, 100, 0.65), inset 0 0 0px #CADDDD;
 }
 .toolbartop {
-  background-image: linear-gradient( #D8E8E8, #CADFDF);
+  background-image: linear-gradient(#B2D1D7, #CDE0E0);
+  );
   height: 24px;
 }
 #searchinputfield {
@@ -279,6 +280,13 @@ button#cleanupbutton {
   background: no-repeat center url("cleanup_button.svg");
   transition: background-color 0.08s ease;
 }
+button#cleanupbutton:hover {
+  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese2);
+}
+button#cleanupbutton:active {
+  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese3);
+}
+
 button#addbookmark {
   height: 24px;
   line-height: 24px;
@@ -295,7 +303,7 @@ button#addbookmark {
   border: 0;
   border-radius: 0px; 
   border-left: solid 1px rgb(179, 179, 179);
-  background-color: var(--colorTurkese1);
+  background-color: transparent;
   color: var(--colorGrey5);
   transition: background-color 0.28s ease;
 }
@@ -533,6 +541,13 @@ button#selectallbutton {
   outline: none;
 }
 
+
+button#selectnonebutton:hover,
+button#selectallbutton:hover {
+  background-color: var(--colorTurkese2);
+  color: var(--colorBlack);
+}
+
 button#selectnonebutton {
   display: none;
 }
@@ -558,20 +573,43 @@ input[type="checkbox"].cleanupcheckbox {
   top: 7px;
   width: 17px;
   height: 17px;
-  border: solid 1px #999999;
+  border: solid 1px var(--colorGrey4);
   border-radius: 3px;
   background-color: none;
   opacity: 0;
   z-index: -1;
 }
 
+input[type="checkbox"].cleanupcheckbox:hover {
+  border-color: var(--colorGrey5);
+}
+
+input[type="checkbox"].cleanupcheckbox:active {
+  background-color: var(--colorBlue2);
+  border-color: var(--colorBlue5);
+}
+
 input[type="checkbox"].cleanupcheckbox:checked {
-  background: no-repeat center url("checkmark.svg");
+  background: no-repeat center url("checkmark.svg") var(--colorBlue2);
+  border: 1px solid var(--colorBlue3);
+}
+
+input[type="checkbox"].cleanupcheckbox:checked:hover {
+  background-color: var(--colorBlue1);
+}
+
+input[type="checkbox"].cleanupcheckbox:active:checked {
+  border-color: var(--colorGrey5);
+  background: no-repeat center url("checkmark_active.svg") var(--colorGrey2);
 }
 
 #content.cleanupmode li.bookmark.selected {
-  background-color: #E3EEF1;
-  border-color: #DFE7EA; 
+  background-color: var(--colorBlue2);
+  border-top: 1px solid var(--colorGrey3);
+  margin-top: -1px;
+  height: 39px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--colorGrey3);
 }
 
 #content.cleanupmode li.bookmark.selected > a.link {
@@ -579,34 +617,17 @@ input[type="checkbox"].cleanupcheckbox:checked {
 }
 
 #content.cleanupmode li.bookmark.selected > a.link:hover {
-  background-color: var(--colorBlue2);
+  background-color: var(--colorBlue1);
 }
-
 
 #content.cleanupmode input.cleanupcheckbox {
   opacity: 1;
-  transition: all;
-  transition-delay: 100ms;
-  transition-duration: 100ms;
   z-index: 1;
-}
-
-#content.cleanupmode input[type="checkbox"].cleanupcheckbox:checked {
-  border: 1px solid #157A9F;
-  background-color: none;
-  transition-duration: 0s;
-  transition-delay: 0s;
-}
-
-#content.cleanupmode input[type="checkbox"].cleanupcheckbox:active {
-  border: 1px solid #157A9F;
-  background-color: none;
-  transition-duration: 0s;
-  transition-delay: 0s;
 }
 
 #content.cleanupmode button.deletebutton {
   opacity: 0;
+  visibility: hidden;
   transition: all;
   transition-duration: 100ms;
 }
