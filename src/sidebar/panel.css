@@ -28,11 +28,6 @@ body {
   --timeCleanupUnfold: 0.22s;
   --timeCleanupFold: 0.22s;
 }
-body:after {
-  content: 'checkmark.svg','checkmark_hover.svg','checkmark_active.svg','cleanup_button.svg','cleanup_button_hover.svg','cleanup_button_active.svg','delete_bookmark.svg','delete_bookmark_hover.svg',
-  'delete_bookmark_active.svg';
-  display: none;
-}
 div#content {
   background-color: var(--colorBackground);
   height: 100%;
