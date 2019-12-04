@@ -20,6 +20,7 @@ html, body {
   --colorTurkese1: #D7E7E7;
   --colorTurkese2: #CDE0E0;
   --colorTurkese3: #B2D1D7;
+  --colorTurkese4: #95BCC3;
   background-color: var(--colorBackground);
 }
 body {
@@ -230,11 +231,11 @@ button.deletebutton:active {
   z-index: 4;
   width: 100%;
   height: 24px;
-  background-color: var(--colorTurkese3);
+  background-color: var(--colorTurkese4);
   box-shadow: 0px 2px 3px 0px rgba(100, 100, 100, 0.65), inset 0 0 0px #CADDDD;
 }
 .toolbartop {
-  background-image: linear-gradient(#E3EEF1, #D7E7E7);
+  background-image: linear-gradient(#CDE4E4, #C1D8D8);
   height: 24px;
 }
 #searchinputfield {
@@ -287,7 +288,7 @@ button#cleanupbutton:hover {
   background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese2);
 }
 button#cleanupbutton:active {
-  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese3);
+  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese1);
 }
 button#addbookmark {
   height: 24px;
@@ -315,7 +316,8 @@ button#addbookmark:hover {
   transition: background-color 0.08s ease;
 }
 button#addbookmark:active {
-  background-color: var(--colorTurkese3);
+  color: var(--colorBlue4);
+  background-color: var(--colorTurkese1);
 }
 
 /* searchfield variables */
@@ -331,16 +333,16 @@ button#addbookmark:active {
   width: calc(100% - 112px);
 } 
 #toolbar.showsearchfield button#searchshowhidebutton {
-  background: no-repeat center url("close_button.svg") #fff;
+  background: no-repeat center url("delete_bookmark.svg") #fff;
   animation-name: transition_button_close;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
 }
 #toolbar.showsearchfield button#searchshowhidebutton:hover {
-  background: no-repeat center url("close_button_hover.svg") #fff;
+  background: no-repeat center url("delete_bookmark_hover.svg") #fff;
 }
 #toolbar.showsearchfield button#searchshowhidebutton:active {
-  background: no-repeat center url("close_button_active.svg") #fff;
+  background: no-repeat center url("delete_bookmark_active.svg") #fff;
 }
 #toolbar.showsearchfield button#addbookmark {
   width: 70px;
@@ -366,10 +368,10 @@ button#addbookmark:active {
   background: no-repeat center url("search_button.svg") transparent;
 }
 #toolbar:not(.showsearchfield) button#searchshowhidebutton:hover {
-  background: no-repeat center url("search_button.svg") var(--colorTurkese2);
+  background: no-repeat center url("search_button_hover.svg") var(--colorTurkese2);
 }
 #toolbar:not(.showsearchfield) button#searchshowhidebutton:active {
-  background: no-repeat center url("search_button.svg") var(--colorTurkese3);
+  background: no-repeat center url("search_button_active.svg") var(--colorTurkese1);
 }
 #toolbar:not(.showsearchfield) button#addbookmark {
   width: calc(100% - 43px);
@@ -386,10 +388,10 @@ body.noanimations * {
 /* searchfield unfolding */
 @keyframes transition_button_close {
   0% {
-    background: none center var(--colorTurkese3);
+    background: none center var(--colorTurkese1);
   }
   50% {
-    background: none center var(--colorTurkese3);
+    background: none center var(--colorTurkese1);
   }
   80% {
     background: none center #fff;
@@ -402,13 +404,13 @@ body.noanimations * {
   0% {
     width: 1px;
     padding-left: 0px;
-    background-color: var(--colorTurkese3);
+    background-color: var(--colorTurkese1);
     color: transparent;
   }
   50% {
     padding-left: 5px;
     width: calc(100% - 112px);
-    background-color: var(--colorTurkese3);
+    background-color: var(--colorTurkese1);
     color: transparent;
   }
   80% {
@@ -525,8 +527,15 @@ button#selectallbutton {
 
 button#selectnonebutton:hover,
 button#selectallbutton:hover {
-  background-color: var(--colorTurkese2);
+  background-color: var(--colorTurkese1);
   color: var(--colorBlack);
+  border-color: var(--colorBlack);
+}
+button#selectnonebutton:active,
+button#selectallbutton:active {
+  background-color: var(--colorTurkese1);
+  color: var(--colorBlue4);
+  border-color: var(--colorBlue4);
 }
 button#selectnonebutton {
   display: none;
