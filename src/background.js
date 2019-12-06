@@ -324,7 +324,7 @@ function showBadge(badgeText) {
 // give error feedback on the toolbar button
 function showErrorBadge() {
   setTimeout(() => {
-    browser.browserAction.setBadgeBackgroundColor({color: '#E36A40'});
+    browser.browserAction.setBadgeBackgroundColor({color: '#E23B03'});
     browser.browserAction.setBadgeText({text: 'X'});
   }, 120);
   setTimeout(() => {
