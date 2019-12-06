@@ -1,34 +1,37 @@
+"use strict";
 
-/* File: gulpfile.js */
+const gulp = require('gulp');
+const del = require('del');
+const stripComments = require('gulp-strip-comments');
+const stripDebug = require('gulp-strip-debug');
 
-// grab gulp 3 packages
-const gulp  = require('gulp'),
-    gutil = require('gulp-util'),
-    decomment = require('gulp-decomment');
-    streamqueue = require('streamqueue');
-    removelogging = require("gulp-remove-logging");
-    removeEmptyLines = require('gulp-remove-empty-lines');
-    clean = require('gulp-clean');
+function clean() {
+   return del(['build/**/*']);
+}
 
-gulp.task('default', ['clean'], () => {
-    gulp.start('build');
-});
+function processJavascript() {
+   return gulp
+      .src(['./src/background.js', './src/sidebar/*.js'], { base: 'src/' })
+      .pipe(stripComments( { space:false, trim:true } ))
+      .pipe(stripDebug())
+      .pipe(gulp.dest('./build/'));
+}
 
-// build
-gulp.task('build', () => {
-  return streamqueue({ objectMode: true },
-    gulp.src(['src/manifest.json','./src/background.js', './src/sidebar/*.js', './src/sidebar/*.html', './src/_locales/**'], { base: 'src/' })
-    .pipe(decomment({trim: true}))
-    .pipe(removelogging())
-    .pipe(removeEmptyLines())
-    .pipe(gulp.dest('./build/')),
-    gulp.src(['src/icons/**/*.*', 'src/sidebar/*.svg', 'src/sidebar/*.css'], { base: 'src/' })
-    .pipe(gulp.dest('./build/'))
-    )
-});
+function processOtherCode() {
+   // comments are not stripped from CSS as decomment still has troubles with regular expressions
+   return gulp
+      .src(['src/manifest.json', './src/sidebar/*.html', './src/_locales/**'], { base: 'src/' })
+      .pipe(stripComments())
+      .pipe(gulp.dest('./build/'));
+}
 
-// clean build
-gulp.task('clean', function() {
-  return gulp.src(['build/'], {read: false})
-    .pipe(clean());
-});
+function moveAssets() {
+   return gulp
+      .src(['src/icons/**/*.*', 'src/sidebar/*.svg',  'src/sidebar/*.css'], { base: 'src/' })
+      .pipe(gulp.dest('./build/'))
+}
+
+const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, moveAssets));
+
+exports.build = build;
+exports.clean = clean;

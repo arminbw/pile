@@ -8,7 +8,10 @@ Simply visit [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon
 ```
 npm install --global web-ext
 npm install
-gulp build
+npm run build
+```
+
+```
 web-ext run --pref=browser.link.open_newwindow=3 --source-dir build --firefox=/Applications/Firefox.app/Contents/MacOS/firefox-bin --browser-console --verbose
 ```
 

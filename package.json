@@ -4,20 +4,17 @@
   "description": "A lightweight bookmarking tool for the avid reader",
   "main": "background.js",
   "devDependencies": {
-    "eslint": "^6.1.0",
-    "gulp": "^3.9.1",
-    "gulp-clean": "^0.4.0",
-    "gulp-decomment": "^0.2.0",
-    "gulp-remove-empty-lines": "^0.1.0",
-    "gulp-remove-logging": "^1.2.0",
-    "gulp-util": "^3.0.8",
-    "install": "^0.10.4",
-    "npm": "^6.10.2",
-    "streamqueue": "^1.1.2"
+    "del": "^5.1.0",
+    "eslint": "^6.7.2",
+    "gulp": "^4.0.2",
+    "gulp-strip-comments": "^2.5.2",
+    "gulp-strip-debug": "^3.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ."
+    "lint": "eslint src/.;exit 0",
+    "build": "gulp build",
+    "clean": "gulp clean"
   },
   "repository": {
     "type": "git",

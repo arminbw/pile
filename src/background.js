@@ -141,7 +141,7 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
     // go through all the children of the pile folder
     window.bookmarkListNode = document.createElement('ul');
     window.bookmarkListNode.id = 'bookmarklist';
-    if (piledBookmarksTree[0].hasOwnProperty('children')) {
+    if (Object.prototype.hasOwnProperty.call(piledBookmarksTree[0], 'children')) {
       for (let bookmark of piledBookmarksTree[0].children) {
         window.bookmarkListNode.appendChild(createBookmarkNode(bookmark));
       }
@@ -241,7 +241,7 @@ async function addBookmarkandClose(tab, removePinned) {
     let tabs = await browser.tabs.query({ windowId: tab.windowId });
     // only remove pinned tabs when the user explicitly says so
     if ((removePinned === true) || (tab.pinned === false)) {
-      let bookmark = await addBookmark(tab);
+      await addBookmark(tab);
       if (tabs.length === 1) {
         await browser.tabs.create({});
         await browser.tabs.remove(tab.id);
@@ -261,7 +261,7 @@ async function addBookmarkandClose(tab, removePinned) {
 // close all tabs and bookmark all urls before
 async function addAllBookmarksandClose(windowId) {
   // get the bookmark folder and an array of all tabs
-  let bookmarkFolderId = await getBookmarkFolderId();
+  await getBookmarkFolderId(); // TODO: needed?
   let tabs = await browser.tabs.query({windowId: windowId});
   try {
     semaphore.registerChange();
@@ -343,7 +343,7 @@ async function getBookmarkFolderId() {
   // check all bookmarks titled 'Pile'
   if (bookmarks.length > 0) {
     for (let bookmark of bookmarks) {
-      if (bookmark.hasOwnProperty('type')) {
+      if (Object.prototype.hasOwnProperty.call(bookmark, 'type')) {
         if (bookmark.type === 'folder') {
           return bookmark.id;
         }
@@ -353,7 +353,7 @@ async function getBookmarkFolderId() {
     // No pile folder was found. Let's create one.
     semaphore.registerChange();
     console.log('background: creating bookmark folder');
-    let pileFolderBookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
+    let bookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
     .catch(error => {
       logError('getBookmarkFolderId', error)
       throw error; // TODO: DOES THAT WORK https://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/

@@ -222,7 +222,7 @@ async function addBookmark() {
       // TODO: no shake. css class seems to have low priority
       let errorHtmlElement = document.getElementById('addbookmark');
       playCssAnimation(errorHtmlElement, 'shaking', 'paddingrightshake');
-    };
+    }
   }
 }
 
@@ -342,7 +342,7 @@ function deleteSelectedBookmarks() {
       playCssAnimation(feedbackEl, 'shaking', 'paddingrightshake');
     }
   } else {
-    const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid );
+    const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid);
     backgroundscript.removeBookmarks(bookmarkIDs);
   }
 }
