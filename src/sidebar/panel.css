@@ -12,14 +12,12 @@ html, body {
   --colorGrey0: #F8F8F8;
   --colorGrey1: #F2F2F2;
   --colorGrey2: #ECECEC;
-  --colorGrey3: #D9D9D9;
   --colorGrey4: #999999;
   --colorGrey5: #444444;
   --colorGrey6: #3A3A3A;
   --colorGrey7: #2F2F2F;
   --colorTurkese1: #D7E7E7;
   --colorTurkese2: #CDE0E0;
-  --colorTurkese3: #B2D1D7;
   --colorTurkese4: #95BCC3;
   background-color: var(--colorBackground);
 }
@@ -379,6 +377,9 @@ button#addbookmark:active {
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
 }
+#toolbar:not(.showsearchfield) #searchinputfield::placeholder {
+  color: transparent;
+}
 
 /* suppress all animations during page load */
 body.noanimations * {
@@ -524,7 +525,6 @@ button#selectallbutton {
   background: none;
   outline: none;
 }
-
 button#selectnonebutton:hover,
 button#selectallbutton:hover {
   background-color: var(--colorTurkese1);
