@@ -30,7 +30,7 @@ function logError(functionName, error) {
 window.addEventListener('click', (event) => {
   if (event.which === 1) {
     const fn = event.target.dataset.functionname;
-
+    console.log(fn);
     switch (fn) {
       case 'addbookmark':
         // add bookmark by clicking on the add button
@@ -45,11 +45,12 @@ window.addEventListener('click', (event) => {
       case 'togglesearch':
         toggleSearch();
         return;
-      case 'startcleanup':
-        startCleanupMode();
-        return;
-      case 'cancelcleanup':
-        stopCleanupMode();
+      case 'togglecleanup':
+        if (cleanupMode) {
+          stopCleanupMode();
+        } else {
+          startCleanupMode();
+        }
         return;
     }
 
@@ -68,6 +69,9 @@ window.addEventListener('click', (event) => {
           return;
         case 'deleteselected':
           deleteSelectedBookmarks();
+          return;
+        case 'cancelcleanup':
+          stopCleanupMode();
           return;
       }
     }

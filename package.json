@@ -25,5 +25,7 @@
   ],
   "author": "Armin Wagner",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "core-js": "^3.6.0"
+  }
 }

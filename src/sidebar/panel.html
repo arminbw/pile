@@ -10,8 +10,7 @@
 
 <body class="noanimations">
   <div style="display: none;">
-    <img src="cleanup_button_hover.svg"/>
-    <img src="cleanup_button_active.svg"/>
+    <img src="checkmark.svg"/>
     <img src="checkmark_hover.svg"/>
     <img src="checkmark_active.svg"/>
     <img src="delete_bookmark_hover.svg"/>
@@ -21,7 +20,30 @@
   </div>
   <div id="content">
     <div id="toolbar">
-      <div class="toolbartop"><input id="searchinputfield" type="search" placeholder="Search" id="searchinputfield"/><button data-functionname="togglesearch" id="searchshowhidebutton"></button><button data-functionname="startcleanup" id="cleanupbutton"></button><div id="cleanupcounter">All cleaned up</div><div id="selectallornonebutton"><button id="selectallbutton" data-functionname="selectall" data-localize-text="all">All</button><button id="selectnonebutton" data-functionname="deselectall" data-localize-text="none">None</button></div><div id="addbookmarkcontainer"><button data-functionname="addbookmark" id="addbookmark" data-localize-text="addPage">ADD PAGE</button></div></div>
+      <div class="toolbartop"><input id="searchinputfield" type="search" placeholder="Search" id="searchinputfield"/><button data-functionname="togglesearch" id="searchshowhidebutton"></button><button data-functionname="togglecleanup" id="cleanupbutton"><svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="21" height="24" viewBox="0 0 21 24" pointer-events="none">
+          <defs>
+            <style>
+              .cls-1 {
+                fill: none; 
+                stroke: #3c3c3c;
+                stroke-linecap: square;
+              }
+              .cls-2 {
+                fill: #3c3c3c;
+              }
+            </style>
+          </defs>
+          <g class="trashcanbottom">
+            <polygon id="Path" class="cls-1" points="6.03 7.07 6.51 18.07 14.55 18.07 15.01 7.07 6.03 7.07"/>
+            <line id="Path-2" data-name="Path" class="cls-1" x1="10.52" y1="9.57" x2="10.52" y2="15.57"/>
+            <line id="Path-3" data-name="Path" class="cls-1" x1="8.52" y1="9.57" x2="8.52" y2="15.57"/>
+            <line id="Path-4" data-name="Path" class="cls-1" x1="12.52" y1="9.57" x2="12.52" y2="15.57"/>
+          </g>
+          <g class="trashcantop">
+            <polygon class="cls-2" points="14.97 7.57 6.04 7.57 5.99 6.57 15.02 6.57 14.97 7.57"/>
+            <rect class="cls-2" x="8.75" y="4.8" width="3.5" height="1"/>
+          </g>
+        </svg></button><div id="cleanupcounter">All cleaned up</div><div id="selectallornonebutton"><button id="selectallbutton" data-functionname="selectall" data-localize-text="all">All</button><button id="selectnonebutton" data-functionname="deselectall" data-localize-text="none">None</button></div><div id="addbookmarkcontainer"><button data-functionname="addbookmark" id="addbookmark" data-localize-text="addPage">ADD PAGE</button></div></div>
     <div id="cleanupconfirmation"><button class="deleteselectedbutton" data-functionname="deleteselected" data-localize-text="delete">Delete</button><button class="cancelcleanupbutton" data-functionname="cancelcleanup" data-localize-text="cancel">Cancel</button></div>
     </div>
     <ul id="bookmarklist">

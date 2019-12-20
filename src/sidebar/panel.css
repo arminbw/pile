@@ -269,7 +269,6 @@ button#cleanupbutton {
   display: block;
   float: left;
   border: 0;
-  border-left: solid 1px rgb(179, 179, 179);
   padding: 0;
   margin: 0;
   text-align: center;
@@ -279,15 +278,27 @@ button#cleanupbutton {
   height: 24px;
   line-height: 24px;
   background-color: rgba(186,226,230,0);
-  background: no-repeat center url("cleanup_button.svg");
   transition: background-color 0.08s ease;
 }
 button#cleanupbutton:hover {
-  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese2);
+  background: no-repeat center var(--colorTurkese2);
 }
 button#cleanupbutton:active {
-  background: no-repeat center url("cleanup_button_hover.svg") var(--colorTurkese1);
+  background: no-repeat center var(--colorTurkese1);
 }
+button#cleanupbutton:hover svg .cls-1 {
+  stroke: #000;
+}
+button#cleanupbutton:hover svg .cls-2 {
+  fill: #000;
+}
+button#cleanupbutton:active svg .cls-1 {
+  stroke: var(--colorBlue3);
+}
+button#cleanupbutton:active svg .cls-2 {
+  fill: var(--colorBlue3);
+}
+
 button#addbookmark {
   height: 24px;
   line-height: 24px;
@@ -302,8 +313,6 @@ button#addbookmark {
   text-align: center;
   text-decoration: none;
   border: 0;
-  border-radius: 0px; 
-  border-left: solid 1px rgb(179, 179, 179);
   background-color: transparent;
   color: var(--colorGrey5);
   transition: background-color 0.28s ease;
@@ -527,7 +536,7 @@ button#selectallbutton {
 }
 button#selectnonebutton:hover,
 button#selectallbutton:hover {
-  background-color: var(--colorTurkese1);
+  background-color: var(--colorTurkese2);
   color: var(--colorBlack);
   border-color: var(--colorBlack);
 }
@@ -609,6 +618,35 @@ input[type="checkbox"].cleanupcheckbox:active:checked {
 }
 
 /* cleanup animation */
+#content.cleanupmode button#cleanupbutton svg > .trashcantop {
+  transform-box: fill-box;
+  transform-origin: 0px 2px;
+  animation: anim-open 0.3s forwards;
+  animation-timing-function: ease-out;
+} 
+@keyframes anim-open {
+  0% {
+      transform: translate(0px, 0px) rotate(0deg);
+  }
+  100% {
+      transform: translate(0px, -1.8px) rotate(-12deg);
+  }
+}
+#content:not(.cleanupmode) button#cleanupbutton svg > .trashcantop {
+  transform-box: fill-box;
+  transform-origin: 0px 2px;
+  animation: anim-close 0.3s forwards;
+  animation-timing-function: ease-out;
+}
+@keyframes anim-close {
+  0% {
+    transform: translate(0px, -1.8px) rotate(-12deg);
+  }
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+}
+
 #content #toolbar {
   transition-duration: var(--timeCleanupFold);
   transition-timing-function: ease-in;
