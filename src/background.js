@@ -69,7 +69,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
       addBookmarkandClose(tab, true);
       break;
     case 'putAllOnPile':
-      addAllBookmarksandClose(tab.windowId);
+      addAllBookmarksandClose(tab.windowId, false);
       break;
   }
 });
@@ -106,10 +106,11 @@ class Semaphore {
   }
   registerChange() {
     this.processes++;
-    console.log('background semaphore: register change');
+    console.log(`background semaphore: registerChange - ${this.processes} processes`);
   }
   changeFinished() {
     this.processes--;
+    console.log(`background semaphore: changeFinished - ${this.processes} processes`);
     this.updateWhenPossible();
   }
   updateWhenPossible() {
@@ -118,7 +119,7 @@ class Semaphore {
       updateBookmarkListNode();
     } else {
       console.log('background semaphore: something is being processed. not updating html.');
-      console.log(this.processes);
+      console.log(`background semaphore process counter: ${this.processes}`);
     }
   }
 }
@@ -195,12 +196,14 @@ function createBookmarkNode(bookmark) {
 // Add or remove bookmarks
 /* ------------------------------------------------ */
 
+// remove a bookmark
+// returns a Promise
 function removeBookmark(id) {
   return browser.bookmarks.remove(id);
 }
 
 // add a bookmark
-// returns the promise of a newly added BookmarkTreeNode
+// returns the Promise of a newly added BookmarkTreeNode
 async function addBookmark(tab) {
   let badgeText = '+1';
   let bookmark = undefined;
@@ -235,74 +238,75 @@ async function addBookmark(tab) {
 }
 
 // add a bookmark and close the tab
+// returns true or false
 async function addBookmarkandClose(tab, removePinned) {
   try {
     semaphore.registerChange();
     let tabs = await browser.tabs.query({ windowId: tab.windowId });
     // only remove pinned tabs when the user explicitly says so
-    if ((removePinned === true) || (tab.pinned === false)) {
+    if ((removePinned === true)||(tab.pinned === false)) {
       await addBookmark(tab);
       if (tabs.length === 1) {
         await browser.tabs.create({});
-        await browser.tabs.remove(tab.id);
-      } else {
-        await browser.tabs.remove(tab.id);
-      }
+        console.log('creating empty tab');
+      } 
+      await browser.tabs.remove(tab.id);
+      semaphore.changeFinished();
+      return true;
     }
   } catch(error) {
     logError('addBookmarkandClose', error);
-    semaphore.changeFinished();
-    return false;
   }
   semaphore.changeFinished();
-  return true;
+  return false;
 }
 
 // close all tabs and bookmark all urls before
 async function addAllBookmarksandClose(windowId) {
-  // get the bookmark folder and an array of all tabs
-  await getBookmarkFolderId(); // TODO: needed?
-  let tabs = await browser.tabs.query({windowId: windowId});
+  let badgeText;
+  let counter = 0;
   try {
+    // get the bookmark folder and an array of all tabs
+    await getBookmarkFolderId(); // wait
+    let tabs = await browser.tabs.query({windowId: windowId});
     semaphore.registerChange();
-    let counter = 0;
-    // create bookmarks and close tabs in parallel
-    await Promise.all(tabs.map(tab => {
-      if (addBookmarkandClose(tab, false)) {
+    // create bookmarks and close tabs
+    await Promise.all(tabs.map(async (tab) => {
+      console.log(`removing tab: ${tab}`);
+      if (await addBookmarkandClose(tab, false)) {
         counter++;
-      }
+      };
+      console.log(counter);
     }));
-    // TODO: test badge
-    showBadge(`+${counter}`);
-    console.log('all closed');
   } catch(error) {
     logError('addBookmarkandClose', error);
-    semaphore.changeFinished();
-    return false;
   }
+  badgeText = `+${counter}`;
+  showBadge(badgeText);
   semaphore.changeFinished();
-  return true;
 }
 
 // receives an array of bookmark ids
 // removes said bookmarks in one fell swoop
 async function removeBookmarks(bookmarkIDs) {
+  let badgeText;
+  let counter = 0;
   try {
+    console.log("deleting multiple bookmarks");
     semaphore.registerChange();
-    let counter = 0;
-    await Promise.all(bookmarkIDs.map((id) => {
-      removeBookmark(id);
+    await Promise.all(bookmarkIDs.map(async (id) => {
+      await removeBookmark(id);
+      // TODO: deal with Promise rejection
       counter++;
     }));
-    // TODO: test badge
-    console.log(counter);
   } catch(error) {
     logError('addBookmarkandClose', error);
     semaphore.changeFinished();
-    return false;
   }
+  badgeText = `-${counter}`;
+  showBadge(badgeText);
   semaphore.changeFinished();
-  return true;
+  console.log(`${badgeText} bookmarks removed`);
 }
 
 
