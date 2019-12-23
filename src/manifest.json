@@ -47,8 +47,5 @@
       },
       "description": "Put it on the Pile" 
     }
-  },
-  "options_ui": {
-    "page": "options.html"
   }
 }
