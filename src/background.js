@@ -275,7 +275,7 @@ async function addAllBookmarksandClose(windowId) {
       console.log(`removing tab: ${tab}`);
       if (await addBookmarkandClose(tab, false)) {
         counter++;
-      };
+      }
       console.log(counter);
     }));
   } catch(error) {

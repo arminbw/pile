@@ -9,5 +9,10 @@
   },
 	"extends": [
 		"eslint:recommended"
-	]
+	],
+    "plugins": ["no-unsanitized"],
+    "rules": {
+        "no-unsanitized/method": "error",
+        "no-unsanitized/property": "error"
+    }
 }
