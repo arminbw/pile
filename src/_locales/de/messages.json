@@ -12,7 +12,7 @@
     "message": "Tab schließen und auf Pile legen"
   },
   "putAllOnPileMessage": {
-    "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen"
+    "message": "ALLE nicht-angehefteten Tabs schließen und auf Pile legen"
   },
   "of": {
     "message": "von"
