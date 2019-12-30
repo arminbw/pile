@@ -1,47 +1,57 @@
 {
-    "extensionDescription": {
-      "message": "Niedrigschwelliges Bookmarking für umtriebige Leser."
-    },
-    "buttonTitle": {
-      "message": "Auf Pile legen"
-    },
-    "ExecuteSidebarAction": {
-      "message": "Pile-Seitenleiste zeigen/verbergen"
-    },
-    "putOnPileMessage": {
-      "message": "Tab schließen und auf Pile legen"
-    },
-    "putAllOnPileMessage": {
-      "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen"
-    },
-    "of": {
-      "message": "von"
-    },
-    "cleanedUp": {
-      "message": "Leer"
-    },
-    "all": {
-      "message": "Alle"
-    },
-    "none": {
-      "message": "Keine"
-    },
-    "addPage": {
-      "message": "Ablegen"
-    },
-    "delete": {
-      "message": "Löschen"
-    },
-    "cancel": {
-      "message": "Abbrechen"
-    },
-    "search": {
-      "message": "Suche"
-    },
-    "deleteBookmark": {
-      "message": "Lesezeichen löschen"
-    },
-    "markForDeletion": {
-      "message": "Lesezeichen auswählen"
-    }
+  "extensionDescription": {
+    "message": "Niedrigschwelliges Bookmarking für umtriebige Leser."
+  },
+  "buttonTitle": {
+    "message": "Auf Pile legen"
+  },
+  "ExecuteSidebarAction": {
+    "message": "Pile-Seitenleiste zeigen/verbergen"
+  },
+  "putOnPileMessage": {
+    "message": "Tab schließen und auf Pile legen"
+  },
+  "putAllOnPileMessage": {
+    "message": "ALLE nicht angehefteten Tabs schließen und auf Pile legen"
+  },
+  "of": {
+    "message": "von"
+  },
+  "cleanUp": {
+    "message": "Aufräumen"
+  },
+  "cleanedUp": {
+    "message": "Alles sauber"
+  },
+  "all": {
+    "message": "Alle"
+  },
+  "none": {
+    "message": "Keine"
+  },
+  "addPage": {
+    "message": "HINZUFÜGEN"
+  },
+  "addPageToPileTitle": {
+    "message": "Die aktuelle Seite hinzufügen"
+  },
+  "delete": {
+    "message": "Löschen"
+  },
+  "cancel": {
+    "message": "Abbrechen"
+  },
+  "search": {
+    "message": "Suche"
+  },
+  "deleteBookmark": {
+    "message": "Lesezeichen löschen"
+  },
+  "markForDeletion": {
+    "message": "Lesezeichen auswählen"
+  },
+  "deleteSelectedTitle": {
+    "message": "Ausgewählte Lesezeichen löschen",
+    "description": "Delete selected bookmarks confirmation button title"
   }
+}

@@ -380,11 +380,19 @@ async function init() {
     }
   }, false);
 
-  // internationalize
-  /*document.querySelectorAll('[data-localize-text]').forEach(el => {
-    el.textContent = "browser.i18n.getMessage(elem.dataset.localize-text";
+  // localization of basic ui elements
+  document.querySelectorAll('[data-localize-text]').forEach(el => {
+    el.textContent = browser.i18n.getMessage(el.dataset.localizeText);
   });
-  document.getElementById('searchinputfield').textContent = browser.i18n.getMessage('search');*/
+  document.querySelectorAll('[data-localize-title]').forEach(el => {
+    console.log(el.dataset.localizeText);
+    el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
+  });
+  document.querySelectorAll('[data-localize-placeholder]').forEach(el => {
+    console.log(el.dataset.localizeText);
+    el.placeholder = browser.i18n.getMessage(el.dataset.localizePlaceholder);
+  });
+  document.getElementById('searchinputfield').textContent = browser.i18n.getMessage('search');
 
   // register message handler
   browser.runtime.onMessage.addListener(handleMessage);
