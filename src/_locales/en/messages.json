@@ -28,7 +28,7 @@
     "description": "Clean up mode ON/OFF"
   },
   "cleanedUp": {
-    "message": "All cleanup up",
+    "message": "Clean",
     "description": "Nothing to delete"
   },
   "all": {
@@ -40,7 +40,7 @@
     "description": "All/None button label"
   },
   "addPage": {
-    "message": "Add Page",
+    "message": "ADD PAGE",
     "description": "Add Page button label"
   },
   "addPageToPileTitle": {

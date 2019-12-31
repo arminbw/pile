@@ -1,6 +1,6 @@
 {
   "name": "pile",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "A lightweight bookmarking tool for the avid reader",
   "main": "background.js",
   "devDependencies": {

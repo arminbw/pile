@@ -11,6 +11,7 @@ let searchStyle;
 // the updateCounter gets incremented every time something is changed
 let updateCounter = 0;
 
+// when the user clicks on the trashcan in the sidebar, cleanupMode is set to true
 let cleanupMode = false;
 
 
@@ -24,7 +25,7 @@ function logError(functionName, error) {
 
 
 /* ------------------------------------------------ */
-// Event listeners
+// UI event listeners
 /* ------------------------------------------------ */
 
 window.addEventListener('click', (event) => {
@@ -34,7 +35,7 @@ window.addEventListener('click', (event) => {
     switch (fn) {
       case 'addbookmark':
         // add bookmark by clicking on the add button
-        // clear search before adding
+        // clear search before adding, so the users sees the newly added bookmark
         if (document.getElementById('toolbar').classList.contains('showsearchfield')) {
           document.getElementById('searchinputfield').value = '';
           filterList('');
@@ -89,27 +90,27 @@ document.getElementById('searchinputfield').addEventListener('input', (e) => {
 });
 
 // if a tab is activated (e.g. by switching/closing tabs),
-// check if a content update is necessary, then update the content
-// TODO: really necessary?
+// check if a content update is necessary
+// TODO: is this really necessary?
 browser.tabs.onActivated.addListener((activatedTab) => {
   if (activatedTab.windowId !== myWindowId) {
-    updateBookmarkListNode();
+    updateBookmarkListElement();
   }
 });
 
 
 /* ------------------------------------------------ */
-// Update the list of pile bookmarks in the panel
+// Update the list of Pile bookmarks in the panel
 /* ------------------------------------------------ */
 
 // get the latest html representation of the bookmarks,
 // but only if any changes happened
-function updateBookmarkListNode() {
+function updateBookmarkListElement() {
   console.log(`panel of window ${myWindowId} compares updateCounter: panel ${updateCounter} background ${backgroundscript.updateCounter}`);
   if (updateCounter < backgroundscript.updateCounter) {
     console.log(`panel of window ${myWindowId}: something to update`);
     sidebarBookmarkList = document.getElementById('bookmarklist');
-    contentArea.replaceChild(backgroundscript.bookmarkListNode.cloneNode(true), sidebarBookmarkList);
+    contentArea.replaceChild(backgroundscript.bookmarkListElement.cloneNode(true), sidebarBookmarkList);
     sidebarBookmarkList = document.getElementById('bookmarklist'); // needed
     updateCounter = backgroundscript.updateCounter;
     if (cleanupMode) updateCleanupCounter();
@@ -124,13 +125,13 @@ function updateBookmarkListNode() {
 }
 
 function handleMessage(request, sender, sendResponse) {
-  // TODO: add error handling, etc.
+  // TODO: add proper error handling
   console.log(`panel of window ${myWindowId} received message: ${request.message}`);
   if (request.message === 'updatePilePanel') {
-     // The timeout allows the css transition to end before
-     // the background does update the list because of a double
+     // The timeout allows the CSS transition to end before
+     // the background updates the list because of a double
      setTimeout(() => {
-       updateBookmarkListNode();
+       updateBookmarkListElement();
      }, 380);
   }
 }
@@ -145,7 +146,7 @@ function handleMessage(request, sender, sendResponse) {
 function deleteBookmark(id) {
   if (id) {
     console.log(`panel of window ${myWindowId} deleting ${id}`);
-    let li = getBookmarkListElement(id);
+    let li = getBookmarkElement(id);
     li.classList.add('beingdeleted');
     updateCounter++;
     // can the user scroll? (scrollHeight > offsetHeight)
@@ -167,8 +168,7 @@ function deleteBookmark(id) {
       }, false);
     } else {  
       if ((sidebarBookmarkList.scrollTop > 0) && (distanceToBottom < 38)) {
-        // edge case:
-        // list is scrollable, but not after the deletion
+        // edge case: list is scrollable, but not after the deletion
         // and user has scrolled down a bit
         // solution: scroll to the top
         sidebarBookmarkList.scrollTo(0,0);
@@ -184,15 +184,15 @@ function deleteBookmark(id) {
 }
 
 // helper for deleteBookmark
-function getBookmarkListElement(bookmarkid) {
-  return sidebarBookmarkList.querySelector('[data-bookmarkid="' + bookmarkid + '"]');
+function getBookmarkElement(bookmarkID) {
+  return sidebarBookmarkList.querySelector('[data-bookmarkid="' + bookmarkID + '"]');
 }
 
-// play a css animation once
+// play a CSS animation once
 // add the class cssClass to htmlElement and remove it when played once
-function playCssAnimation(htmlElement, cssClass, animationName) {
+function playCSSAnimation(htmlElement, cssClass, animationName) {
   htmlElement.classList.add(cssClass);
-  let stopAnimation = function(event) {
+  const stopAnimation = function(event) {
     if (event.animationName === animationName) {
       htmlElement.classList.remove(cssClass);
       htmlElement.removeEventListener('animationend', stopAnimation);
@@ -204,28 +204,28 @@ function playCssAnimation(htmlElement, cssClass, animationName) {
 // add a bookmark and show an animation
 // do not rebuild the whole list
 async function addBookmark() {
-  let tabs = await browser.tabs.query({active: true, currentWindow: true})
-  // check if the page is already bookmarked and on top of the pile
+  const tabs = await browser.tabs.query({active: true, currentWindow: true})
+  // check if the page is already bookmarked and on top of the Pile
   if (sidebarBookmarkList.firstChild !== null) {
-    let topEntry = sidebarBookmarkList.firstChild;
+    const topEntry = sidebarBookmarkList.firstChild;
     if (tabs[0].url === topEntry.firstChild.href) {
-      playCssAnimation(topEntry, 'shaking', 'shake');
+      playCSSAnimation(topEntry, 'shaking', 'shake');
       return;
     }
   }
   if (tabs[0].url !== false) {
-    updateCounter++;
     try {
-      let newbookmark = await backgroundscript.addBookmark(tabs[0]);
-      let bookmarkNode = backgroundscript.createBookmarkNode(newbookmark);
-      playCssAnimation(sidebarBookmarkList, 'adding', 'slidein');
-      sidebarBookmarkList.prepend(bookmarkNode);
+      const newBookmark = await backgroundscript.addBookmark(tabs[0]);
+      updateCounter++;
+      const renderedBookmark = backgroundscript.renderBookmark(newBookmark);
+      playCSSAnimation(sidebarBookmarkList, 'adding', 'slidein');
+      sidebarBookmarkList.prepend(renderedBookmark);
     } catch(error) {
-      logError('addBookmark/create', error);
+      logError('addBookmark/render', error);
       console.log('error shake');
-      // TODO: no shake. css class seems to have low priority
-      let errorHtmlElement = document.getElementById('addbookmark');
-      playCssAnimation(errorHtmlElement, 'shaking', 'paddingrightshake');
+      // TODO: no shake. find better css animation solution
+      // const errorHtmlElement = document.getElementById('addbookmark');
+      // playCSSAnimation(errorHtmlElement, 'shaking', 'shakeXTranslation');
     }
   }
 }
@@ -233,14 +233,15 @@ async function addBookmark() {
 // fold/unfold the search input field
 function toggleSearch() {
   const toolbar = document.getElementById('toolbar');
-  const cssIDshowSearchField = 'showsearchfield'; 
-  if (toolbar.classList.contains(cssIDshowSearchField)) {
-    document.getElementById('searchinputfield').value = '';
+  const cssClassShowSearchField = 'showsearchfield';
+  const cssIDSearchInputField = 'searchinputfield';
+  if (toolbar.classList.contains(cssClassShowSearchField)) {
+    document.getElementById(cssIDSearchInputField).value = '';
     filterList('');
-    toolbar.classList.remove(cssIDshowSearchField);
+    toolbar.classList.remove(cssClassShowSearchField);
   } else {
-    toolbar.classList.add(cssIDshowSearchField);
-    document.getElementById('searchinputfield').focus(); 
+    toolbar.classList.add(cssClassShowSearchField);
+    document.getElementById(cssIDSearchInputField).focus(); 
   }
 }
 
@@ -306,7 +307,7 @@ function selectAllBookmarks() {
   let bookmarkCount = sidebarBookmarkList.children.length;
   if (bookmarkCount === 0) {
     let feedbackEl = document.getElementById('cleanupcounter');
-    playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+    playCSSAnimation(feedbackEl, 'shaking', 'paddingleftshake');
   } else {
     for (let bookmark of sidebarBookmarkList.children) {
       let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
@@ -340,10 +341,10 @@ function deleteSelectedBookmarks() {
     const bookmarkCount = sidebarBookmarkList.children.length;
     if (bookmarkCount === 0) {
       const feedbackEl = document.getElementById('cleanupcounter');
-      playCssAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+      playCSSAnimation(feedbackEl, 'shaking', 'paddingleftshake');
     } else {
       const feedbackEl = document.getElementById('selectallornonebutton');
-      playCssAnimation(feedbackEl, 'shaking', 'paddingrightshake');
+      playCSSAnimation(feedbackEl, 'shaking', 'paddingrightshake');
     }
   } else {
     const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid);
@@ -400,7 +401,7 @@ async function init() {
 
   // get the backgroundscript and update the bookmark list
   backgroundscript = await browser.runtime.getBackgroundPage();
-  updateBookmarkListNode();
+  updateBookmarkListElement();
   // if the backgroundscript is still building its list, just wait for the update message
 }
 

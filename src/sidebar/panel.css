@@ -156,21 +156,23 @@ a.link, a.link:visited {
 }
 #content.cleanupmode #selectallornonebutton.shaking, 
 #addbookmark.shaking {
+  animation-delay: 0s;
   animation: paddingrightshake 0.42s linear;
-  animation-delay: 0;
 }
 @keyframes paddingrightshake {
   8%, 41% {
-    transform: translateX(0px);
+    padding-right: 0px;
   }
   25%, 58% {
-    transform: translateX(2px);
+    padding-right: 4px;
+    padding-left: -4px;
   }
   75% {
-    transform: translateX(-1px);
+    padding-right: 0px;
   }
   92% {
-    transform: translateX(1px);
+    padding-right: 2px;
+    padding-left: -2px;
   }
   0%, 100% {
     padding-right: 0px;
@@ -182,19 +184,24 @@ a.link, a.link:visited {
 }
 @keyframes paddingleftshake {
   8%, 41% {
-    padding-left: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
   25%, 58% {
-    padding-left: 4px;
+    padding-left: 1px;
+    padding-right: 9px;
   }
   75% {
-    padding-left: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
   92% {
-    padding-left: 2px;
+    padding-left: 3px;
+    padding-right: 7px;
   }
   0%, 100% {
-    padding-left: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }
 button.deletebutton {
@@ -387,12 +394,14 @@ button#addbookmark:active {
 }
 #toolbar:not(.showsearchfield) button#addbookmark {
   width: calc(100% - 43px);
-  animation-name: transition_button_add_large;
-  animation-duration: var(--timeSearchFieldHiding);
-  animation-timing-function: ease-out;
 }
 #toolbar:not(.showsearchfield) #searchinputfield::placeholder {
   color: transparent;
+}
+#toolbar:not(.showsearchfield) button#addbookmark:not(.shaking) {
+  animation-name: transition_button_add_large;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
 }
 
 /* suppress all animations during page load */

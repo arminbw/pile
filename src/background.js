@@ -1,9 +1,6 @@
 'use strict';
 
-window.bookmarkListNode = document.createElement('ul');
-window.updateCounter = 0;
 const bookmarkFolderName = 'Pile';
-
 
 /* ------------------------------------------------ */
 // Debugging
@@ -69,7 +66,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
       addBookmarkandClose(tab, true);
       break;
     case 'putAllOnPile':
-      addAllBookmarksandClose(tab.windowId, false);
+      addAllBookmarksAndClose(tab.windowId, false);
       break;
   }
 });
@@ -116,7 +113,7 @@ class Semaphore {
   updateWhenPossible() {
     if (this.processes === 0) {
       console.log(`background semaphore update: ${this.processes} processes`);
-      updateBookmarkListNode();
+      updateBookmarkListElement();
     } else {
       console.log('background semaphore: something is being processed. not updating html.');
       console.log(`background semaphore process counter: ${this.processes}`);
@@ -132,7 +129,7 @@ let semaphore = new Semaphore();
 
 // rebuild the complete list of bookmarks shown in all panels
 // when needed: inform the active panels of all windows to fetch it and update their html
-async function updateBookmarkListNode(bInformActivePanels = true) {
+async function updateBookmarkListElement(bInformActivePanels = true) {
   console.log('background: updating html');
   try {
     let bookmarkFolderId = await getBookmarkFolderId();
@@ -140,11 +137,11 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
     // remove this extra step, when clarified
     let piledBookmarksTree = await browser.bookmarks.getSubTree(bookmarkFolderId);
     // go through all the children of the pile folder
-    window.bookmarkListNode = document.createElement('ul');
-    window.bookmarkListNode.id = 'bookmarklist';
+    window.bookmarkListElement = document.createElement('ul');
+    window.bookmarkListElement.id = 'bookmarklist';
     if (Object.prototype.hasOwnProperty.call(piledBookmarksTree[0], 'children')) {
       for (let bookmark of piledBookmarksTree[0].children) {
-        window.bookmarkListNode.appendChild(createBookmarkNode(bookmark));
+        window.bookmarkListElement.appendChild(renderBookmark(bookmark));
       }
     }
     // the updateCounter allows panel.js to check if it needs to update its DOM or not
@@ -160,13 +157,13 @@ async function updateBookmarkListNode(bInformActivePanels = true) {
       });
     }
   } catch(error) {
-    logError('updateBookmarkListNode', error);
+    logError('updateBookmarkListElement', error);
   }
   return; 
 }
 
 // return html code representing a single bookmark 
-function createBookmarkNode(bookmark) {
+function renderBookmark(bookmark) {
   let li = document.createElement('li');
   li.classList.add('bookmark');
   li.setAttribute('data-bookmarkid', bookmark.id);
@@ -261,8 +258,8 @@ async function addBookmarkandClose(tab, removePinned) {
   return false;
 }
 
-// close all tabs and bookmark all urls before
-async function addAllBookmarksandClose(windowId) {
+// close all tabs and bookmark all URLs before
+async function addAllBookmarksAndClose(windowId) {
   let badgeText;
   let counter = 0;
   try {
@@ -354,7 +351,7 @@ async function getBookmarkFolderId() {
       }
     }
   } else {
-    // No pile folder was found. Let's create one.
+    // No pile folder was found. Let’s create one.
     semaphore.registerChange();
     console.log('background: creating bookmark folder');
     let bookmark = await browser.bookmarks.create({ title: bookmarkFolderName })
@@ -371,8 +368,12 @@ async function getBookmarkFolderId() {
 /* ------------------------------------------------ */
 // Initialization
 /* ------------------------------------------------ */
+
+window.bookmarkListElement = document.createElement('ul');
+window.updateCounter = 0;
+
 browser.tabs.query({active: true, currentWindow: true})
 .then(() => {
-  updateBookmarkListNode();
+  updateBookmarkListElement();
   initBookmarksListener();
 });
