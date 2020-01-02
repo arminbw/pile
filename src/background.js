@@ -133,12 +133,12 @@ async function updateBookmarkListElement(bInformActivePanels = true) {
   console.log('background: updating html');
   try {
     let bookmarkFolderId = await getBookmarkFolderId();
-    // TODO: the node returned by .search does not have children, but the node returned by .subtree does.
+    // REMINDER: the node returned by .search does not have children, but the node returned by .subtree does.
     // remove this extra step, when clarified
     let piledBookmarksTree = await browser.bookmarks.getSubTree(bookmarkFolderId);
     // go through all the children of the pile folder
     window.bookmarkListElement = document.createElement('ul');
-    window.bookmarkListElement.id = 'bookmarklist';
+    window.bookmarkListElement.classList.add('bookmarks');
     if (Object.prototype.hasOwnProperty.call(piledBookmarksTree[0], 'children')) {
       for (let bookmark of piledBookmarksTree[0].children) {
         window.bookmarkListElement.appendChild(renderBookmark(bookmark));
@@ -174,11 +174,11 @@ function renderBookmark(bookmark) {
   a.setAttribute('href', bookmark.url);
   a.appendChild(document.createTextNode(bookmark.title));
   let button = document.createElement('button'); 
-  button.classList.add('deletebutton');
+  button.classList.add('delete-button');
   button.setAttribute('data-deleteid', bookmark.id);
   button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
   let checkbox = document.createElement('input'); 
-  checkbox.classList.add('cleanupcheckbox');
+  checkbox.classList.add('cleanup-checkbox');
   checkbox.setAttribute('type', 'checkbox');
   checkbox.setAttribute('data-functionname', 'selectbookmark');
   checkbox.setAttribute('title', browser.i18n.getMessage('markForDeletion'));

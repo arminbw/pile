@@ -36,10 +36,10 @@ window.addEventListener('click', (event) => {
       case 'addbookmark':
         // add bookmark by clicking on the add button
         // clear search before adding, so the users sees the newly added bookmark
-        if (document.getElementById('toolbar').classList.contains('showsearchfield')) {
-          document.getElementById('searchinputfield').value = '';
+        if (document.getElementById('toolbar').classList.contains('show-search-field')) {
+          document.querySelector('.search-input-field').value = '';
           filterList('');
-          document.getElementById('searchinputfield').focus();
+          document.querySelector('.search-input-field').focus();
         }
         addBookmark();
         return;
@@ -85,7 +85,7 @@ window.addEventListener('click', (event) => {
   }
 });
 
-document.getElementById('searchinputfield').addEventListener('input', (e) => {
+document.querySelector('.search-input-field').addEventListener('input', (e) => {
   filterList(e.target.value)
 });
 
@@ -109,9 +109,9 @@ function updateBookmarkListElement() {
   console.log(`panel of window ${myWindowId} compares updateCounter: panel ${updateCounter} background ${backgroundscript.updateCounter}`);
   if (updateCounter < backgroundscript.updateCounter) {
     console.log(`panel of window ${myWindowId}: something to update`);
-    sidebarBookmarkList = document.getElementById('bookmarklist');
+    sidebarBookmarkList = document.querySelector('ul.bookmarks');
     contentArea.replaceChild(backgroundscript.bookmarkListElement.cloneNode(true), sidebarBookmarkList);
-    sidebarBookmarkList = document.getElementById('bookmarklist'); // needed
+    sidebarBookmarkList = document.querySelector('ul.bookmarks'); // needed
     updateCounter = backgroundscript.updateCounter;
     if (cleanupMode) updateCleanupCounter();
   } else {
@@ -147,7 +147,7 @@ function deleteBookmark(id) {
   if (id) {
     console.log(`panel of window ${myWindowId} deleting ${id}`);
     let li = getBookmarkElement(id);
-    li.classList.add('beingdeleted');
+    li.classList.add('being-deleted');
     updateCounter++;
     // can the user scroll? (scrollHeight > offsetHeight)
     // only do the foldup if:
@@ -209,7 +209,7 @@ async function addBookmark() {
   if (sidebarBookmarkList.firstChild !== null) {
     const topEntry = sidebarBookmarkList.firstChild;
     if (tabs[0].url === topEntry.firstChild.href) {
-      playCSSAnimation(topEntry, 'shaking', 'shake');
+      playCSSAnimation(topEntry, 'shaking', 'animation-shake-y');
       return;
     }
   }
@@ -218,14 +218,12 @@ async function addBookmark() {
       const newBookmark = await backgroundscript.addBookmark(tabs[0]);
       updateCounter++;
       const renderedBookmark = backgroundscript.renderBookmark(newBookmark);
-      playCSSAnimation(sidebarBookmarkList, 'adding', 'slidein');
+      playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
       sidebarBookmarkList.prepend(renderedBookmark);
     } catch(error) {
       logError('addBookmark/render', error);
-      console.log('error shake');
-      // TODO: no shake. find better css animation solution
-      // const errorHtmlElement = document.getElementById('addbookmark');
-      // playCSSAnimation(errorHtmlElement, 'shaking', 'shakeXTranslation');
+      const errorHtmlElement = document.querySelector('.add-bookmark');
+      playCSSAnimation(errorHtmlElement, 'shaking', 'animation-shake-x');
     }
   }
 }
@@ -233,15 +231,17 @@ async function addBookmark() {
 // fold/unfold the search input field
 function toggleSearch() {
   const toolbar = document.getElementById('toolbar');
-  const cssClassShowSearchField = 'showsearchfield';
-  const cssIDSearchInputField = 'searchinputfield';
+  const cssClassShowSearchField = 'show-search-field';
   if (toolbar.classList.contains(cssClassShowSearchField)) {
-    document.getElementById(cssIDSearchInputField).value = '';
+    document.querySelector('.search-input-field').value = '';
     filterList('');
     toolbar.classList.remove(cssClassShowSearchField);
+    const errorHtmlElement = document.querySelector('.add-bookmark');
+    playCSSAnimation(errorHtmlElement, 'hide-search-field', 'transition_button_add_large');
   } else {
     toolbar.classList.add(cssClassShowSearchField);
-    document.getElementById(cssIDSearchInputField).focus(); 
+
+    document.querySelector('.search-input-field').focus();
   }
 }
 
@@ -272,28 +272,31 @@ function filterList(terms) {
 // and then delete them with one click
 function startCleanupMode() {
   cleanupMode = true;
-  document.getElementById('content').classList.add('cleanupmode');
+  document.getElementById('content').classList.add('cleanup-mode');
   updateCleanupCounter();
 }
 
 // switch back from cleanup mode
 function stopCleanupMode() {
   cleanupMode = false;
-  document.getElementById('content').classList.remove('cleanupmode');
+  document.getElementById('content').classList.remove('cleanup-mode');
 }
 
 // show the number of selectable and selected bookmarks in cleanup mode
 function updateCleanupCounter() {
   const bookmarkCount = sidebarBookmarkList.children.length;
   const selectedCount = document.querySelectorAll('.selected').length;
-  let cleanupCounterEl =  document.getElementById('cleanupcounter');
-  let SelectAllOrNoneEl = document.getElementById('selectallornonebutton');
+  let cleanupCounterEl =  document.querySelector('.cleanup-counter-selected');
+  let cleanupCounterContextEl = document.querySelector('.cleanup-counter-context');
+  let SelectAllOrNoneEl = document.querySelector('.select-all-or-none-button');
   if (bookmarkCount === 0) {
-    cleanupCounterEl.firstChild.textContent = browser.i18n.getMessage("cleanedUp");
+    cleanupCounterEl.textContent = '';
+    cleanupCounterContextEl.textContent = browser.i18n.getMessage("cleanedUp");
     SelectAllOrNoneEl.classList.remove('none');
   } else {
     let ofLan = browser.i18n.getMessage("of");
-    cleanupCounterEl.firstChild.textContent = `${selectedCount} ${ofLan} ${bookmarkCount}`;
+    cleanupCounterEl.textContent = selectedCount;
+    cleanupCounterContextEl.textContent = ` ${ofLan} ${bookmarkCount}`;
     if ((bookmarkCount !== 0) && (selectedCount === bookmarkCount)) {
       SelectAllOrNoneEl.classList.add('none');
     } else {
@@ -306,17 +309,17 @@ function updateCleanupCounter() {
 function selectAllBookmarks() {
   let bookmarkCount = sidebarBookmarkList.children.length;
   if (bookmarkCount === 0) {
-    let feedbackEl = document.getElementById('cleanupcounter');
-    playCSSAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+    let feedbackEl = document.querySelector('.cleanup-counter');
+    playCSSAnimation(feedbackEl, 'shaking', 'animation-shake-x');
   } else {
     for (let bookmark of sidebarBookmarkList.children) {
-      let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
+      let checkboxEl = bookmark.querySelector('.cleanup-checkbox');
       if (!checkboxEl.checked) {
         checkboxEl.checked = true;
         bookmark.classList.add('selected');
       }
     }
-    document.getElementById('selectallornonebutton').classList.add('none');
+    document.querySelector('.select-all-or-none-button').classList.add('none');
     updateCleanupCounter();
   }
 }
@@ -324,13 +327,13 @@ function selectAllBookmarks() {
 // deselect all bookmarks in cleanup mode
 function deselectAllBookmarks() {
   for (let bookmark of sidebarBookmarkList.children) {
-    let checkboxEl = bookmark.querySelector('.cleanupcheckbox');
+    let checkboxEl = bookmark.querySelector('.cleanup-checkbox');
     if (checkboxEl.checked) {
       checkboxEl.checked = false;
       bookmark.classList.remove('selected');
     }
   }
-  document.getElementById('selectallornonebutton').classList.remove('none');
+  document.querySelector('.select-all-or-none-button').classList.remove('none');
   updateCleanupCounter();
 }
 
@@ -340,15 +343,18 @@ function deleteSelectedBookmarks() {
   if (selectedNodes.length === 0) {
     const bookmarkCount = sidebarBookmarkList.children.length;
     if (bookmarkCount === 0) {
-      const feedbackEl = document.getElementById('cleanupcounter');
-      playCSSAnimation(feedbackEl, 'shaking', 'paddingleftshake');
+      const feedbackEl = document.querySelector('.cleanup-counter');
+      playCSSAnimation(feedbackEl, 'shaking', 'animation-shake-x');
     } else {
-      const feedbackEl = document.getElementById('selectallornonebutton');
-      playCSSAnimation(feedbackEl, 'shaking', 'paddingrightshake');
+      const feedbackEl = document.querySelector('.select-all-or-none-button');
+      playCSSAnimation(feedbackEl, 'shaking', 'animation-shake-x');
     }
   } else {
     const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid);
     backgroundscript.removeBookmarks(bookmarkIDs);
+    if ((selectedNodes.length) === (sidebarBookmarkList.children.length)) {
+      stopCleanupMode();
+    };
   }
 }
 
@@ -361,7 +367,7 @@ async function init() {
   let windowInfo = await browser.windows.getCurrent({populate: true});
   console.log(windowInfo);
   myWindowId = windowInfo.id;
-  sidebarBookmarkList = document.querySelector('#bookmarklist');
+  sidebarBookmarkList = document.querySelector('ul.bookmarks');
   contentArea = document.querySelector('#content');
 
   // the noanimations css class temporarily suppresses all animations after page load
@@ -393,7 +399,7 @@ async function init() {
     console.log(el.dataset.localizeText);
     el.placeholder = browser.i18n.getMessage(el.dataset.localizePlaceholder);
   });
-  document.getElementById('searchinputfield').textContent = browser.i18n.getMessage('search');
+  document.querySelector('.search-input-field').textContent = browser.i18n.getMessage('search');
 
   // register message handler
   browser.runtime.onMessage.addListener(handleMessage);
