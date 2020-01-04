@@ -237,7 +237,7 @@ function toggleSearch() {
     filterList('');
     toolbar.classList.remove(cssClassShowSearchField);
     const errorHtmlElement = document.querySelector('.add-bookmark');
-    playCSSAnimation(errorHtmlElement, 'hide-search-field', 'transition_button_add_large');
+    playCSSAnimation(errorHtmlElement, 'hide-search-field', 'transition-button-add-large');
   } else {
     toolbar.classList.add(cssClassShowSearchField);
 
