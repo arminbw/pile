@@ -1,12 +1,12 @@
 {
   "name": "pile",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "A lightweight bookmarking tool for the avid reader",
   "main": "background.js",
   "devDependencies": {
     "del": "^5.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-no-unsanitized": "^3.0.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-no-unsanitized": "^3.1.2",
     "gulp": "^4.0.2",
     "gulp-strip-comments": "^2.5.2",
     "gulp-strip-debug": "^3.0.0"
@@ -27,6 +27,8 @@
   "author": "Armin Wagner",
   "license": "MIT",
   "dependencies": {
-    "core-js": "^3.6.0"
+    "core-js": "^3.6.5",
+    "update": "^0.7.4",
+    "web-ext": "^4.3.0"
   }
 }

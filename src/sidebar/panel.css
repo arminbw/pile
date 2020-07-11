@@ -1,7 +1,4 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  box-sizing: border-box;
+body {
   --color-black: #000;
   --color-background: #F2F2F2;
   --color-blue1: #EFF6F8;
@@ -14,14 +11,26 @@ html, body {
   --color-grey2: #ECECEC;
   --color-grey3: #E6E6E6;
   --color-grey4: #999999;
-  --color-grey5: #444444;
+  --color-grey5: #333333;
   --color-grey6: #3A3A3A;
   --color-grey7: #2F2F2F;
   --color-turkese1: #D7E7E7;
   --color-turkese2: #CDE0E0;
   --color-turkese4: #95BCC3;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
   background-color: var(--color-background);
 }
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
 body {
   font: caption;
   background-color: var(--color-background);
@@ -33,6 +42,7 @@ div#content {
   height: 100%;
   overflow: hidden;
   width: 100%;
+  border-right: solid 1px var(--color-grey3);
 }
 
 /* the list of deleteable bookmarks */
@@ -125,7 +135,7 @@ a.link {
   z-index: 0;
 }
 a.link, a.link:visited {
-  color: var(--color-grey5);
+  color: var(--color-grey6);
 }
 .bookmark > a.link:hover {
   color: var(--color-black);
