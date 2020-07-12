@@ -27,7 +27,8 @@ html, body {
 input:focus,
 select:focus,
 textarea:focus,
-button:focus {
+button:focus,
+a, a:hover, a:active, a:focus {
     outline: none;
 }
 
