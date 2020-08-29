@@ -684,6 +684,7 @@ input[type="checkbox"].cleanup-checkbox:active:checked {
   transition-timing-function: ease-out;
 }
 #content .cleanup-confirmation {
+  position: relative;
   z-index: -1;
   opacity: 1;
   transform: translateY(-24px);
@@ -692,6 +693,7 @@ input[type="checkbox"].cleanup-checkbox:active:checked {
   transition-delay: 0s;
 }
 #content.cleanup-mode .cleanup-confirmation {
+  position: relative;
   z-index: 1;
   transition-property: opacity;
   transition-delay: var(--timeCleanupUnfold);
