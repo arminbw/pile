@@ -236,11 +236,10 @@ function toggleSearch() {
     document.querySelector('.search-input-field').value = '';
     filterList('');
     toolbar.classList.remove(cssClassShowSearchField);
-    const errorHtmlElement = document.querySelector('.add-bookmark');
-    playCSSAnimation(errorHtmlElement, 'hide-search-field', 'transition-button-add-large');
+    const bookmarkHtmlElement = document.querySelector('.add-bookmark');
+    playCSSAnimation(bookmarkHtmlElement, 'hide-search-field', 'transition-button-add-large');
   } else {
     toolbar.classList.add(cssClassShowSearchField);
-
     document.querySelector('.search-input-field').focus();
   }
 }
@@ -394,10 +393,6 @@ async function init() {
   document.querySelectorAll('[data-localize-title]').forEach(el => {
     console.log(el.dataset.localizeText);
     el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
-  });
-  document.querySelectorAll('[data-localize-placeholder]').forEach(el => {
-    console.log(el.dataset.localizeText);
-    el.placeholder = browser.i18n.getMessage(el.dataset.localizePlaceholder);
   });
   document.querySelector('.search-input-field').textContent = browser.i18n.getMessage('search');
 

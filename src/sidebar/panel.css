@@ -82,7 +82,7 @@ li.bookmark:active {
   background-color: var(--color-grey0);
 }
 ul.bookmarks.adding li.bookmark {
-  animation-duration: 0.28s;
+  animation-duration: 0.18s;
   animation-name: animation-slidein;
   z-index: 2;
   transition-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
@@ -96,8 +96,8 @@ ul.bookmarks.adding li.bookmark {
   }
 }
 ul.bookmarks.foldup li.bookmark {
-  transition: transform 0.38s ease-in-out;
-  transition-delay: 0.28s;
+  transition: transform 0.12s ease-in-out;
+  transition-delay: 0.22s;
   transform: translateY(38px);
   z-index: 1;
 }
@@ -106,8 +106,8 @@ ul.bookmarks.foldup li.bookmark.being-deleted ~ li.bookmark {
   transform: none;
 }
 ul.bookmarks:not(.foldup) li.bookmark.being-deleted, li.bookmark.being-deleted ~ li.bookmark {
-  transition: transform 0.38s ease-in-out;
-  transition-delay: 0.28s;
+  transition: transform 0.12s ease-in-out;
+  transition-delay: 0.12s;
   transform: translateY(-38px);
   z-index: 1;
 }
@@ -237,9 +237,6 @@ button.delete-button:active {
   border: 0;
   padding: 0 0 0 5px;
 }
-.search-input-field::placeholder {
-  color: var(--color-grey4);
-}
 .search-show-hide-button {
   display: block;
   float: left;
@@ -305,7 +302,7 @@ button.add-bookmark {
   border: 0;
   background-color: transparent;
   color: var(--color-grey5);
-  transition: background-color 0.28s ease;
+  transition: background-color 0.12s ease;
 }
 button.add-bookmark:hover {
   color: var(--color-black);
@@ -319,15 +316,10 @@ button.add-bookmark:active {
 
 /* searchfield variables */
 #toolbar {
-  --timeSearchFieldHiding: 0.4s;
+  --timeSearchFieldHiding: 0.22s;
 }
 
 /* the searchfield is shown, add button is small */
-#toolbar.show-search-field input.search-input-field::placeholder {
-  animation-name: transition-field-placeholder-show;
-  animation-duration: var(--timeSearchFieldHiding);
-  animation-timing-function: ease-out;
-}
 #toolbar.show-search-field input.search-input-field {
   animation-name: transition-field-show;
   animation-duration: var(--timeSearchFieldHiding);
@@ -420,17 +412,6 @@ body.no-animations * {
     color: #3B3B3B;
   }
 }
-@keyframes transition-field-placeholder-show {
-  0% {
-    color: transparent;
-  }
-  80% {
-    color: #fff;
-  }
-  100% {
-    color: var(--color-grey4);
-  }
-}
 @keyframes transition-button-add-small {
   0% {
     width: calc(100% - 43px);
@@ -468,7 +449,7 @@ body.no-animations * {
     color: #fff;
   }
   100% {
-    color:
+    color: #fff;
   }
 }
 @keyframes transition-button-add-large {

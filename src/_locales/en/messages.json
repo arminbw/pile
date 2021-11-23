@@ -55,10 +55,6 @@
     "message": "Cancel",
     "description": "Stop cleanup mode"
   },
-  "search": {
-    "message": "Search",
-    "description": "Search placeholder text"
-  },
   "deleteBookmark": {
     "message": "Delete Bookmark",
     "description": "remove bookmark"
