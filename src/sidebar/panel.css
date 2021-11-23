@@ -323,6 +323,11 @@ button.add-bookmark:active {
 }
 
 /* the searchfield is shown, add button is small */
+#toolbar.show-search-field input.search-input-field::placeholder {
+  animation-name: transition-field-placeholder-show;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
 #toolbar.show-search-field input.search-input-field {
   animation-name: transition-field-show;
   animation-duration: var(--timeSearchFieldHiding);
@@ -373,9 +378,6 @@ button.add-bookmark:active {
 #toolbar:not(.show-search-field) .add-bookmark {
   width: calc(100% - 43px);
 }
-#toolbar:not(.show-search-field) .search-input-field::placeholder {
-  color: transparent;
-}
 button.add-bookmark.hide-search-field {
   animation-name: transition-button-add-large;
   animation-duration: var(--timeSearchFieldHiding);
@@ -407,20 +409,26 @@ body.no-animations * {
     width: 1px;
     padding-left: 0px;
     background-color: var(--color-turkese1);
-    color: transparent;
   }
   50% {
     padding-left: 5px;
     width: calc(100% - 114px);
     background-color: var(--color-turkese1);
-    color: transparent;
   }
   80% {
     background-color: #FFF;
     color: #3B3B3B;
   }
+}
+@keyframes transition-field-placeholder-show {
+  0% {
+    color: transparent;
+  }
+  80% {
+    color: #fff;
+  }
   100% {
-    background-color: #FFF;
+    color: var(--color-grey4);
   }
 }
 @keyframes transition-button-add-small {
@@ -457,6 +465,10 @@ body.no-animations * {
     width: 1px;
     padding-left: 0px;
     background: none transparent;
+    color: #fff;
+  }
+  100% {
+    color:
   }
 }
 @keyframes transition-button-add-large {
@@ -469,17 +481,21 @@ body.no-animations * {
 }
 
 /* cleanup mode */
-.delete-selected-button {
+.delete-selected-button, .cancel-cleanup-button {
   display: inline-block;
   text-align: center;
-  width: calc(50% - 6px);
-  height: 18px;
-  background-color: var(--color-blue3);
-  color: var(--color-grey0);
+  width: calc(50%);
+  height: 24px;
   font-size: 11px;
   line-height: 18px;
-  margin: 3px 2px 3px 4px;
-  border-radius: 3px;
+}
+.delete-selected-button {
+  background-color: var(--color-blue3);
+  color: var(--color-grey0);
+}
+.cancel-cleanup-button {
+  background-color: var(--color-grey5);
+  color: var(--color-grey0);
 }
 .delete-selected-button:hover {
   background-color: var(--color-blue4);
@@ -488,18 +504,6 @@ body.no-animations * {
 .delete-selected-button:active {
   background-color: var(--color-blue5);
   color: #FFF;
-}
-.cancel-cleanup-button {
-  display: inline-block;
-  text-align: center;
-  width: calc(50% - 6px);
-  height: 18px;
-  background-color: var(--color-grey5);
-  color: var(--color-grey0);
-  font-size: 11px;
-  line-height: 18px;
-  margin: 3px 4px 3px 2px;
-  border-radius: 3px;
 }
 .cancel-cleanup-button:hover {
   background-color: var(--color-grey6);
