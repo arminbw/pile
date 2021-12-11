@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Pile - lightweight bookmarking",
   "description": "__MSG_extensionDescription__",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "default_locale": "en",
   "applications": {
     "gecko": {
@@ -31,9 +31,17 @@
   "background": {
     "scripts": [
       "background.js"
-    ]
+    ],
+  "option_ui": {
+      "page": "options.html"
+    }
   },
   "permissions": ["bookmarks", "contextMenus", "activeTab", "tabs", "storage"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{12b48d24-912c-4e23-a817-8e89a3f32639}"
+    }
+  },
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
