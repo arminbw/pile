@@ -31,17 +31,13 @@
   "background": {
     "scripts": [
       "background.js"
-    ],
-  "option_ui": {
-      "page": "options.html"
-    }
+    ]
   },
-  "permissions": ["bookmarks", "contextMenus", "activeTab", "tabs", "storage"],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{12b48d24-912c-4e23-a817-8e89a3f32639}"
-    }
+  "options_ui": {
+      "page": "options/options.html",
+      "browser_style": true
   },
+  "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs"],
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
