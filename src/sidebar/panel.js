@@ -358,6 +358,23 @@ function deleteSelectedBookmarks() {
 }
 
 /* ------------------------------------------------ */
+// Change the theme of the sidebar
+/* ------------------------------------------------ */
+browser.storage.onChanged.addListener( function(changes, areaName) {
+  console.log(changes);
+  console.log(areaName);
+  let changedItems = Object.keys(changes);
+  for (let item of changedItems) {
+    console.log(item + " has changed:");
+    console.log("Old value: ");
+    console.log(changes[item].oldValue);
+    console.log("New value: ");
+    console.log(changes[item].newValue);
+  }
+});
+
+
+/* ------------------------------------------------ */
 // Initialization
 /* ------------------------------------------------ */
 

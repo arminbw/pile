@@ -66,5 +66,9 @@
   "deleteSelectedTitle": {
     "message": "Delete selected bookmarks",
     "description": "Delete selected bookmarks confirmation button title"
+  },
+  "search": {
+    "message": "Search",
+    "description": "Filter bookmarks by title"
   }
 }

@@ -50,7 +50,6 @@ async function updateIfPiledBookmark(parentId) {
   }
 }
 
-
 // TODO: browser.bookmarks.onChildrenReordered.addListener(updateContent); // not yet supported by FF
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/bookmarks/onChildrenReordered
 

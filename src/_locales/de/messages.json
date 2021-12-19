@@ -50,5 +50,8 @@
   "deleteSelectedTitle": {
     "message": "Ausgewählte Lesezeichen löschen",
     "description": "Delete selected bookmarks confirmation button title"
+  },
+  "search": {
+    "message": "Suche"
   }
 }
