@@ -12,6 +12,7 @@ package-lock.json
 
 testdata
 test
+testDev
 testGerman
 testBuild
 testBuildDev

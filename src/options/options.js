@@ -1,7 +1,4 @@
 function setTheme(e) {
-  // e.preventDefault();
-  console.log('setting theme');
-  console.log(document.querySelector('#select-theme').value);
   browser.storage.local.set({
     'pile-theme': document.querySelector('#select-theme').value
   });
@@ -10,18 +7,17 @@ function setTheme(e) {
 function restoreOptions() {
 
   function setCurrentChoice(result) {
-    document.querySelector('#select-theme').value = result.theme || 'light';
+    document.querySelector('#select-theme').value = result['pile-theme'] || 'light';
   }
 
   function onError(error) {
-    console.log(`Error: ${error}`);
+    console.error(`Pile option error: ${error}`);
   }
 
-  let getting = browser.storage.local.get('pile-theme');
-  getting.then(setCurrentChoice, onError);
+  browser.storage.local.get('pile-theme').then(setCurrentChoice, onError);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   restoreOptions();
-  document.querySelector('#select-theme').addEventListener('onChange', setTheme);
+  document.querySelector('#select-theme').addEventListener('change', setTheme);
 });
