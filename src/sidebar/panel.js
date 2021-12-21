@@ -366,6 +366,12 @@ browser.storage.onChanged.addListener( (changes, areaName) => {
   }
 });
 
+async function getBrowserTheme() {
+  const theme = await browser.theme.getCurrent();
+  console.log(theme);
+}
+getBrowserTheme();
+
 
 /* ------------------------------------------------ */
 // Initialization

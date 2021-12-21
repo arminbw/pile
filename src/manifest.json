@@ -6,7 +6,7 @@
   "default_locale": "en",
   "applications": {
     "gecko": {
-      "strict_min_version": "57.0"
+      "strict_min_version": "58.0a11"
     }
   },
   "icons": {
@@ -37,7 +37,7 @@
       "page": "options/options.html",
       "browser_style": true
   },
-  "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs"],
+  "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs", "theme"],
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
