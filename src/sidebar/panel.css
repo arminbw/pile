@@ -1,4 +1,4 @@
-body {
+.theme-light {
   --color-black: #000;
   --color-background: #F2F2F2;
   --color-blue1: #EFF6F8;
@@ -18,6 +18,28 @@ body {
   --color-turkese2: #CDE0E0;
   --color-turkese4: #95BCC3;
 }
+
+.theme-dark {
+  --color-black: #fff;
+  --color-background: #000;
+  --color-blue1: red;
+  --color-blue2: #DEEAEE;
+  --color-blue3: #157A9F;
+  --color-blue4: #1A6B88;
+  --color-blue5: green;
+  --color-grey0: #F8F8F8;
+  --color-grey1: #4d4d4d;
+  --color-grey2: #ECECEC;
+  --color-grey3: #E6E6E6;
+  --color-grey4: #999999;
+  --color-grey5: #333333;
+  --color-grey6: #999;
+  --color-grey7: #2F2F2F;
+  --color-turkese1: blue;
+  --color-turkese2: #CDE0E0;
+  --color-turkese4: #95BCC3;
+}
+
 html, body {
   height: 100%;
   margin: 0;

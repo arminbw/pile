@@ -7,7 +7,7 @@ function setTheme(e) {
 function restoreOptions() {
 
   function setCurrentChoice(result) {
-    document.querySelector('#select-theme').value = result['pile-theme'] || 'light';
+    document.querySelector('#select-theme').value = result['pile-theme'] || 'theme-light';
   }
 
   function onError(error) {

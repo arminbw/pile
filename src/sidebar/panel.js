@@ -5,6 +5,7 @@ let backgroundscript;
 let sidebarBookmarkList;
 let contentArea;
 let searchStyle;
+let themeCSSName;
 
 // every panel gets the html list of all bookmarks from the backgroundscript
 // to prevent unnecessary updates, we use a counter 
@@ -133,8 +134,31 @@ function handleMessage(request, sender, sendResponse) {
      setTimeout(() => {
        updateBookmarkListElement();
      }, 380);
+  };
+  if (request.message === 'changeTheme') {
+     changeTheme(request.data);
   }
 }
+
+
+/* ------------------------------------------------ */
+// Change the theme of the sidebar
+/* ------------------------------------------------ */
+
+function changeTheme(newThemeCSSName) {
+    console.log(newThemeCSSName);
+    console.log(contentArea);
+    console.log(themeCSSName);
+    document.body.classList.remove(themeCSSName);
+    document.body.classList.add(newThemeCSSName);
+    themeCSSName = newThemeCSSName;
+}
+
+/*async function getBrowserTheme() {
+  const newTheme = await browser.theme.getCurrent();
+  console.log(newTheme);
+}
+getBrowserTheme();*/
 
 
 /* ------------------------------------------------ */
@@ -357,20 +381,6 @@ function deleteSelectedBookmarks() {
   }
 }
 
-/* ------------------------------------------------ */
-// Change the theme of the sidebar
-/* ------------------------------------------------ */
-browser.storage.onChanged.addListener( (changes, areaName) => {
-  if (changes['pile-theme']?.newValue) {
-    console.log(changes['pile-theme']?.newValue);
-  }
-});
-
-async function getBrowserTheme() {
-  const theme = await browser.theme.getCurrent();
-  console.log(theme);
-}
-getBrowserTheme();
 
 
 /* ------------------------------------------------ */
@@ -387,8 +397,11 @@ async function init() {
 
   // the noanimations css class temporarily suppresses all animations after page load
   setTimeout(() => {
-    document.body.className='';
+    document.body.classList.remove('no-animations');
   }, 650);
+
+  // the default CSS theme is 'light'
+  themeCSSName = 'light';
 
   // create a new stylesheet for the search/filter (see filterList())
   searchStyle = document.createElement('style');
