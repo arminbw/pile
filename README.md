@@ -2,7 +2,7 @@
 Pile is a lightweight Firefox add-on for the avid reader. It gives you a place where you can temporarily store links for later review. In contrast to other “read it later”-like solutions, it stores your bookmarks not in the cloud, but locally.
 
 ## Installation
-Simply visit [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/pile-lightweight-bookmarking/) and click on the "Add to Firefox" button.
+Simply visit [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/pile-lightweight-bookmarking/) and click on the "Add to Firefox" button.
 
 ## Building
 ```
