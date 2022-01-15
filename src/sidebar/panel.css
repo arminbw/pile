@@ -1,5 +1,5 @@
 .theme-light {
-  --color-black: #000;
+  --color-text-bookmark: #000;
   --color-background: #F2F2F2;
   --color-blue1: #EFF6F8;
   --color-blue2: #DEEAEE;
@@ -7,9 +7,9 @@
   --color-blue4: #1A6B88;
   --color-blue5: #17617C;
   --color-grey0: #F8F8F8;
-  --color-grey1: #F2F2F2;
+  --color-bookmark-background: #F2F2F2;
   --color-grey2: #ECECEC;
-  --color-grey3: #E6E6E6;
+  --color-bookmark-seperator: #E6E6E6;
   --color-grey4: #999999;
   --color-grey5: #333333;
   --color-grey6: #3A3A3A;
@@ -20,7 +20,7 @@
 }
 
 .theme-dark {
-  --color-black: #fff;
+  --color-text-bookmark: #B1B1B9;
   --color-background: #000;
   --color-blue1: red;
   --color-blue2: #DEEAEE;
@@ -28,9 +28,10 @@
   --color-blue4: #1A6B88;
   --color-blue5: green;
   --color-grey0: #F8F8F8;
-  --color-grey1: #4d4d4d;
+  --color-bookmark-background: #252527;
   --color-grey2: #ECECEC;
-  --color-grey3: #E6E6E6;
+  --color-bookmark-seperator: #303031;
+  --color-bookmark-delete: 
   --color-grey4: #999999;
   --color-grey5: #333333;
   --color-grey6: #999;
@@ -65,7 +66,7 @@ div#content {
   height: 100%;
   overflow: hidden;
   width: 100%;
-  border-right: solid 1px var(--color-grey3);
+  border-right: solid 1px var(--color-bookmark-seperator);
 }
 
 /* the list of deleteable bookmarks */
@@ -81,11 +82,11 @@ ul.bookmarks {
   scroll-behavior: smooth;
 }
 li.bookmark {
-  border-bottom: 1px solid var(--color-grey3);
+  border-bottom: 1px solid var(--color-bookmark-seperator);
   height: 38px;
   margin: 0;
   padding: 0;
-  background-color: var(--color-grey1);
+  background-color: var(--color-bookmark-background);
   list-style: none;
   line-height: 38px;
   font-size: 12px;
@@ -161,7 +162,7 @@ a.link, a.link:visited {
   color: var(--color-grey6);
 }
 .bookmark > a.link:hover {
-  color: var(--color-black);
+  color: var(--color-text-bookmark);
 }
 .bookmark > a.link:active {
   color: var(--color-blue3);
@@ -218,11 +219,10 @@ button.delete-button {
   line-height: 21px;
   text-align: center;
   text-decoration: none;
-  color: var(--color-grey5);
-  background: no-repeat center url("delete_bookmark.svg");
+  background-image: url("data:image/svg+xml,%3csvg height='11' viewBox='0 0 11 11' width='11' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd' stroke='%23d9d9d9' stroke-width='1.5'%3e%3cpath d='m1 1 9 9'/%3e%3cpath d='m1 10 9-9'/%3e%3c/g%3e%3c/svg%3e");
 }
 button.delete-button, button.delete-button:visited {
-  color: var(--color-grey4);
+  stroke-color: var(--color-bookmark-delete);
 }
 button.delete-button:hover {
   background: no-repeat center url("delete_bookmark_hover.svg");
@@ -327,7 +327,7 @@ button.add-bookmark {
   transition: background-color 0.12s ease;
 }
 button.add-bookmark:hover {
-  color: var(--color-black);
+  color: var(--color-text-bookmark);
   background-color: var(--color-turkese2);
   transition: background-color 0.08s ease;
 }
@@ -550,8 +550,8 @@ body.no-animations * {
 .select-none-button:hover,
 .select-all-button:hover {
   background-color: var(--color-turkese2);
-  color: var(--color-black);
-  border-color: var(--color-black);
+  color: var(--color-text-bookmark);
+  border-color: var(--color-text-bookmark);
 }
 .select-none-button:active,
 .select-all-button:active {
