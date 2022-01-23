@@ -53,17 +53,6 @@ async function updateIfPiledBookmark(parentId) {
 // TODO: browser.bookmarks.onChildrenReordered.addListener(updateContent); // not yet supported by FF
 // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/bookmarks/onChildrenReordered
 
-// changing themes
-browser.storage.onChanged.addListener( (changes, areaName) => {
-  if (changes['pile-theme']?.newValue) {
-    console.log(changes);
-    browser.runtime.sendMessage({
-        message: 'changeTheme',
-        data: changes['pile-theme'].newValue
-    });
-  }
-});
-
 
 /* ------------------------------------------------ */
 // Contextual Menu

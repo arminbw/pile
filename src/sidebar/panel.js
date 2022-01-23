@@ -135,9 +135,6 @@ function handleMessage(request, sender, sendResponse) {
        updateBookmarkListElement();
      }, 380);
   };
-  if (request.message === 'changeTheme') {
-     changeTheme(request.data);
-  }
 }
 
 
@@ -146,13 +143,19 @@ function handleMessage(request, sender, sendResponse) {
 /* ------------------------------------------------ */
 
 function changeTheme(newThemeCSSName) {
-    console.log(newThemeCSSName);
-    console.log(contentArea);
-    console.log(themeCSSName);
-    document.body.classList.remove(themeCSSName);
-    document.body.classList.add(newThemeCSSName);
-    themeCSSName = newThemeCSSName;
+  console.log(newThemeCSSName);
+  document.body.classList.remove(themeCSSName);
+  document.body.classList.add(newThemeCSSName);
+  themeCSSName = newThemeCSSName;
 }
+
+browser.storage.onChanged.addListener( (changes, areaName) => {
+  if (changes['pile-theme']?.newValue) {
+    console.log(changes);
+    changeTheme(changes['pile-theme']?.newValue);
+  }
+});
+
 
 /*async function getBrowserTheme() {
   const newTheme = await browser.theme.getCurrent();
@@ -400,8 +403,12 @@ async function init() {
     document.body.classList.remove('no-animations');
   }, 650);
 
-  // the default CSS theme is 'light'
-  themeCSSName = 'light';
+  // change the theme
+  browser.storage.local.get('pile-theme').then((obj) => { 
+    if (obj['pile-theme']?.newValue) {
+      changeTheme(obj['pile-theme'].newValue);
+    }
+  }, logError);
 
   // create a new stylesheet for the search/filter (see filterList())
   searchStyle = document.createElement('style');
