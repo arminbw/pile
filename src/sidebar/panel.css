@@ -1,45 +1,53 @@
 .theme-light {
-  --color-text-bookmark: #000;
-  --color-background: #F2F2F2;
-  --color-blue1: #EFF6F8;
-  --color-blue2: #DEEAEE;
-  --color-blue3: #157A9F;
-  --color-blue4: #1A6B88;
-  --color-blue5: #17617C;
-  --color-grey0: #F8F8F8;
-  --color-bookmark-background: #F2F2F2;
-  --color-grey2: #ECECEC;
-  --color-bookmark-seperator: #E6E6E6;
+  --color-contrast-100: #000;
+  --color-contrast-100-inverted: #fff;
+  --color-contrast-80: #333;
+  --color-contrast-66: #2F2F2F;
+  --color-contrast-60: #383838;
+  --color-active: #157A9F;
+  --color-background: #FDFDFD;
+  --color-bookmark-background: #FDFDFD;
+  --color-bookmark-background-active: #F8F8F8;
+  --color-bookmark-seperator: #F0F0F0;
   --color-bookmark-delete: #D9D9D9;
-  --color-grey4: #999999;
-  --color-grey5: #333333;
-  --color-grey6: #3A3A3A;
-  --color-grey7: #2F2F2F;
-  --color-turkese1: #D7E7E7;
-  --color-turkese2: #CDE0E0;
-  --color-turkese4: #95BCC3;
+  --color-bookmark-delete-hover: #000;
+  --color-bookmark-selected: #DEEAEE;
+  --color-bookmark-selected-border: #CDE0E0;
+  --color-checkbox-active: #EFF6F8;
+  --color-checkbox-border: #999999;
+
+  --color-button-delete: #157A9F;
+  --color-button-delete-active: #1A6B88;
+
+  --color-toolbar-background: #95BCC3;
+  --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-border-active: #1A6B88;
+
+  --color-checkbox-border-hover: #1A6B88;
+  --color-checkbox-border-active: #17617C;
+  --color-checkbox-checked-active: #ECECEC;
 }
 
 .theme-dark {
-  --color-text-bookmark: #B1B1B9;
+  --color-contrast-100: #B1B1B9;
   --color-background: #000;
-  --color-blue1: red;
-  --color-blue2: #DEEAEE;
-  --color-blue3: #157A9F;
-  --color-blue4: #1A6B88;
-  --color-blue5: green;
-  --color-grey0: #F8F8F8;
-  --color-bookmark-background: #252527;
-  --color-grey2: #ECECEC;
-  --color-bookmark-seperator: #303031;
+  --color-checkbox-active: red;
+  --color-bookmark-selected: #DEEAEE;
+  --color-active: #157A9F;
+  --color-checkbox-border-hover: #1A6B88;
+  --color-checkbox-border-active: green;
+--color-bookmark-background-active: #F8F8F8;
+--color-bookmark-background: #252527;
+--color-checkbox-checked-active: #ECECEC;
+--color-bookmark-seperator: #303031;
 --color-bookmark-delete: blue; 
---color-grey4: #999999;
---color-grey5: #333333;
---color-grey6: #999;
---color-grey7: #2F2F2F;
---color-turkese1: blue;
---color-turkese2: #CDE0E0;
---color-turkese4: #95BCC3;
+--color-checkbox-border: #999999;
+--color-contrast-80: #333333;
+--color-contrast-60: #999;
+--color-contrast-66: #2F2F2F;
+--color-toolbar-button-active: blue;
+--color-bookmark-selected-border: #CDE0E0;
+--color-toolbar-background: #95BCC3;
 }
 
 html, body {
@@ -83,17 +91,18 @@ padding: 0 0 0 0;
 scroll-behavior: smooth;
 }
 li.bookmark {
+z-index: 2;
+position: relative;
+display: flex;
+box-sizing: content-box;
 border-bottom: 1px solid var(--color-bookmark-seperator);
-height: 38px;
+height: 36px;
+line-height: 36px;
 margin: 0;
 padding: 0;
 background-color: var(--color-bookmark-background);
 list-style: none;
-line-height: 38px;
 font-size: 12px;
-display: flex;
-position: relative;
-z-index: 2;
 }
 li.bookmark:last-child {
 margin-bottom: 63px;
@@ -103,7 +112,7 @@ margin-top: 0px;
 }
 li.bookmark:hover,
 li.bookmark:active {
-background-color: var(--color-grey0);
+background-color: var(--color-bookmark-background-active);
 }
 ul.bookmarks.adding li.bookmark {
 animation-duration: 0.18s;
@@ -122,7 +131,7 @@ transform: translateY(0px);
 ul.bookmarks.foldup li.bookmark {
 transition: transform 0.12s ease-in-out;
 transition-delay: 0.22s;
-transform: translateY(38px);
+transform: translateY(37px);
 z-index: 1;
 }
 ul.bookmarks.foldup li.bookmark.being-deleted ~ li.bookmark {
@@ -132,7 +141,7 @@ transform: none;
 ul.bookmarks:not(.foldup) li.bookmark.being-deleted, li.bookmark.being-deleted ~ li.bookmark {
 transition: transform 0.12s ease-in-out;
 transition-delay: 0.12s;
-transform: translateY(-38px);
+transform: translateY(-37px);
 z-index: 1;
 }
 li.bookmark:last-child.being-deleted {
@@ -150,23 +159,24 @@ transition-delay: 0;
 }
 a.link {
 display: block;
-width: 100%;
+width: calc(100% - 42px);
 white-space: nowrap;
 overflow: hidden;
-text-overflow: ellipsis;
+text-overflow: clip;
 padding-left: 8px;
-padding-right: 44px;
+padding-right: 45px;
 text-decoration: none;
 z-index: 0;
+mask-image: linear-gradient(90deg, var(--color-contrast-100) 86%, transparent);
 }
 a.link, a.link:visited {
-color: var(--color-grey6);
+color: var(--color-contrast-60);
 }
 .bookmark > a.link:hover {
-color: var(--color-text-bookmark);
+color: var(--color-contrast-100);
 }
 .bookmark > a.link:active {
-color: var(--color-blue3);
+color: var(--color-active);
 }
 .bookmark.shaking {
 animation: animation-shake-y 0.42s linear;
@@ -211,14 +221,13 @@ button.delete-button {
   display: block;
   position: absolute;
   width: 21px;
-  height: 21px;
+  height: 20px;
   right: 20px;
   top: 8px;
+  bottom: 8px;
   border: 0;
   padding: 0;
   margin: 0;
-  line-height: 21px;
-  text-align: center;
   text-decoration: none;
   mask: url("delete_bookmark.svg") no-repeat 50% 50%;
 }
@@ -226,10 +235,10 @@ button.delete-button, button.delete-button:visited {
   background-color: var(--color-bookmark-delete);
 }
 button.delete-button:hover {
-  mask: 
+  background-color: var(--color-bookmark-delete-hover); 
 }
 button.delete-button:active {
-  background: no-repeat center url("delete_bookmark_active.svg");
+  background-color: var(--color-active);
 }
 
 /* the toolbar */
@@ -238,7 +247,7 @@ button.delete-button:active {
   z-index: 4;
   width: 100%;
   height: 24px;
-  background-color: var(--color-turkese4);
+  background-color: var(--color-toolbar-background);
   box-shadow:
   0 0.1px 1.4px rgba(0, 0, 0, 0.121),
   0 0.4px 4.7px rgba(0, 0, 0, 0.206),
@@ -291,10 +300,10 @@ button.delete-button:active {
   transition: background-color 0.08s ease;
 }
 .cleanup-button:hover {
-  background: no-repeat center var(--color-turkese2);
+  background: no-repeat center var(--color-bookmark-selected-border);
 }
 .cleanup-button:active {
-  background: no-repeat center var(--color-turkese1);
+  background: no-repeat center var(--color-toolbar-button-active);
 }
 .cleanup-button:hover svg .cls-1 {
   stroke: #000;
@@ -303,10 +312,10 @@ button.delete-button:active {
   fill: #000;
 }
 .cleanup-button:active svg .cls-1 {
-  stroke: var(--color-blue3);
+  stroke: var(--color-active);
 }
 .cleanup-button:active svg .cls-2 {
-  fill: var(--color-blue3);
+  fill: var(--color-active);
 }
 
 button.add-bookmark {
@@ -314,7 +323,6 @@ button.add-bookmark {
   line-height: 24px;
   font-size: 11px;
   font-weight: 400;
-  color: var(--color-grey4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -324,17 +332,17 @@ button.add-bookmark {
   text-decoration: none;
   border: 0;
   background-color: transparent;
-  color: var(--color-grey5);
+  color: var(--color-add-bookmark-text);
   transition: background-color 0.12s ease;
 }
 button.add-bookmark:hover {
-  color: var(--color-text-bookmark);
-  background-color: var(--color-turkese2);
+  color: var(--color-contrast-100);
+  background-color: var(--color-bookmark-selected-border);
   transition: background-color 0.08s ease;
 }
 button.add-bookmark:active {
-  color: var(--color-blue4);
-  background-color: var(--color-turkese1);
+  color: var(--color-active);
+  background-color: var(--color-toolbar-button-active);
 }
 
 /* searchfield variables */
@@ -350,16 +358,17 @@ button.add-bookmark:active {
   width: calc(100% - 114px);
 } 
 #toolbar.show-search-field .search-show-hide-button {
-  background: no-repeat center url("delete_bookmark.svg") #fff;
+  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
   animation-name: transition-button-close;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
+  background-color: var(--color-bookmark-delete);
 }
 #toolbar.show-search-field .search-show-hide-button:hover {
-  background: no-repeat center url("delete_bookmark_hover.svg") #fff;
+  background-color: var(--color-bookmark-delete-hover);
 }
 #toolbar.show-search-field .search-show-hide-button:active {
-  background: no-repeat center url("delete_bookmark_active.svg") #fff;
+  background-color: var(--color-bookmark-delete);
 }
 #toolbar.show-search-field .add-bookmark {
   width: 70px;
@@ -376,19 +385,19 @@ button.add-bookmark:active {
   width: 1px;
   padding-left: 0px;
   color: transparent;
-  background-color: transparent;
 }
 #toolbar:not(.show-search-field) .search-show-hide-button {
   animation-name: transition-button-search;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
-  background: no-repeat center url("search_button.svg") transparent;
+  mask: url("search_button.svg") no-repeat 50% 50%;
+  background-color: var(--color-contrast-80);
 }
 #toolbar:not(.show-search-field) .search-show-hide-button:hover {
-  background: no-repeat center url("search_button_hover.svg") var(--color-turkese2);
+  background-color: var(--color-contrast-100);
 }
 #toolbar:not(.show-search-field) .search-show-hide-button:active {
-  background: no-repeat center url("search_button_active.svg") var(--color-turkese1);
+  background-color: var(--color-active);
 }
 #toolbar:not(.show-search-field) .add-bookmark {
   width: calc(100% - 43px);
@@ -407,10 +416,10 @@ body.no-animations * {
 /* searchfield unfolding */
 @keyframes transition-button-close {
   0% {
-    background: none center var(--color-turkese1);
+    background: none center var(--color-toolbar-button-active);
   }
   50% {
-    background: none center var(--color-turkese1);
+    background: none center var(--color-toolbar-button-active);
   }
   80% {
     background: none center #fff;
@@ -423,12 +432,12 @@ body.no-animations * {
   0% {
     width: 1px;
     padding-left: 0px;
-    background-color: var(--color-turkese1);
+    background-color: var(--color-toolbar-button-active);
   }
   50% {
     padding-left: 5px;
     width: calc(100% - 114px);
-    background-color: var(--color-turkese1);
+    background-color: var(--color-toolbar-button-active);
   }
   80% {
     background-color: #FFF;
@@ -450,13 +459,13 @@ body.no-animations * {
 /* searchfield folding */
 @keyframes transition-button-search {
   0% {
-    background: none center #fff;
+    background-color: var(--color-input-background);
   }
   80% {
-    background: none center transparent;
+    background-color: transparent;
   }
   100% {
-    background: no-repeat center url("search_button.svg") transparent;
+    background-color: transparent;
   }
 }
 @keyframes transition-field-hide {
@@ -494,27 +503,27 @@ body.no-animations * {
   line-height: 18px;
 }
 .delete-selected-button {
-  background-color: var(--color-blue3);
-  color: var(--color-grey0);
+  background-color: var(--color-button-delete);
+  color: var(--color-contrast-100-inverted);
 }
 .cancel-cleanup-button {
-  background-color: var(--color-grey5);
-  color: var(--color-grey0);
+  background-color: var(--color-contrast-80);
+  color: var(--color-contrast-100-inverted);
 }
 .delete-selected-button:hover {
-  background-color: var(--color-blue4);
+  background-color: var(--color-button-delete-hover);
   color: #FFF;
 }
 .delete-selected-button:active {
-  background-color: var(--color-blue5);
+  background-color: var(--color-button-delete-active);
   color: #FFF;
 }
 .cancel-cleanup-button:hover {
-  background-color: var(--color-grey6);
+  background-color: var(--color-contrast-60);
   color: #FFF;
 }
 .cancel-cleanup-button:active {
-  background-color: var(--color-grey7);
+  background-color: var(--color-contrast-66);
   color: #FFF;
 }
 .select-all-or-none-button {
@@ -536,11 +545,11 @@ body.no-animations * {
   vertical-align:top;
   width: 42px;
   height: 18px;
-  color: var(--color-grey5);
+  color: var(--color-contrast-80);
   font-size: 11px;
   line-height: 16px;
   border-radius: 3px;
-  border: solid 1px var(--color-grey5);
+  border: solid 1px var(--color-contrast-80);
   padding: 0;
   margin: 3px 4px 3px 4px;
   text-align: center;
@@ -550,15 +559,15 @@ body.no-animations * {
 }
 .select-none-button:hover,
 .select-all-button:hover {
-  background-color: var(--color-turkese2);
-  color: var(--color-text-bookmark);
-  border-color: var(--color-text-bookmark);
+  background-color: var(--color-bookmark-selected-border);
+  color: var(--color-contrast-100);
+  border-color: var(--color-contrast-100);
 }
 .select-none-button:active,
 .select-all-button:active {
-  background-color: var(--color-turkese1);
-  color: var(--color-blue4);
-  border-color: var(--color-blue4);
+  background-color: var(--color-toolbar-button-active);
+  color: var(--color-toolbar-button-active);
+  border-color: var(--color-toolbar-button-active);
 }
 .select-none-button {
   display: none;
@@ -568,15 +577,16 @@ body.no-animations * {
   animation-delay: 0;
 }
 input[type="checkbox"].cleanup-checkbox {
+  box-sizing: border-box;
   appearance: none;
-  -webkit-appearance: none;
   outline: none;
   position: absolute;
-  right: 19px;
-  top: 7px;
-  width: 17px;
-  height: 17px;
-  border: solid 1px var(--color-grey4);
+  right: 22px;
+  top: 10px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: solid 1px var(--color-checkbox-border);
   border-radius: 3px;
   background-color: none;
   opacity: 0;
@@ -594,37 +604,34 @@ input[type="checkbox"].cleanup-checkbox:before {
 }
 
 input[type="checkbox"].cleanup-checkbox:hover {
-  border-color: var(--color-grey5);
+  border-color: var(--color-contrast-80);
 }
 input[type="checkbox"].cleanup-checkbox:active {
-  background-color: var(--color-blue1);
-  border-color: var(--color-blue5);
+  background-color: var(--color-checkbox-active);
+  border-color: var(--color-checkbox-border-active);
 }
 input[type="checkbox"].cleanup-checkbox:checked {
   background: no-repeat center url("checkmark.svg") transparent;
-  border: 1px solid var(--color-blue3);
+  border: 1px solid var(--color-active);
 }
 input[type="checkbox"].cleanup-checkbox:checked:hover {
-  background: no-repeat center url("checkmark_hover.svg") var(--color-blue1);
-  border: 1px solid var(--color-blue4);
+  background: no-repeat center url("checkmark_hover.svg") var(--color-checkbox-active);
+  border: 1px solid var(--color-checkbox-border-hover);
 }
 input[type="checkbox"].cleanup-checkbox:active:checked {
-  background: no-repeat center url("checkmark_active.svg") var(--color-grey2);
-  border-color: var(--color-grey5);
+  background: no-repeat center url("checkmark_active.svg") var(--color-checkbox-checked-active);
+  border-color: var(--color-contrast-80);
 }
 #content.cleanup-mode li.bookmark.selected {
-  background-color: var(--color-blue2);
-  border-top: 1px solid var(--color-turkese2);
+  background-color: var(--color-bookmark-selected);
+  border-top: 1px solid var(--color-bookmark-selected-border);
   margin-top: -1px;
-  height: 39px;
+  height: 38px;
   box-sizing: border-box;
-  border-bottom: 1px solid var(--color-turkese2);
-}
-#content.cleanup-mode li.bookmark.selected > a.link {
-  color: var(--color-grey5);
+  border-bottom: 1px solid var(--color-bookmark-selected-border);
 }
 #content.cleanup-mode li.bookmark.selected > a.link:hover {
-  background-color: var(--color-blue1);
+  background-color: var(--color-checkbox-active);
 }
 #content.cleanup-mode input.cleanup-checkbox {
   opacity: 1;
