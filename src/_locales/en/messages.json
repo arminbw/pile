@@ -20,7 +20,7 @@
     "description": "Close ALL unpinned tabs and put a bookmark for each of them in the Pile's bookmark folder."
   },
   "of": {
-    "message": "of",
+    "message": " of",
     "description": "Example: 1 of 10"
   },
   "cleanUp": {
@@ -40,7 +40,7 @@
     "description": "All/None button label"
   },
   "addPage": {
-    "message": "ADD PAGE",
+    "message": "Add Page",
     "description": "Add Page button label"
   },
   "addPageToPileTitle": {
@@ -68,7 +68,7 @@
     "description": "Delete selected bookmarks confirmation button title"
   },
   "search": {
-    "message": "Search",
+    "message": "Show/Hide Search",
     "description": "Filter bookmarks by title"
   }
 }

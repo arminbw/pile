@@ -1,60 +1,59 @@
 .theme-light {
   --color-contrast-100: #000;
-  --color-contrast-100-inverted: #fff;
+  --color-contrast-87: #212121;
   --color-contrast-80: #333;
-  --color-contrast-66: #2F2F2F;
-  --color-contrast-60: #383838;
+  --color-contrast-14: #DBDBDB;
+  --color-contrast-06: #F0F0F0;
+  --color-contrast-02: #FAFAFA;
+  --color-contrast-01: #fff;
+  --color-contrast-00: #fff;
   --color-active: #157A9F;
-  --color-background: #FDFDFD;
-  --color-bookmark-background: #FDFDFD;
-  --color-bookmark-background-active: #F8F8F8;
-  --color-bookmark-seperator: #F0F0F0;
-  --color-bookmark-delete: #D9D9D9;
-  --color-bookmark-delete-hover: #000;
   --color-bookmark-selected: #DEEAEE;
   --color-bookmark-selected-border: #CDE0E0;
   --color-checkbox-active: #EFF6F8;
   --color-checkbox-border: #999999;
-
   --color-button-delete: #157A9F;
-  --color-button-delete-active: #1A6B88;
-
+  --color-button-delete-hover: #1A6B88;
+  --color-button-delete-active: #17617C;
   --color-toolbar-background: #95BCC3;
   --color-toolbar-button-active: #D7E7E7;
   --color-toolbar-button-border-active: #1A6B88;
-
   --color-checkbox-border-hover: #1A6B88;
   --color-checkbox-border-active: #17617C;
   --color-checkbox-checked-active: #ECECEC;
 }
 
 .theme-dark {
-  --color-contrast-100: #B1B1B9;
-  --color-background: #000;
-  --color-checkbox-active: red;
-  --color-bookmark-selected: #DEEAEE;
+  --color-contrast-100: #fff;
+  --color-contrast-87: #DEDEDE;
+  --color-contrast-80: #CCC;
+     --color-contrast-14: #5B5B5B;
+     --color-contrast-06: #303030;
+  --color-contrast-02: #252525;
+  --color-contrast-01: #202020;
+  --color-contrast-00: #fff;
+  --color-contrast-00: #000;
   --color-active: #157A9F;
+  --color-bookmark-selected: #DEEAEE;
+  --color-bookmark-selected-border: #CDE0E0;
+  --color-checkbox-active: #EFF6F8;
+  --color-checkbox-border: #999999;
+  --color-button-delete: #157A9F;
+  --color-button-delete-hover: #1A6B88;
+  --color-button-delete-active: #17617C;
+  --color-toolbar-background: #95BCC3;
+  --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-border-active: #1A6B88;
   --color-checkbox-border-hover: #1A6B88;
-  --color-checkbox-border-active: green;
---color-bookmark-background-active: #F8F8F8;
---color-bookmark-background: #252527;
---color-checkbox-checked-active: #ECECEC;
---color-bookmark-seperator: #303031;
---color-bookmark-delete: blue; 
---color-checkbox-border: #999999;
---color-contrast-80: #333333;
---color-contrast-60: #999;
---color-contrast-66: #2F2F2F;
---color-toolbar-button-active: blue;
---color-bookmark-selected-border: #CDE0E0;
---color-toolbar-background: #95BCC3;
+  --color-checkbox-border-active: #17617C;
+  --color-checkbox-checked-active: #ECECEC;
 }
 
 html, body {
 height: 100%;
 margin: 0;
 box-sizing: border-box;
-background-color: var(--color-background);
+background-color: var(--color-contrast-02);
 }
 input:focus,
 select:focus,
@@ -66,16 +65,16 @@ outline: none;
 
 body {
 font: caption;
-background-color: var(--color-background);
+background-color: var(--color-contrast-02);
 --timeCleanupUnfold: 0.22s;
 --timeCleanupFold: 0.22s;
 }
 div#content {
-background-color: var(--color-background);
+background-color: var(--color-contrast-02);
 height: 100%;
 overflow: hidden;
 width: 100%;
-border-right: solid 1px var(--color-bookmark-seperator);
+border-right: solid 1px var(--color-contrast-06);
 }
 
 /* the list of deleteable bookmarks */
@@ -85,7 +84,7 @@ height: 100vh;
 width: calc(100% + 30px);
 overflow-y: scroll;
 overflow-x: hidden;
-background-color: var(--color-background);
+background-color: var(--color-contrast-02);
 margin: 24px 0 0 0;
 padding: 0 0 0 0;
 scroll-behavior: smooth;
@@ -95,12 +94,12 @@ z-index: 2;
 position: relative;
 display: flex;
 box-sizing: content-box;
-border-bottom: 1px solid var(--color-bookmark-seperator);
+border-bottom: 1px solid var(--color-contrast-06);
 height: 36px;
 line-height: 36px;
 margin: 0;
 padding: 0;
-background-color: var(--color-bookmark-background);
+background-color: var(--color-contrast-02);
 list-style: none;
 font-size: 12px;
 }
@@ -112,7 +111,7 @@ margin-top: 0px;
 }
 li.bookmark:hover,
 li.bookmark:active {
-background-color: var(--color-bookmark-background-active);
+background-color: var(--color-contrast-01);
 }
 ul.bookmarks.adding li.bookmark {
 animation-duration: 0.18s;
@@ -159,18 +158,17 @@ transition-delay: 0;
 }
 a.link {
 display: block;
-width: calc(100% - 42px);
+width: calc(100% - 38px);
 white-space: nowrap;
 overflow: hidden;
-text-overflow: clip;
+text-overflow: ellipsis;
 padding-left: 8px;
-padding-right: 45px;
 text-decoration: none;
 z-index: 0;
-mask-image: linear-gradient(90deg, var(--color-contrast-100) 86%, transparent);
+mask-image: linear-gradient(90deg, var(--color-contrast-100) calc(100% - 24px), transparent);
 }
 a.link, a.link:visited {
-color: var(--color-contrast-60);
+color: var(--color-contrast-80);
 }
 .bookmark > a.link:hover {
 color: var(--color-contrast-100);
@@ -232,10 +230,10 @@ button.delete-button {
   mask: url("delete_bookmark.svg") no-repeat 50% 50%;
 }
 button.delete-button, button.delete-button:visited {
-  background-color: var(--color-bookmark-delete);
+  background-color: var(--color-contrast-14);
 }
 button.delete-button:hover {
-  background-color: var(--color-bookmark-delete-hover); 
+  background-color: var(--color-contrast-100); 
 }
 button.delete-button:active {
   background-color: var(--color-active);
@@ -247,7 +245,7 @@ button.delete-button:active {
   z-index: 4;
   width: 100%;
   height: 24px;
-  background-color: var(--color-toolbar-background);
+  background-color: #C1D8D8;
   box-shadow:
   0 0.1px 1.4px rgba(0, 0, 0, 0.121),
   0 0.4px 4.7px rgba(0, 0, 0, 0.206),
@@ -358,17 +356,23 @@ button.add-bookmark:active {
   width: calc(100% - 114px);
 } 
 #toolbar.show-search-field .search-show-hide-button {
-  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
+  background-color: var(--color-contrast-00);
   animation-name: transition-button-close;
   animation-duration: var(--timeSearchFieldHiding);
   animation-timing-function: ease-out;
-  background-color: var(--color-bookmark-delete);
 }
-#toolbar.show-search-field .search-show-hide-button:hover {
-  background-color: var(--color-bookmark-delete-hover);
+#toolbar.show-search-field .search-show-hide-button:before {
+  content: '';
+  display: block;
+  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
+  background-color: var(--color-contrast-14);
+  height: 100%
 }
-#toolbar.show-search-field .search-show-hide-button:active {
-  background-color: var(--color-bookmark-delete);
+#toolbar.show-search-field .search-show-hide-button:hover::before {
+  background-color: var(--color-contrast-100);
+}
+#toolbar.show-search-field .search-show-hide-button:active::before {
+  background-color: var(--color-contrast-14);
 }
 #toolbar.show-search-field .add-bookmark {
   width: 70px;
@@ -459,7 +463,7 @@ body.no-animations * {
 /* searchfield folding */
 @keyframes transition-button-search {
   0% {
-    background-color: var(--color-input-background);
+    background-color: var(--color-input-contrast-02);
   }
   80% {
     background-color: transparent;
@@ -504,11 +508,19 @@ body.no-animations * {
 }
 .delete-selected-button {
   background-color: var(--color-button-delete);
-  color: var(--color-contrast-100-inverted);
+  color: var(--color-contrast-00);
 }
 .cancel-cleanup-button {
   background-color: var(--color-contrast-80);
-  color: var(--color-contrast-100-inverted);
+  color: var(--color-contrast-00);
+}
+.cancel-cleanup-button:hover {
+  background-color: var(--color-contrast-87);
+  color: #FFF;
+}
+.cancel-cleanup-button:active {
+  background-color: var(--color-contrast-100);
+  color: #FFF;
 }
 .delete-selected-button:hover {
   background-color: var(--color-button-delete-hover);
@@ -518,15 +530,7 @@ body.no-animations * {
   background-color: var(--color-button-delete-active);
   color: #FFF;
 }
-.cancel-cleanup-button:hover {
-  background-color: var(--color-contrast-60);
-  color: #FFF;
-}
-.cancel-cleanup-button:active {
-  background-color: var(--color-contrast-66);
-  color: #FFF;
-}
-.select-all-or-none-button {
+select-all-or-none-button {
   display: inline-block;
 }
 .select-all-or-none-button.none .select-none-button {
@@ -566,8 +570,8 @@ body.no-animations * {
 .select-none-button:active,
 .select-all-button:active {
   background-color: var(--color-toolbar-button-active);
-  color: var(--color-toolbar-button-active);
-  border-color: var(--color-toolbar-button-active);
+  color: var(--color-active);
+  border-color: var(--color-active);
 }
 .select-none-button {
   display: none;
@@ -770,10 +774,9 @@ button.add-bookmark {
   height: 24px;
   font-size: 11px;
   line-height: 24px;
-  padding: 0 5px 0 5px;
+  padding: 0 0 0 5px;
   opacity: 1;
   transition-property: width;
-  opacity: 0;
   transition: none;
   transition-duration: 0;
   padding-left: 0;
@@ -784,14 +787,11 @@ button.add-bookmark {
   z-index: 1;
   position: relative;
   display: inline-block;
-  opacity: 1;
   font-size: 11px;
   line-height: 24px;
   transition: all;
-  transition-property: opacity;
-  transition-delay: var(--timeSearchFieldHiding);
-  transition-duration: 300ms;
-  width: 20px;
+  transition-property: all;
+  transition-duration: var(--timeSearchFieldHiding);
 }
 .cleanup-counter-context,
 .cleanup-counter-selected {
@@ -800,15 +800,29 @@ button.add-bookmark {
   vertical-align: top;
 }
 .cleanup-counter-context {
-  padding-left: 4px;
+  opacity: 1;
+  padding-left: 5px;
+  transition: opacity;
 }
 #content.cleanup-mode #toolbar.show-search-field .cleanup-counter-selected {
   width: 20px;
 }
 #content.cleanup-mode #toolbar.show-search-field .cleanup-counter-context {
-  opacity: 1;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  opacity: 0 !important;
   width: 0;
+  padding: 0;
+  transition-duration: 300ms;
+  transition: opacity;
+}
+.cleanup-counter {
+  width: 74px;
+  transition: auto;
+  transition-duration: 300ms;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+#content.cleanup-mode #toolbar.show-search-field .cleanup-counter {
+  width: 21px;
+  transition: none;
 }
