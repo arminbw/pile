@@ -219,7 +219,7 @@ async function addBookmark(tab) {
           removeBookmark(bookmark.id);
           window.updateCounter++;
         }
-        badgeText = '⬆';
+        badgeText = '↑';
       }
     }
     bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId});
