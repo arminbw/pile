@@ -27,10 +27,13 @@
   --color-contrast-100: #fff;
   --color-contrast-87: #DEDEDE;
   --color-contrast-80: #CCC;
-     --color-contrast-14: #5B5B5B;
-     --color-contrast-06: #303030;
-  --color-contrast-02: #252525;
-  --color-contrast-01: #202020;
+  --color-contrast-70: #B3B3B3;
+  --color-contrast-36: #5B5B5B;
+  --color-contrast-20: #333333;
+  --color-contrast-14: #242424;
+     --color-contrast-06: #0F0F0F;
+  --color-contrast-02: #050505;
+  --color-contrast-01: #000;
   --color-contrast-00: #000;
   --color-active: #157A9F;
   --color-bookmark-selected: #DEEAEE;
@@ -102,6 +105,11 @@ background-color: var(--color-contrast-02);
 list-style: none;
 font-size: 12px;
 }
+.theme-dark li.bookmark {
+  background-color: var(--color-contrast-14);
+  border-bottom: 1px solid var(--color-contrast-20);
+}
+}
 li.bookmark:last-child {
 margin-bottom: 63px;
 }
@@ -157,27 +165,29 @@ transition-delay: 0;
 }
 a.link {
 display: block;
-width: calc(100% - 38px);
+width: calc(100% - 40px);
 white-space: nowrap;
 overflow: hidden;
-text-overflow: ellipsis;
 padding-left: 8px;
 text-decoration: none;
 z-index: 0;
-mask-image: linear-gradient(90deg, var(--color-contrast-100) calc(100% - 24px), transparent);
+mask-image: linear-gradient(90deg, var(--color-contrast-100) calc(100% - 16px), transparent);
 }
 a.link, a.link:visited {
-color: var(--color-contrast-80);
+  color: var(--color-contrast-80);
 }
 .bookmark > a.link:hover {
-color: var(--color-contrast-100);
+  color: var(--color-contrast-100);
 }
 .bookmark > a.link:active {
-color: var(--color-active);
+  color: var(--color-active);
+}
+.theme-dark a.link, a.link:visited {
+  color: var(--color-contrast-70);
 }
 .bookmark.shaking {
-animation: animation-shake-y 0.42s linear;
-z-index: 3;
+  animation: animation-shake-y 0.42s linear;
+  z-index: 3;
 }
 @keyframes animation-shake-y {
 8%, 41% {
@@ -217,9 +227,9 @@ button.delete-button {
   z-index: 1;
   display: block;
   position: absolute;
-  width: 21px;
+  width: 20px;
   height: 20px;
-  right: 20px;
+  right: 18px;
   top: 8px;
   bottom: 8px;
   border: 0;
@@ -236,6 +246,9 @@ button.delete-button:hover {
 }
 button.delete-button:active {
   background-color: var(--color-active);
+}
+.theme-dark button.delete-button, button.delete-button:visited {
+  background-color: var(--color-contrast-36);
 }
 
 /* the toolbar */
@@ -529,7 +542,7 @@ body.no-animations * {
   background-color: var(--color-button-delete-active);
   color: #FFF;
 }
-select-all-or-none-button {
+.select-all-or-none-button {
   display: inline-block;
 }
 .select-all-or-none-button.none .select-none-button {
@@ -579,18 +592,39 @@ select-all-or-none-button {
   animation: animation-shake-x 0.42s linear;
   animation-delay: 0;
 }
+.cleanup-checkbox-border {
+  box-sizing: border-box;
+  border: solid 1px var(--color-checkbox-border);
+  border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  top: 8px;
+  left: 1px;
+  z-index: -1;
+  opacity: 0;
+}
+.cleanup-checkbox-border:hover {
+  border: 1px solid var(--color-checkbox-border-hover);
+}
+.cleanup-checkbox-border:active {
+  border-color: var(--color-checkbox-border-active);
+}
+#content.cleanup-mode li.bookmark.selected .cleanup-checkbox-border {
+  border-color: orange;
+}
+#content.cleanup-mode li.bookmark.selected .cleanup-checkbox-border:hover {
+  border-color: var(--color-checkbox-border-active);
+  background-color: red;
+}
 input[type="checkbox"].cleanup-checkbox {
   box-sizing: border-box;
   appearance: none;
   outline: none;
   position: absolute;
-  right: 22px;
-  top: 10px;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin: 0;
-  border: solid 1px var(--color-checkbox-border);
-  border-radius: 3px;
   background-color: none;
   opacity: 0;
   z-index: -1;
@@ -605,25 +639,18 @@ input[type="checkbox"].cleanup-checkbox:before {
   bottom: -11px;
   background-color: transparent;
 }
-
-input[type="checkbox"].cleanup-checkbox:hover {
-  border-color: var(--color-contrast-80);
-}
 input[type="checkbox"].cleanup-checkbox:active {
   background-color: var(--color-checkbox-active);
-  border-color: var(--color-checkbox-border-active);
 }
 input[type="checkbox"].cleanup-checkbox:checked {
   background: no-repeat center url("checkmark.svg") transparent;
-  border: 1px solid var(--color-active);
+  mask: url("checkmark.svg") no-repeat 50% 50%;
 }
 input[type="checkbox"].cleanup-checkbox:checked:hover {
-  background: no-repeat center url("checkmark_hover.svg") var(--color-checkbox-active);
-  border: 1px solid var(--color-checkbox-border-hover);
+  background-color: var(--color-checkbox-active);
 }
 input[type="checkbox"].cleanup-checkbox:active:checked {
-  background: no-repeat center url("checkmark_active.svg") var(--color-checkbox-checked-active);
-  border-color: var(--color-contrast-80);
+  background-color: var(--color-checkbox-checked-active);
 }
 #content.cleanup-mode li.bookmark.selected {
   background-color: var(--color-bookmark-selected);
@@ -636,7 +663,8 @@ input[type="checkbox"].cleanup-checkbox:active:checked {
 #content.cleanup-mode li.bookmark.selected > a.link:hover {
   background-color: var(--color-checkbox-active);
 }
-#content.cleanup-mode input.cleanup-checkbox {
+#content.cleanup-mode input.cleanup-checkbox,
+#content.cleanup-mode .cleanup-checkbox-border {
   opacity: 1;
   z-index: 1;
 }

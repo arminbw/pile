@@ -60,7 +60,7 @@ window.addEventListener('click', (event) => {
       switch (fn) {
         case 'selectbookmark':
           // highlight bookmark when checkbox is clicked
-          event.target.parentElement.classList.toggle('selected');
+          event.target.parentElement.parentElement.classList.toggle('selected');
           updateCleanupCounter();
           return;
         case 'selectall':

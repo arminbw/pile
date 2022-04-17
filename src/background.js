@@ -176,14 +176,17 @@ function renderBookmark(bookmark) {
   button.classList.add('delete-button');
   button.setAttribute('data-deleteid', bookmark.id);
   button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
+  let checkboxBorderWrapper = document.createElement('div');
+  checkboxBorderWrapper.classList.add('cleanup-checkbox-border');
   let checkbox = document.createElement('input'); 
   checkbox.classList.add('cleanup-checkbox');
   checkbox.setAttribute('type', 'checkbox');
   checkbox.setAttribute('data-functionname', 'selectbookmark');
   checkbox.setAttribute('title', browser.i18n.getMessage('markForDeletion'));
+  checkboxBorderWrapper.appendChild(checkbox);
   li.appendChild(a);
   li.appendChild(button);
-  li.appendChild(checkbox);
+  li.appendChild(checkboxBorderWrapper);
   return li;
 }
 
