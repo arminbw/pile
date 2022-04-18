@@ -28,7 +28,8 @@
   --color-contrast-87: #DEDEDE;
   --color-contrast-80: #CCC;
   --color-contrast-70: #B3B3B3;
-  --color-contrast-36: #5B5B5B;
+  --color-contrast-36: #5C5C5C;
+  --color-contrast-28: #474747;
   --color-contrast-20: #333333;
   --color-contrast-14: #242424;
      --color-contrast-06: #0F0F0F;
@@ -105,11 +106,6 @@ background-color: var(--color-contrast-02);
 list-style: none;
 font-size: 12px;
 }
-.theme-dark li.bookmark {
-  background-color: var(--color-contrast-14);
-  border-bottom: 1px solid var(--color-contrast-20);
-}
-}
 li.bookmark:last-child {
 margin-bottom: 63px;
 }
@@ -119,6 +115,14 @@ margin-top: 0px;
 li.bookmark:hover,
 li.bookmark:active {
 background-color: var(--color-contrast-01);
+}
+.theme-dark li.bookmark {
+  background-color: var(--color-contrast-20);
+  border-bottom: 1px solid var(--color-contrast-28);
+}
+.theme-dark li.bookmark:hover,
+.theme.dark li.bookmark:active {
+  background-color: var(--color-contrast-14);
 }
 ul.bookmarks.adding li.bookmark {
 animation-duration: 0.18s;
@@ -183,7 +187,7 @@ a.link, a.link:visited {
   color: var(--color-active);
 }
 .theme-dark a.link, a.link:visited {
-  color: var(--color-contrast-70);
+  color: var(--color-contrast-80);
 }
 .bookmark.shaking {
   animation: animation-shake-y 0.42s linear;
@@ -227,11 +231,11 @@ button.delete-button {
   z-index: 1;
   display: block;
   position: absolute;
-  width: 20px;
-  height: 20px;
-  right: 18px;
-  top: 8px;
-  bottom: 8px;
+  width: 22px;
+  height: 22px;
+  right: 16px;
+  top: 7px;
+  bottom: 7px;
   border: 0;
   padding: 0;
   margin: 0;
@@ -249,6 +253,12 @@ button.delete-button:active {
 }
 .theme-dark button.delete-button, button.delete-button:visited {
   background-color: var(--color-contrast-36);
+}
+.theme-dark button.delete-button:hover {
+  background-color: var(--color-contrast-100);
+}
+.theme-dark button.delete-button:active {
+  background-color: var(--color-active);
 }
 
 /* the toolbar */

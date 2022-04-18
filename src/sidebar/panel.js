@@ -405,9 +405,8 @@ async function init() {
 
   // change the theme
   browser.storage.local.get('pile-theme').then((obj) => { 
-    if (obj['pile-theme']?.newValue) {
-      changeTheme(obj['pile-theme'].newValue);
-    }
+    console.log(obj);
+    changeTheme(obj['pile-theme']);
   }, logError);
 
   // create a new stylesheet for the search/filter (see filterList())
