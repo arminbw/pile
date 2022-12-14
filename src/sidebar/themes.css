@@ -1,0 +1,55 @@
+.theme-light {
+  --color-contrast-100: #000;
+  --color-contrast-87: #212121;
+  --color-contrast-80: #333;
+  --color-contrast-14: #DBDBDB;
+  --color-contrast-06: #F0F0F0;
+  --color-contrast-02: #FAFAFA;
+  --color-contrast-01: #fff;
+  --color-contrast-00: #fff;
+  --color-active: #157A9F;
+  --color-bookmark-selected: #DEEAEE;
+  --color-bookmark-selected-border: #CDE0E0;
+  --color-checkbox-active: #EFF6F8;
+  --color-checkbox-border: #999999;
+  --color-button-delete: #157A9F;
+  --color-button-delete-hover: #1A6B88;
+  --color-button-delete-active: #17617C;
+  --color-toolbar-background: #CDE4E4;
+  --color-toolbar-background-dark: #C1D8D8;
+  --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-border-active: #1A6B88;
+  --color-checkbox-border-hover: #1A6B88;
+  --color-checkbox-border-active: #17617C;
+  --color-checkbox-checked-active: #ECECEC;
+}
+
+.theme-dark {
+  --color-contrast-100: #fff;
+  --color-contrast-87: #DEDEDE;
+  --color-contrast-80: #CCC;
+  --color-contrast-70: #B3B3B3;
+  --color-contrast-40: #666;
+  --color-contrast-28: #474747;
+  --color-contrast-20: #333333;
+  --color-contrast-14: #242424;
+     --color-contrast-06: #0F0F0F;
+  --color-contrast-02: #050505;
+  --color-contrast-01: #000;
+  --color-contrast-00: #000;
+  --color-active: #4A8792;
+  --color-bookmark-selected: #DEEAEE;
+  --color-bookmark-selected-border: #CDE0E0;
+     --color-checkbox-active: #EFF6F8;
+  --color-checkbox-border: #999999;
+  --color-button-delete: #157A9F;
+  --color-button-delete-hover: #1A6B88;
+  --color-button-delete-active: #17617C;
+  --color-toolbar-background: #95BCC3;
+  --color-toolbar-background-dark: #95BCC3;
+  --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-border-active: #1A6B88;
+  --color-checkbox-border-hover: #1A6B88;
+  --color-checkbox-border-active: #17617C;
+  --color-checkbox-checked-active: #ECECEC;
+}

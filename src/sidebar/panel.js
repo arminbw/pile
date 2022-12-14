@@ -152,7 +152,7 @@ function changeTheme(newThemeCSSName) {
 browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-theme']?.newValue) {
     console.log(changes);
-    changeTheme(changes['pile-theme']?.newValue);
+    changeTheme(changes['pile-theme'].newValue);
   }
 });
 

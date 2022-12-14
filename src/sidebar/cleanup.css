@@ -1,0 +1,350 @@
+/* cleanup mode */
+.delete-selected-button, .cancel-cleanup-button {
+  display: inline-block;
+  text-align: center;
+  width: calc(50%);
+  height: 24px;
+  font-size: 11px;
+  line-height: 18px;
+}
+.delete-selected-button {
+  background-color: var(--color-button-delete);
+  color: var(--color-contrast-00);
+}
+.cancel-cleanup-button {
+  background-color: var(--color-contrast-80);
+  color: var(--color-contrast-00);
+}
+.cancel-cleanup-button:hover {
+  background-color: var(--color-contrast-87);
+  color: #FFF;
+}
+.cancel-cleanup-button:active {
+  background-color: var(--color-contrast-100);
+  color: #FFF;
+}
+.delete-selected-button:hover {
+  background-color: var(--color-button-delete-hover);
+  color: #FFF;
+}
+.delete-selected-button:active {
+  background-color: var(--color-button-delete-active);
+  color: #FFF;
+}
+.select-all-or-none-button {
+  display: inline-block;
+}
+.select-all-or-none-button.none .select-none-button {
+  display: inline-block;
+}
+.select-all-or-none-button.none .select-all-button {
+  display: none;
+}
+.select-all-or-none-button.shaking, 
+.add-bookmark.shaking {
+  animation-delay: 0s;
+  animation: animation-shake-x 0.42s linear;
+}
+.select-none-button,
+.select-all-button {
+  vertical-align:top;
+  width: 42px;
+  height: 18px;
+  color: var(--color-contrast-80);
+  font-size: 11px;
+  line-height: 16px;
+  border-radius: 3px;
+  border: solid 1px var(--color-contrast-80);
+  padding: 0;
+  margin: 3px 4px 3px 4px;
+  text-align: center;
+  text-decoration: none;
+  background: none;
+  outline: none;
+}
+.select-none-button:hover,
+.select-all-button:hover {
+  background-color: var(--color-bookmark-selected-border);
+  color: var(--color-contrast-100);
+  border-color: var(--color-contrast-100);
+}
+.select-none-button:active,
+.select-all-button:active {
+  background-color: var(--color-toolbar-button-active);
+  color: var(--color-active);
+  border-color: var(--color-active);
+}
+.select-none-button {
+  display: none;
+}
+.cleanup-counter.shaking {
+  animation: animation-shake-x 0.42s linear;
+  animation-delay: 0;
+}
+.cleanup-checkbox-border {
+  box-sizing: border-box;
+  border: solid 1px var(--color-checkbox-border);
+  border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  top: 8px;
+  left: 1px;
+  z-index: -1;
+  opacity: 0;
+}
+.cleanup-checkbox-border:hover {
+  border: 1px solid var(--color-checkbox-border-hover);
+}
+.cleanup-checkbox-border:active {
+  border-color: var(--color-checkbox-border-active);
+}
+#content.cleanup-mode li.bookmark.selected .cleanup-checkbox-border {
+  border-color: orange;
+}
+#content.cleanup-mode li.bookmark.selected .cleanup-checkbox-border:hover {
+  border-color: var(--color-checkbox-border-active);
+  background-color: red;
+}
+input[type="checkbox"].cleanup-checkbox {
+  box-sizing: border-box;
+  appearance: none;
+  outline: none;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  background-color: none;
+  opacity: 0;
+  z-index: -1;
+}
+input[type="checkbox"].cleanup-checkbox:before {
+  content: " ";
+  position: absolute;
+  z-index: -1;
+  width: 31px;
+  height: 37px;
+  right: -9px;
+  bottom: -11px;
+  background-color: transparent;
+}
+input[type="checkbox"].cleanup-checkbox:active {
+  background-color: var(--color-checkbox-active);
+}
+input[type="checkbox"].cleanup-checkbox:checked {
+  background: no-repeat center url("checkmark.svg") transparent;
+  mask: url("checkmark.svg") no-repeat 50% 50%;
+}
+input[type="checkbox"].cleanup-checkbox:checked:hover {
+  background-color: var(--color-checkbox-active);
+}
+input[type="checkbox"].cleanup-checkbox:active:checked {
+  background-color: var(--color-checkbox-checked-active);
+}
+#content.cleanup-mode li.bookmark.selected {
+  background-color: var(--color-bookmark-selected);
+  border-top: 1px solid var(--color-bookmark-selected-border);
+  margin-top: -1px;
+  height: 38px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--color-bookmark-selected-border);
+}
+#content.cleanup-mode li.bookmark.selected > a.link:hover {
+  background-color: var(--color-checkbox-active);
+}
+#content.cleanup-mode input.cleanup-checkbox,
+#content.cleanup-mode .cleanup-checkbox-border {
+  opacity: 1;
+  z-index: 1;
+}
+#content.cleanup-mode button.delete-button {
+  opacity: 0;
+  visibility: hidden;
+  transition: all;
+  transition-duration: 100ms;
+}
+#content.cleanup-mode a.link {
+  width: calc(100% - 48px);
+}
+#content.cleanup-mode .cleanup-checkbox-border {
+  left: 8px;
+}
+
+/* cleanup animation */
+#content.cleanup-mode .cleanup-button svg > .trashcan-top {
+  transform-box: fill-box;
+  transform-origin: 0px 2px;
+  animation: anim-open 0.3s forwards;
+  animation-timing-function: ease-out;
+} 
+@keyframes anim-open {
+  0% {
+      transform: translate(0px, 0px) rotate(0deg);
+  }
+  100% {
+      transform: translate(0px, -1.8px) rotate(-12deg);
+  }
+}
+#content:not(.cleanup-mode) .cleanup-button svg > .trashcan-top {
+  transform-box: fill-box;
+  transform-origin: 0px 2px;
+  animation: anim-close 0.3s forwards;
+  animation-timing-function: ease-out;
+}
+@keyframes anim-close {
+  0% {
+    transform: translate(0px, -1.8px) rotate(-12deg);
+  }
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+}
+
+#toolbar {
+  transition-duration: var(--timeCleanupFold);
+  transition-timing-function: ease-in;
+  height: 24px;
+}
+#content.cleanup-mode #toolbar {
+  height: 48px;
+  transition-duration: var(--timeCleanupUnfold);
+  transition-timing-function: ease-out;
+}
+#content ul.bookmarks {
+  transform: translateY(0px);
+  transition-delay: 0ms;
+  transition-property: transform;
+  transition-duration: var(--timeCleanupFold);
+  transition-timing-function: ease-in;
+}
+#content.cleanup-mode ul.bookmarks {
+  transform: translateY(24px);
+  transition-delay: 0ms;
+  transition-property: transform;
+  transition-duration: var(--timeCleanupUnfold);
+  transition-timing-function: ease-out;
+}
+#content .cleanup-confirmation {
+  position: relative;
+  z-index: -1;
+  opacity: 1;
+  transform: translateY(-24px);
+  transition: opacity;
+  transition-duration: var(--timeCleanupUnfold);
+  transition-delay: 0s;
+}
+#content.cleanup-mode .cleanup-confirmation {
+  position: relative;
+  z-index: 1;
+  transition-property: opacity;
+  transition-delay: var(--timeCleanupUnfold);
+  transition-duration: 120ms;
+  transform: translateY(0px);
+}
+button.delete-selected-button,
+button.cancel-cleanup-button {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 100ms;
+  transition-delay: 120ms;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: none;
+}
+#content.cleanup-mode .delete-selected-button {
+  opacity: 1;
+  transition-duration: 100ms;
+  transition-delay: calc(var(--timeCleanupUnfold) + 40ms);
+}
+#content.cleanup-mode .cancel-cleanup-button {
+  opacity: 1;
+  transition-duration: 120ms;
+  transition-delay: calc(var(--timeCleanupUnfold) + 80ms);
+}
+button.add-bookmark {
+  z-index: 1;
+  position: relative;
+  display: block;
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: var(--timeCleanupFold);
+}
+#content.cleanup-mode button.add-bookmark {
+  z-index: -1;
+  position: absolute;
+  opacity: 0;
+  transition-duration: 0s;
+}
+.select-all-or-none-button {
+  z-index: -1;
+  position: absolute;
+  opacity: 0;
+  float: right;
+}
+#content.cleanup-mode .select-all-or-none-button {
+  z-index: 1;
+  position: relative;
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 0;
+  transition-delay: 0;
+}
+.cleanup-counter {
+  z-index: -1;
+  position: absolute;
+  height: 24px;
+  font-size: 11px;
+  line-height: 24px;
+  padding: 0 0 0 5px;
+  opacity: 1;
+  transition-property: width;
+  transition: none;
+  transition-duration: 0;
+  padding-left: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#content.cleanup-mode .cleanup-counter {
+  z-index: 1;
+  position: relative;
+  display: inline-block;
+  font-size: 11px;
+  line-height: 24px;
+  transition: all;
+  transition-property: all;
+  transition-duration: var(--timeSearchFieldHiding);
+}
+.cleanup-counter-context,
+.cleanup-counter-selected {
+  display: inline-block;
+  padding: 0;
+  vertical-align: top;
+}
+.cleanup-counter-context {
+  opacity: 1;
+  padding-left: 5px;
+  transition: opacity;
+}
+#content.cleanup-mode #toolbar.show-search-field .cleanup-counter-selected {
+  width: 20px;
+}
+#content.cleanup-mode #toolbar.show-search-field .cleanup-counter-context {
+  opacity: 0 !important;
+  width: 0;
+  padding: 0;
+  transition-duration: 300ms;
+  transition: opacity;
+}
+.cleanup-counter {
+  width: 74px;
+  transition: auto;
+  transition-duration: 300ms;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+#content.cleanup-mode #toolbar.show-search-field .cleanup-counter {
+  width: 21px;
+  transition: none;
+}

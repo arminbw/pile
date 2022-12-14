@@ -1,0 +1,181 @@
+/* the list of deleteable bookmarks */
+ul.bookmarks {
+display: block;
+height: 100vh;
+width: calc(100% + 30px);
+overflow-y: scroll;
+overflow-x: hidden;
+background-color: var(--color-contrast-02);
+margin: 24px 0 0 0;
+padding: 0 0 0 0;
+scroll-behavior: smooth;
+}
+li.bookmark {
+z-index: 2;
+position: relative;
+display: flex;
+box-sizing: content-box;
+border-bottom: 1px solid var(--color-contrast-06);
+height: 36px;
+line-height: 36px;
+margin: 0;
+padding: 0;
+background-color: var(--color-contrast-02);
+list-style: none;
+font-size: 12px;
+}
+li.bookmark:last-child {
+margin-bottom: 63px;
+}
+li.bookmark:first-child {
+margin-top: 0px;
+}
+li.bookmark:hover,
+li.bookmark:active {
+background-color: var(--color-contrast-01);
+}
+.theme-dark li.bookmark {
+  background-color: var(--color-contrast-20);
+  border-bottom: 1px solid var(--color-contrast-28);
+}
+.theme-dark li.bookmark:hover,
+.theme.dark li.bookmark:active {
+  background-color: var(--color-contrast-14);
+}
+ul.bookmarks.adding li.bookmark {
+animation-duration: 0.18s;
+animation-name: animation-slidein;
+z-index: 2;
+transition-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
+}
+@keyframes animation-slidein {
+from {
+transform: translateY(-39px);
+}
+to {
+transform: translateY(0px);
+}
+}
+ul.bookmarks.foldup li.bookmark {
+transition: transform 0.12s ease-in-out;
+transition-delay: 0.22s;
+transform: translateY(37px);
+z-index: 1;
+}
+ul.bookmarks.foldup li.bookmark.being-deleted ~ li.bookmark {
+transition: none;
+transform: none;
+}
+ul.bookmarks:not(.foldup) li.bookmark.being-deleted, li.bookmark.being-deleted ~ li.bookmark {
+transition: transform 0.12s ease-in-out;
+transition-delay: 0.12s;
+transform: translateY(-37px);
+z-index: 1;
+}
+li.bookmark:last-child.being-deleted {
+border-bottom: none;
+}
+li.bookmark.being-deleted .delete-button {
+opacity: 0;
+transition: opacity 0.08s linear;
+transition-delay: 0;
+}
+li.bookmark.being-deleted a.link {
+opacity: 0;
+transition: opacity 0.08s linear;
+transition-delay: 0;
+}
+a.link {
+display: block;
+width: calc(100% - 40px);
+white-space: nowrap;
+overflow: hidden;
+padding-left: 8px;
+text-decoration: none;
+z-index: 0;
+mask-image: linear-gradient(90deg, var(--color-contrast-100) calc(100% - 16px), transparent);
+}
+a.link, a.link:visited {
+  color: var(--color-contrast-80);
+}
+.bookmark > a.link:hover {
+  color: var(--color-contrast-100);
+}
+.bookmark > a.link:active {
+  color: var(--color-active);
+}
+.theme-dark a.link, a.link:visited {
+  color: var(--color-contrast-80);
+}
+.bookmark.shaking {
+  animation: animation-shake-y 0.42s linear;
+  z-index: 3;
+}
+@keyframes animation-shake-y {
+8%, 41% {
+  transform: translateY(-1px);
+}
+25%, 58% {
+  transform: translateY(2px);
+}
+75% {
+  transform: translateY(-1px);
+}
+92% {
+  transform: translateY(1px);
+}
+0%, 100% {
+  transform: translateY(0);
+}
+}
+@keyframes animation-shake-x {
+8%, 41% {
+  transform: translateX(-1px);
+}
+25%, 58% {
+  transform: translateX(2px);
+}
+75% {
+  transform: translateX(-1px);
+}
+92% {
+  transform: translateX(1px);
+}
+0%, 100% {
+  transform: translateX(0);
+}
+}
+
+button.delete-button {
+  z-index: 1;
+  display: block;
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  right: 16px;
+  top: 7px;
+  bottom: 7px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
+}
+button.delete-button, button.delete-button:visited {
+  background-color: var(--color-contrast-14);
+}
+button.delete-button:hover {
+  background-color: var(--color-contrast-100); 
+}
+button.delete-button:active {
+  background-color: var(--color-active);
+}
+.theme-dark button.delete-button, button.delete-button:visited {
+  background-color: var(--color-contrast-40);
+}
+.theme-dark button.delete-button:hover {
+  background-color: var(--color-contrast-100);
+}
+.theme-dark button.delete-button:active {
+  background-color: var(--color-active);
+}

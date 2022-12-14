@@ -29,6 +29,6 @@
   "dependencies": {
     "core-js": "^3.19.3",
     "update": "^0.7.4",
-    "web-ext": "^6.6.0"
+    "web-ext": "^7.1.0"
   }
 }

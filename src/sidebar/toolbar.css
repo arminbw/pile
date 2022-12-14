@@ -1,0 +1,260 @@
+/* the toolbar */
+#toolbar {
+  position: fixed;
+  z-index: 4;
+  width: 100%;
+  height: 24px;
+  background-color: #C1D8D8;
+  box-shadow:
+  0 0.1px 1.4px rgba(0, 0, 0, 0.121),
+  0 0.4px 4.7px rgba(0, 0, 0, 0.206),
+  0 1px 21px rgba(0, 0, 0, 0.34),
+  inset 0 0 0px #CADDDD;
+}
+.toolbar-top {
+  background-image: linear-gradient(var(--color-toolbar-background), var(--color-toolbar-background-dark));
+  height: 24px;
+}
+.theme-dark .toolbar-top {  
+  background: #4A8792;
+}
+.search-input-field {
+  display: block;
+  float: left;
+  height: 24px;
+  line-height: 24px;  
+  width: 1px;
+  font-size: 11px;
+  font-weight: 400;
+  border: 0;
+  padding: 0 0 0 5px;
+}
+.search-show-hide-button {
+  display: block;
+  float: left;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0px;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+  background-color: var(--color-contrast-80);
+  transition: background-color 0.08s ease;
+}
+.cleanup-button {
+  display: block;
+  float: left;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0px;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+  background-color: rgba(186,226,230,0);
+  transition: background-color 0.08s ease;
+}
+.cleanup-button:hover {
+  background: no-repeat center var(--color-bookmark-selected-border);
+}
+.cleanup-button:active {
+  background: no-repeat center var(--color-toolbar-button-active);
+}
+.cleanup-button:hover svg .cls-1 {
+  stroke: #000;
+}
+.cleanup-button:hover svg .cls-2 {
+  fill: #000;
+}
+.cleanup-button:active svg .cls-1 {
+  stroke: var(--color-active);
+}
+.cleanup-button:active svg .cls-2 {
+  fill: var(--color-active);
+}
+
+button.add-bookmark {
+  height: 24px;
+  line-height: 24px;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-contrast-80);
+  transition: background-color 0.12s ease;
+}
+button.add-bookmark:hover {
+  color: var(--color-contrast-100);
+  background-color: var(--color-bookmark-selected-border);
+  transition: background-color 0.08s ease;
+}
+button.add-bookmark:active {
+  color: var(--color-active);
+  background-color: var(--color-toolbar-button-active);
+}
+
+/* searchfield variables */
+#toolbar {
+  --timeSearchFieldHiding: 0.22s;
+}
+
+/* the searchfield is shown, add button is small */
+#toolbar.show-search-field input.search-input-field {
+  animation-name: transition-field-show;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  width: calc(100% - 114px);
+} 
+#toolbar.show-search-field .search-show-hide-button {
+  background-color: var(--color-contrast-00);
+  animation-name: transition-button-close;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+#toolbar.show-search-field .search-show-hide-button:before {
+  content: '';
+  display: block;
+  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
+  background-color: var(--color-contrast-14);
+  height: 100%
+}
+#toolbar.show-search-field .search-show-hide-button:hover::before {
+  background-color: var(--color-contrast-100);
+}
+#toolbar.show-search-field .search-show-hide-button:active::before {
+  background-color: var(--color-contrast-14);
+}
+#toolbar.show-search-field .add-bookmark {
+  width: 70px;
+  animation-name: transition-button-add-small;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+
+/* the searchfield is hidden, add button is big */
+#toolbar:not(.show-search-field) input.search-input-field {
+  animation-name: transition-field-hide;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  width: 1px;
+  padding-left: 0px;
+  color: transparent;
+}
+#toolbar:not(.show-search-field) .search-show-hide-button {
+  animation-name: transition-button-search;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+  mask: url("search_button.svg") no-repeat 50% 50%;
+  background-color: var(--color-contrast-80);
+}
+#toolbar:not(.show-search-field) .search-show-hide-button:hover {
+  background-color: var(--color-contrast-100);
+}
+#toolbar:not(.show-search-field) .search-show-hide-button:active {
+  background-color: var(--color-active);
+}
+#toolbar:not(.show-search-field) .add-bookmark {
+  width: calc(100% - 43px);
+}
+button.add-bookmark.hide-search-field {
+  animation-name: transition-button-add-large;
+  animation-duration: var(--timeSearchFieldHiding);
+  animation-timing-function: ease-out;
+}
+
+/* suppress all animations during page load */
+body.no-animations * {
+  animation-duration: 0s !important;
+}
+
+/* searchfield unfolding */
+@keyframes transition-button-close {
+  0% {
+    background: none center var(--color-toolbar-button-active);
+  }
+  50% {
+    background: none center var(--color-toolbar-button-active);
+  }
+  80% {
+    background: none center #fff;
+  }
+  100% {
+    background: no-repeat center url("close_button.svg") #fff;
+  }
+}
+@keyframes transition-field-show {
+  0% {
+    width: 1px;
+    padding-left: 0px;
+    background-color: var(--color-toolbar-button-active);
+  }
+  50% {
+    padding-left: 5px;
+    width: calc(100% - 114px);
+    background-color: var(--color-toolbar-button-active);
+  }
+  80% {
+    background-color: #FFF;
+    color: #3B3B3B;
+  }
+}
+@keyframes transition-button-add-small {
+  0% {
+    width: calc(100% - 43px);
+  }
+  50% {
+    width: 70px;
+  }
+  100% {
+    width: 70px;
+  }
+}
+
+/* searchfield folding */
+@keyframes transition-button-search {
+  0% {
+    background-color: var(--color-input-contrast-02);
+  }
+  80% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+@keyframes transition-field-hide {
+  0% {
+    width: calc(100% - 114px);
+    color: transparent;
+    background: none #fff;
+  }
+  80% {
+    width: 1px;
+    padding-left: 0px;
+    background: none transparent;
+    color: #fff;
+  }
+  100% {
+    color: #fff;
+  }
+}
+@keyframes transition-button-add-large {
+  0% {
+    width: 70px;
+  }
+  80% {
+    width: calc(100% - 43px);
+  }
+}

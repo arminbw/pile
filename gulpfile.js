@@ -11,24 +11,24 @@ function clean() {
 
 function processJavascript() {
    return gulp
-      .src(['./src/background.js', './src/sidebar/*.js'], { base: 'src/' })
-      .pipe(stripComments( { space:false, trim:true } ))
+      .src(['src/background.js', 'src/sidebar/panel.js'], { base: 'src/' })
       .pipe(stripDebug())
+      .pipe(stripComments( { space:false, trim:true } ))
       .pipe(gulp.dest('./build/'));
 }
 
 function processOtherCode() {
    // comments are not stripped from CSS as decomment still has troubles with regular expressions
    return gulp
-      .src(['src/manifest.json', './src/sidebar/*.html', './src/_locales/**'], { base: 'src/' })
+      .src(['src/manifest.json', 'src/sidebar/*.html', 'src/_locales/**'], { base: 'src/' })
       .pipe(stripComments())
-      .pipe(gulp.dest('./build/'));
+      .pipe(gulp.dest('build/'));
 }
 
 function moveAssets() {
    return gulp
-      .src(['src/icons/**/*.*', 'src/sidebar/*.svg',  'src/sidebar/*.css'], { base: 'src/' })
-      .pipe(gulp.dest('./build/'))
+      .src(['src/icons/**/*.*', 'src/sidebar/*.svg', 'src/sidebar/*.css'], { base: 'src/' })
+      .pipe(gulp.dest('build/'))
 }
 
 const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, moveAssets));
