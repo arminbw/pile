@@ -1,5 +1,5 @@
 import gulp from "gulp";
-import {deleteAsync} from "del";
+import { deleteAsync } from "del";
 import stripComments from "gulp-strip-comments";
 import stripDebug from "gulp-strip-debug";
 
