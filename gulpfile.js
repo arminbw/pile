@@ -1,17 +1,10 @@
-"use strict";
-
-// const gulp = require('gulp');
-// const del = require('del');
-// const stripComments = require('gulp-strip-comments');
-// const stripDebug = require('gulp-strip-debug');
-
 import gulp from "gulp";
-import del from "del";
+import {deleteAsync} from "del";
 import stripComments from "gulp-strip-comments";
 import stripDebug from "gulp-strip-debug";
 
-function clean() {
-   return del(['build/**/*']);
+export function clean() {
+   return deleteAsync(['build/**'], '!build');
 }
 
 function processJavascript() {
@@ -23,7 +16,6 @@ function processJavascript() {
 }
 
 function processOtherCode() {
-   // comments are not stripped from CSS as decomment still has troubles with regular expressions
    return gulp
       .src(['src/manifest.json', 'src/sidebar/*.html', 'src/_locales/**'], { base: 'src/' })
       .pipe(stripComments())
@@ -36,7 +28,5 @@ function moveAssets() {
       .pipe(gulp.dest('build/'))
 }
 
-const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, moveAssets));
+export const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, moveAssets));
 
-exports.build = build;
-exports.clean = clean;
