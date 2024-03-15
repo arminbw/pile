@@ -21,7 +21,8 @@
       "dark": "icons/pile.svg",
       "light": "icons/pile.svg",
       "size": 32
-    }]
+    }],
+    "default_area": "navbar"
   },
   "sidebar_action": {
     "default_icon": "icons/pile.svg",
