@@ -127,6 +127,9 @@ function updateBookmarkListElement() {
 
 function handleMessage(request, sender, sendResponse) {
   // TODO: add proper error handling
+  // add 
+  // if (sender.id !== backgroundscript.id) return;
+  // to prevent other extensions from sending messages
   console.log(`panel of window ${myWindowId} received message: ${request.message}`);
   if (request.message === 'updatePilePanel') {
      // The timeout allows the CSS transition to end before

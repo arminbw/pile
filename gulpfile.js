@@ -1,9 +1,14 @@
 "use strict";
 
-const gulp = require('gulp');
-const del = require('del');
-const stripComments = require('gulp-strip-comments');
-const stripDebug = require('gulp-strip-debug');
+// const gulp = require('gulp');
+// const del = require('del');
+// const stripComments = require('gulp-strip-comments');
+// const stripDebug = require('gulp-strip-debug');
+
+import gulp from "gulp";
+import del from "del";
+import stripComments from "gulp-strip-comments";
+import stripDebug from "gulp-strip-debug";
 
 function clean() {
    return del(['build/**/*']);

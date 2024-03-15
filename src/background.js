@@ -296,6 +296,7 @@ async function removeBookmarks(bookmarkIDs) {
     await Promise.all(bookmarkIDs.map(async (id) => {
       await removeBookmark(id);
       // TODO: deal with Promise rejection
+      // TODO: deal with error 
       counter++;
     }));
   } catch(error) {

@@ -4,12 +4,12 @@
   "description": "A lightweight bookmarking tool for the avid reader",
   "main": "background.js",
   "devDependencies": {
-    "del": "^6.0.0",
-    "eslint": "^8.4.1",
-    "eslint-plugin-no-unsanitized": "^4.0.0",
+    "del": "^7.1.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-no-unsanitized": "^4.0.2",
     "gulp": "^4.0.2",
-    "gulp-strip-comments": "^2.5.2",
-    "gulp-strip-debug": "^4.0.0"
+    "gulp-strip-comments": "^2.6.0",
+    "gulp-strip-debug": "^6.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,8 +27,8 @@
   "author": "Armin Wagner",
   "license": "MIT",
   "dependencies": {
-    "core-js": "^3.19.3",
+    "core-js": "^3.36.0",
     "update": "^0.7.4",
-    "web-ext": "^7.1.0"
+    "web-ext": "^7.11.0"
   }
 }
