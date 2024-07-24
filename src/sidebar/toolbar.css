@@ -14,6 +14,7 @@
 .toolbar-top {
   background-image: linear-gradient(var(--color-toolbar-background), var(--color-toolbar-background-dark));
   height: 24px;
+  display: flex;
 }
 .theme-dark .toolbar-top {  
   background: #4A8792;
@@ -23,11 +24,11 @@
   float: left;
   height: 24px;
   line-height: 24px;  
-  width: 1px;
+  width: 0px;
   font-size: 11px;
   font-weight: 400;
   border: 0;
-  padding: 0 0 0 5px;
+  padding: 0;
 }
 .search-show-hide-button {
   display: block;
@@ -41,8 +42,6 @@
   width: 21px;
   height: 24px;
   line-height: 24px;
-  background-color: var(--color-contrast-80);
-  transition: background-color 0.08s ease;
 }
 .cleanup-button {
   display: block;
@@ -77,7 +76,13 @@
 .cleanup-button:active svg .cls-2 {
   fill: var(--color-active);
 }
-
+button.add-bookmark {
+  z-index: 1;
+  display: inline-block;
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: var(--timeCleanupFold);
+}
 button.add-bookmark {
   height: 24px;
   line-height: 24px;
@@ -87,7 +92,7 @@ button.add-bookmark {
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0;
-  margin: 0;
+  margin: auto;
   text-align: center;
   text-decoration: none;
   border: 0;
@@ -107,20 +112,36 @@ button.add-bookmark:active {
 
 /* searchfield variables */
 #toolbar {
-  --timeSearchFieldHiding: 0.22s;
+  --timeSearchContainer: 4.22s;
 }
 
-/* the searchfield is shown, add button is small */
-#toolbar.show-search-field input.search-input-field {
-  animation-name: transition-field-show;
-  animation-duration: var(--timeSearchFieldHiding);
+#toolbar.search-container {
+  width: calc(100% - 42px);
+}
+
+/* .search-container grows after clicking on search symbol */
+#toolbar.show-search-field .search-container {
+  animation-name: transition-search-show;
+  animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
   width: calc(100% - 114px);
 } 
+
+#toolbar.show-search-field input.search-input-field {
+  animation-name: transition-input-show;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease-out;
+  width: calc(100% - 21px);
+} 
 #toolbar.show-search-field .search-show-hide-button {
-  background-color: var(--color-contrast-00);
-  animation-name: transition-button-close;
-  animation-duration: var(--timeSearchFieldHiding);
+  animation-name: transition-close-button-show;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease-out;
+}
+#toolbar.show-search-field .search-show-hide-button:active,
+#toolbar.show-search-field .search-show-hide-button:hover {
+  animation-name: transition-close-button-show;
+  animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
 }
 #toolbar.show-search-field .search-show-hide-button:before {
@@ -137,24 +158,22 @@ button.add-bookmark:active {
   background-color: var(--color-contrast-14);
 }
 #toolbar.show-search-field .add-bookmark {
-  width: 70px;
-  animation-name: transition-button-add-small;
-  animation-duration: var(--timeSearchFieldHiding);
-  animation-timing-function: ease-out;
+  float: right;
+  min-width: 70px;
 }
 
-/* the searchfield is hidden, add button is big */
-#toolbar:not(.show-search-field) input.search-input-field {
-  animation-name: transition-field-hide;
-  animation-duration: var(--timeSearchFieldHiding);
+/* NEW searchfield gets hidden after clicking close button */
+#toolbar:not(.show-search-field) .search-container {
+  animation-name: transition-search-hide;
+  animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
-  width: 1px;
-  padding-left: 0px;
+  width: 21px;
   color: transparent;
 }
+
 #toolbar:not(.show-search-field) .search-show-hide-button {
   animation-name: transition-button-search;
-  animation-duration: var(--timeSearchFieldHiding);
+  animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
   mask: url("search_button.svg") no-repeat 50% 50%;
   background-color: var(--color-contrast-80);
@@ -170,55 +189,57 @@ button.add-bookmark:active {
 }
 button.add-bookmark.hide-search-field {
   animation-name: transition-button-add-large;
-  animation-duration: var(--timeSearchFieldHiding);
+  animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
 }
+
+
+/* ANIMATIONS and TRANSITIONS */
 
 /* suppress all animations during page load */
 body.no-animations * {
   animation-duration: 0s !important;
 }
-
-/* searchfield unfolding */
-@keyframes transition-button-close {
+/* user clicked the search symbol */
+/* increase width at 0%-50% */
+/* change color to white at 50%-80% */
+@keyframes transition-search-show {
   0% {
-    background: none center var(--color-toolbar-button-active);
-  }
-  50% {
-    background: none center var(--color-toolbar-button-active);
-  }
-  80% {
-    background: none center #fff;
-  }
-  100% {
-    background: no-repeat center url("close_button.svg") #fff;
-  }
-}
-@keyframes transition-field-show {
-  0% {
-    width: 1px;
-    padding-left: 0px;
+    width: 21px;
     background-color: var(--color-toolbar-button-active);
   }
   50% {
-    padding-left: 5px;
     width: calc(100% - 114px);
     background-color: var(--color-toolbar-button-active);
   }
   80% {
-    background-color: #FFF;
+    background-color: #fff;
     color: #3B3B3B;
   }
 }
-@keyframes transition-button-add-small {
+/* 1. the close button pops out after the animation finished */
+@keyframes transition-close-button-show {
   0% {
-    width: calc(100% - 43px);
+    background-color: var(--color-toolbar-button-active);
   }
   50% {
-    width: 70px;
+    background-color: var(--color-toolbar-button-active);
   }
   100% {
-    width: 70px;
+    background: #fff;
+  }
+}
+/* start revealing the input field at 80% */
+@keyframes transition-input-show {
+  0% {
+    padding-left: 0px;
+  }
+  80% {
+    padding-left: 0px;
+  }
+  100% {
+    padding-left: 5px;
+    color: #3B3B3B;
   }
 }
 
@@ -234,7 +255,23 @@ body.no-animations * {
     background-color: transparent;
   }
 }
-@keyframes transition-field-hide {
+@keyframes transition-search-hide {
+  0% {
+    width: calc(100% - 114px);
+    color: transparent;
+    background: none #fff;
+  }
+  80% {
+    width: 21px;
+    padding-left: 0px;
+    background: none transparent;
+    color: #fff;
+  }
+  100% {
+    color: #fff;
+  }
+}
+@keyframes transition-input-hide {
   0% {
     width: calc(100% - 114px);
     color: transparent;

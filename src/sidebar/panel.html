@@ -20,7 +20,7 @@
   </div>
   <div id="content">
     <div id="toolbar">
-      <div class="toolbar-top"><input class="search-input-field" type="search" /><button data-functionname="togglesearch" data-localize-title="search" class="search-show-hide-button"></button><button data-functionname="togglecleanup" data-localize-title="cleanUp" class="cleanup-button"><svg xmlns="http://www.w3.org/2000/svg" width="21" height="24" viewBox="0 0 21 24" pointer-events="none">
+      <div class="toolbar-top"><div class="search-container"><input class="search-input-field" type="search" /><button data-functionname="togglesearch" data-localize-title="search" class="search-show-hide-button"></button></div><button data-functionname="togglecleanup" data-localize-title="cleanUp" class="cleanup-button"><svg xmlns="http://www.w3.org/2000/svg" width="21" height="24" viewBox="0 0 21 24" pointer-events="none">
           <defs>
             <style>
               .cls-1 {
@@ -43,7 +43,7 @@
             <polygon class="cls-2" points="14.97 7.57 6.04 7.57 5.99 6.57 15.02 6.57 14.97 7.57"/>
             <rect class="cls-2" x="8.75" y="4.8" width="3.5" height="1"/>
           </g>
-        </svg></button><div class="cleanup-counter"><span class="cleanup-counter-selected"></span><span class="cleanup-counter-context" data-localize-text="cleanedUp">All clean</span></div><div class="select-all-or-none-button"><button class="select-all-button" data-functionname="selectall" data-localize-text="all">All</button><button class="select-none-button" data-functionname="deselectall" data-localize-text="none">None</button></div><div><button data-functionname="addbookmark" class="add-bookmark" data-localize-title="addPageToPileTitle" data-localize-text="addPage">ADD PAGE</button></div></div>
+        </svg></button><div class="cleanup-counter"><span class="cleanup-counter-selected"></span><span class="cleanup-counter-context" data-localize-text="cleanedUp">All clean</span></div><div class="select-all-or-none-button"><button class="select-all-button" data-functionname="selectall" data-localize-text="all">All</button><button class="select-none-button" data-functionname="deselectall" data-localize-text="none">None</button></div><button data-functionname="addbookmark" class="add-bookmark" data-localize-title="addPageToPileTitle" data-localize-text="addPage">ADD PAGE</button></div>
     <div class="cleanup-confirmation"><button class="delete-selected-button" data-functionname="deleteselected" data-localize-text="delete" data-localize-title="deleteSelectedTitle">Delete</button><button class="cancel-cleanup-button" data-functionname="cancelcleanup" data-localize-text="cancel">Cancel</button></div>
     </div>
     <ul class="bookmarks">

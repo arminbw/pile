@@ -262,6 +262,7 @@ button.cancel-cleanup-button {
   transition-duration: 120ms;
   transition-delay: calc(var(--timeCleanupUnfold) + 80ms);
 }
+#content.cleanup-mode button.add-bookmark {
 button.add-bookmark {
   z-index: 1;
   position: relative;
@@ -270,7 +271,6 @@ button.add-bookmark {
   transition-property: opacity;
   transition-duration: var(--timeCleanupFold);
 }
-#content.cleanup-mode button.add-bookmark {
   z-index: -1;
   position: absolute;
   opacity: 0;
