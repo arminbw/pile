@@ -1,18 +1,11 @@
 'use strict';
 
-let myWindowId;
-let backgroundscript;
+let pileFolderId;
 let sidebarBookmarkList;
 let contentArea;
 let searchStyle;
 let themeCSSName;
 
-// every panel gets the html list of all bookmarks from the backgroundscript
-// to prevent unnecessary updates, we use a counter 
-// the updateCounter gets incremented every time something is changed
-let updateCounter = 0;
-
-// when the user clicks on the trashcan in the sidebar, cleanupMode is set to true
 let cleanupMode = false;
 
 
@@ -22,6 +15,84 @@ let cleanupMode = false;
 
 function logError(functionName, error) {
   console.error(`Pile panel error: ${functionName}, ${error}`);
+}
+
+
+/* ------------------------------------------------ */
+// Render bookmarks
+/* ------------------------------------------------ */
+
+function renderBookmark(bookmark) {
+  let li = document.createElement('li');
+  li.classList.add('bookmark');
+  li.setAttribute('data-bookmarkid', bookmark.id);
+  li.setAttribute('data-title', bookmark.title.toLowerCase());
+  li.setAttribute('data-url', bookmark.url);
+  li.setAttribute('title', bookmark.title);
+  let a = document.createElement('a');
+  a.classList.add('link');
+  a.setAttribute('href', bookmark.url);
+  a.appendChild(document.createTextNode(bookmark.title));
+  let button = document.createElement('button');
+  button.classList.add('delete-button');
+  button.setAttribute('data-deleteid', bookmark.id);
+  button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
+  let checkboxBorderWrapper = document.createElement('div');
+  checkboxBorderWrapper.classList.add('cleanup-checkbox-border');
+  let checkbox = document.createElement('input');
+  checkbox.classList.add('cleanup-checkbox');
+  checkbox.setAttribute('type', 'checkbox');
+  checkbox.setAttribute('data-functionname', 'selectbookmark');
+  checkbox.setAttribute('title', browser.i18n.getMessage('markForDeletion'));
+  checkboxBorderWrapper.appendChild(checkbox);
+  li.appendChild(a);
+  li.appendChild(button);
+  li.appendChild(checkboxBorderWrapper);
+  return li;
+}
+
+
+/* ------------------------------------------------ */
+// Bookmark event listeners
+/* ------------------------------------------------ */
+
+browser.bookmarks.onCreated.addListener((id, bookmark) => {
+  if (bookmark.parentId !== pileFolderId) return;
+  if (!bookmark.url) return;
+  const existing = sidebarBookmarkList.querySelector(`[data-url="${CSS.escape(bookmark.url)}"]`);
+  if (existing) {
+    existing.setAttribute('data-bookmarkid', id);
+    existing.querySelector('.delete-button').setAttribute('data-deleteid', id);
+    sidebarBookmarkList.prepend(existing);
+  } else {
+    sidebarBookmarkList.prepend(renderBookmark(bookmark));
+  }
+});
+
+browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
+  if (id === pileFolderId) {
+    pileFolderId = null;
+    fullRebuild([]);
+    return;
+  }
+  if (removeInfo.parentId !== pileFolderId) return;
+  getBookmarkElement(id)?.remove();
+  if (cleanupMode) updateCleanupCounter();
+});
+
+browser.bookmarks.onChanged.addListener(async (id) => {
+  if (!getBookmarkElement(id)) return;
+  fullRebuild(await getSubTree());
+});
+
+browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
+  if (moveInfo.parentId !== pileFolderId && moveInfo.oldParentId !== pileFolderId) return;
+  fullRebuild(await getSubTree());
+});
+
+async function getSubTree() {
+  const tree = await browser.bookmarks.getSubTree(pileFolderId);
+  return tree[0].children ?? [];
 }
 
 
@@ -90,54 +161,19 @@ document.querySelector('.search-input-field').addEventListener('input', (e) => {
   filterList(e.target.value)
 });
 
-// if a tab is activated (e.g. by switching/closing tabs),
-// check if a content update is necessary
-// TODO: is this really necessary?
-browser.tabs.onActivated.addListener((activatedTab) => {
-  if (activatedTab.windowId !== myWindowId) {
-    updateBookmarkListElement();
-  }
-});
-
 
 /* ------------------------------------------------ */
 // Update the list of Pile bookmarks in the panel
 /* ------------------------------------------------ */
 
-// get the latest html representation of the bookmarks,
-// but only if any changes happened
-function updateBookmarkListElement() {
-  console.log(`panel of window ${myWindowId} compares updateCounter: panel ${updateCounter} background ${backgroundscript.updateCounter}`);
-  if (updateCounter < backgroundscript.updateCounter) {
-    console.log(`panel of window ${myWindowId}: something to update`);
-    sidebarBookmarkList = document.querySelector('ul.bookmarks');
-    contentArea.replaceChild(backgroundscript.bookmarkListElement.cloneNode(true), sidebarBookmarkList);
-    sidebarBookmarkList = document.querySelector('ul.bookmarks'); // needed
-    updateCounter = backgroundscript.updateCounter;
-    if (cleanupMode) updateCleanupCounter();
-  } else {
-    console.log(`panel of window ${myWindowId}: no need to update`);
+function fullRebuild(bookmarks) {
+  sidebarBookmarkList.replaceChildren();
+  for (const bookmark of bookmarks) {
+    sidebarBookmarkList.appendChild(renderBookmark(bookmark));
   }
-
-  // (re-)adjust scrollbar offset
-  let scrollbarWidth = sidebarBookmarkList.offsetWidth - sidebarBookmarkList.clientWidth + 14;
-  let widthCSS = `calc(100% + ${scrollbarWidth}px)`;
-  sidebarBookmarkList.style.width = widthCSS; 
-}
-
-function handleMessage(request, sender, sendResponse) {
-  // TODO: add proper error handling
-  // add 
-  // if (sender.id !== backgroundscript.id) return;
-  // to prevent other extensions from sending messages
-  console.log(`panel of window ${myWindowId} received message: ${request.message}`);
-  if (request.message === 'updatePilePanel') {
-     // The timeout allows the CSS transition to end before
-     // the background updates the list because of a double
-     setTimeout(() => {
-       updateBookmarkListElement();
-     }, 380);
-  };
+  if (cleanupMode) updateCleanupCounter();
+  const scrollbarWidth = sidebarBookmarkList.offsetWidth - sidebarBookmarkList.clientWidth + 14;
+  sidebarBookmarkList.style.width = `calc(100% + ${scrollbarWidth}px)`;
 }
 
 
@@ -160,29 +196,16 @@ browser.storage.onChanged.addListener( (changes, areaName) => {
 });
 
 
-/*async function getBrowserTheme() {
-  const newTheme = await browser.theme.getCurrent();
-  console.log(newTheme);
-}
-getBrowserTheme();*/
-
-
 /* ------------------------------------------------ */
 // Sidebar user interaction
 /* ------------------------------------------------ */
 
 // delete a bookmark and show an animation
-// do not rebuild the whole list
 function deleteBookmark(id) {
   if (id) {
-    console.log(`panel of window ${myWindowId} deleting ${id}`);
+    console.log(`deleting ${id}`);
     let li = getBookmarkElement(id);
     li.classList.add('being-deleted');
-    updateCounter++;
-    // can the user scroll? (scrollHeight > offsetHeight)
-    // only do the foldup if:
-    // * the user can scroll
-    // * the user reached the bottom of the list
     let scrollablePart = sidebarBookmarkList.scrollHeight - sidebarBookmarkList.offsetHeight;
     let distanceToBottom = scrollablePart - sidebarBookmarkList.scrollTop;
     if ((sidebarBookmarkList.scrollTopMax > 38) && (distanceToBottom < 38)) {
@@ -191,22 +214,19 @@ function deleteBookmark(id) {
         if (event.propertyName === 'transform') {
           let scrollTop = sidebarBookmarkList.scrollTop - 38;
           sidebarBookmarkList.removeChild(li);
-          backgroundscript.removeBookmark(id);
+          browser.bookmarks.remove(id);
           sidebarBookmarkList.classList.remove('foldup');
-          sidebarBookmarkList.scrollTo(0,scrollTop);
+          sidebarBookmarkList.scrollTo(0, scrollTop);
         }
       }, false);
-    } else {  
+    } else {
       if ((sidebarBookmarkList.scrollTop > 0) && (distanceToBottom < 38)) {
-        // edge case: list is scrollable, but not after the deletion
-        // and user has scrolled down a bit
-        // solution: scroll to the top
-        sidebarBookmarkList.scrollTo(0,0);
+        sidebarBookmarkList.scrollTo(0, 0);
       }
       li.addEventListener('transitionend', (event) => {
         if (event.propertyName === 'transform') {
           sidebarBookmarkList.removeChild(li);
-          backgroundscript.removeBookmark(id);
+          browser.bookmarks.remove(id);
         }
       }, false);
     }
@@ -219,7 +239,6 @@ function getBookmarkElement(bookmarkID) {
 }
 
 // play a CSS animation once
-// add the class cssClass to htmlElement and remove it when played once
 function playCSSAnimation(htmlElement, cssClass, animationName) {
   htmlElement.classList.add(cssClass);
   const stopAnimation = function(event) {
@@ -232,29 +251,22 @@ function playCSSAnimation(htmlElement, cssClass, animationName) {
 }
 
 // add a bookmark and show an animation
-// do not rebuild the whole list
 async function addBookmark() {
-  const tabs = await browser.tabs.query({active: true, currentWindow: true})
-  // check if the page is already bookmarked and on top of the Pile
-  if (sidebarBookmarkList.firstChild !== null) {
-    const topEntry = sidebarBookmarkList.firstChild;
-    if (tabs[0].url === topEntry.firstChild.href) {
-      playCSSAnimation(topEntry, 'shaking', 'animation-shake-y');
-      return;
-    }
-  }
-  if (tabs[0].url !== false) {
-    try {
-      const newBookmark = await backgroundscript.addBookmark(tabs[0]);
-      updateCounter++;
-      const renderedBookmark = backgroundscript.renderBookmark(newBookmark);
-      playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
-      sidebarBookmarkList.prepend(renderedBookmark);
-    } catch(error) {
-      logError('addBookmark/render', error);
-      const errorHtmlElement = document.querySelector('.add-bookmark');
-      playCSSAnimation(errorHtmlElement, 'shaking', 'animation-shake-x');
-    }
+  const tabs = await browser.tabs.query({active: true, currentWindow: true});
+  const tab = tabs[0];
+  if (tab.url === 'about:blank') return;
+  const optimistic = renderBookmark({ id: '', url: tab.url, title: tab.title });
+  sidebarBookmarkList.prepend(optimistic);
+  playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
+  try {
+    const response = await browser.runtime.sendMessage({ type: 'ADD_BOOKMARK', tab: { url: tab.url, title: tab.title } });
+    pileFolderId = response.folderId;
+    // onCreated fires → finds element by data-url → updates data-bookmarkid → moves to top
+  } catch(error) {
+    logError('addBookmark', error);
+    optimistic.remove();
+    const errorHtmlElement = document.querySelector('.add-bookmark');
+    playCSSAnimation(errorHtmlElement, 'shaking', 'animation-shake-x');
   }
 }
 
@@ -274,7 +286,7 @@ function toggleSearch() {
   }
 }
 
-// hackish search/filter functionality (don’t try this at home!)
+// hackish search/filter functionality (don't try this at home!)
 function filterList(terms) {
   if (searchStyle.sheet.cssRules.length > 1) {
     searchStyle.sheet.deleteRule(0);
@@ -296,26 +308,21 @@ function filterList(terms) {
 // Cleanup mode sidebar user interaction
 /* ------------------------------------------------ */
 
-// switch to cleanup mode
-// cleanup mode allows the user to select multiple bookmarks
-// and then delete them with one click
 function startCleanupMode() {
   cleanupMode = true;
   document.getElementById('content').classList.add('cleanup-mode');
   updateCleanupCounter();
 }
 
-// switch back from cleanup mode
 function stopCleanupMode() {
   cleanupMode = false;
   document.getElementById('content').classList.remove('cleanup-mode');
 }
 
-// show the number of selectable and selected bookmarks in cleanup mode
 function updateCleanupCounter() {
   const bookmarkCount = sidebarBookmarkList.children.length;
   const selectedCount = document.querySelectorAll('.selected').length;
-  let cleanupCounterEl =  document.querySelector('.cleanup-counter-selected');
+  let cleanupCounterEl = document.querySelector('.cleanup-counter-selected');
   let cleanupCounterContextEl = document.querySelector('.cleanup-counter-context');
   let SelectAllOrNoneEl = document.querySelector('.select-all-or-none-button');
   if (bookmarkCount === 0) {
@@ -334,7 +341,6 @@ function updateCleanupCounter() {
   }
 }
 
-// select all bookmarks in cleanup mode
 function selectAllBookmarks() {
   let bookmarkCount = sidebarBookmarkList.children.length;
   if (bookmarkCount === 0) {
@@ -353,7 +359,6 @@ function selectAllBookmarks() {
   }
 }
 
-// deselect all bookmarks in cleanup mode
 function deselectAllBookmarks() {
   for (let bookmark of sidebarBookmarkList.children) {
     let checkboxEl = bookmark.querySelector('.cleanup-checkbox');
@@ -366,7 +371,6 @@ function deselectAllBookmarks() {
   updateCleanupCounter();
 }
 
-// delete all bookmarks that have been selected in cleanup mode
 function deleteSelectedBookmarks() {
   let selectedNodes = document.querySelectorAll('.selected');
   if (selectedNodes.length === 0) {
@@ -380,13 +384,13 @@ function deleteSelectedBookmarks() {
     }
   } else {
     const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid);
-    backgroundscript.removeBookmarks(bookmarkIDs);
-    if ((selectedNodes.length) === (sidebarBookmarkList.children.length)) {
+    selectedNodes.forEach(node => node.remove());
+    Promise.all(bookmarkIDs.map(id => browser.bookmarks.remove(id)));
+    if (cleanupMode && sidebarBookmarkList.children.length === 0) {
       stopCleanupMode();
-    };
+    }
   }
 }
-
 
 
 /* ------------------------------------------------ */
@@ -394,54 +398,43 @@ function deleteSelectedBookmarks() {
 /* ------------------------------------------------ */
 
 async function init() {
-  // When the sidebar loads, get the ID of its window and fetch the content.
-  let windowInfo = await browser.windows.getCurrent({populate: true});
-  console.log(windowInfo);
-  myWindowId = windowInfo.id;
   sidebarBookmarkList = document.querySelector('ul.bookmarks');
   contentArea = document.querySelector('#content');
 
-  // the noanimations css class temporarily suppresses all animations after page load
   setTimeout(() => {
     document.body.classList.remove('no-animations');
   }, 650);
 
-  // change the theme
-  browser.storage.local.get('pile-theme').then((obj) => { 
+  browser.storage.local.get('pile-theme').then((obj) => {
     console.log(obj);
     changeTheme(obj['pile-theme']);
   }, logError);
 
-  // create a new stylesheet for the search/filter (see filterList())
   searchStyle = document.createElement('style');
   searchStyle.appendChild(document.createTextNode(''));
   document.head.appendChild(searchStyle);
 
-  // remove right click context menu from add button and blank content area
   contentArea.addEventListener('contextmenu', function(e) {
     if (e.target.className !== 'link') {
       e.preventDefault();
     }
   }, false);
 
-  // localization of basic ui elements
   document.querySelectorAll('[data-localize-text]').forEach(el => {
     el.textContent = browser.i18n.getMessage(el.dataset.localizeText);
   });
   document.querySelectorAll('[data-localize-title]').forEach(el => {
-    console.log(el.dataset.localizeText);
     el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
   });
   document.querySelector('.search-input-field').textContent = browser.i18n.getMessage('search');
 
-  // register message handler
-  browser.runtime.onMessage.addListener(handleMessage);
-  console.log(`panel of window ${myWindowId} ready: waiting for a first update`);
-
-  // get the backgroundscript and update the bookmark list
-  backgroundscript = await browser.runtime.getBackgroundPage();
-  updateBookmarkListElement();
-  // if the backgroundscript is still building its list, just wait for the update message
+  try {
+    const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS' });
+    pileFolderId = response.folderId;
+    fullRebuild(response.bookmarks);
+  } catch (error) {
+    logError('init', error);
+  }
 }
 
 init();
