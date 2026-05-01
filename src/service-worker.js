@@ -40,23 +40,18 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function onCreatedErrorHandler() {
-  if (browser.runtime.lastError) {
-    logError('contextMenus.create', browser.runtime.lastError);
-  }
-}
-
-browser.contextMenus.create({
-  id: 'putOnPile',
-  title: browser.i18n.getMessage('putOnPileMessage'),
-  contexts: ['page', 'frame', 'image', 'page']
-}, onCreatedErrorHandler);
-
-browser.contextMenus.create({
-  id: 'putAllOnPile',
-  title: browser.i18n.getMessage('putAllOnPileMessage'),
-  contexts: ['tab']
-}, onCreatedErrorHandler);
+browser.runtime.onInstalled.addListener(() => {
+  browser.contextMenus.create({
+    id: 'putOnPile',
+    title: browser.i18n.getMessage('putOnPileMessage'),
+    contexts: ['page', 'frame', 'image', 'page']
+  });
+  browser.contextMenus.create({
+    id: 'putAllOnPile',
+    title: browser.i18n.getMessage('putAllOnPileMessage'),
+    contexts: ['tab']
+  });
+});
 
 
 /* ------------------------------------------------ */
