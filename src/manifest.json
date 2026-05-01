@@ -30,7 +30,7 @@
     "default_panel": "sidebar/panel.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["service-worker.js"]
   },
   "options_ui": {
       "page": "options/options.html",
