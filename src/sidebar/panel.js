@@ -79,14 +79,9 @@ browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (cleanupMode) updateCleanupCounter();
 });
 
-browser.bookmarks.onChanged.addListener((id, changeInfo) => {
-  const el = getBookmarkElement(id);
-  if (!el) return;
-  el.replaceWith(renderBookmark({
-    id,
-    title: changeInfo.title ?? el.getAttribute('title'),
-    url: changeInfo.url ?? el.dataset.url,
-  }));
+browser.bookmarks.onChanged.addListener(async (id) => {
+  if (!getBookmarkElement(id)) return;
+  fullRebuild(await getSubTree());
 });
 
 browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
@@ -105,10 +100,8 @@ async function getSubTree() {
 /* ------------------------------------------------ */
 
 window.addEventListener('click', (event) => {
-  if (event.which === 1) {
-    const fn = event.target.dataset.functionname;
-    console.log(fn);
-    switch (fn) {
+  const fn = event.target.dataset.functionname;
+  switch (fn) {
       case 'addbookmark':
         // add bookmark by clicking on the add button
         // clear search before adding, so the users sees the newly added bookmark
@@ -138,7 +131,7 @@ window.addEventListener('click', (event) => {
       switch (fn) {
         case 'selectbookmark':
           // highlight bookmark when checkbox is clicked
-          event.target.parentElement.parentElement.classList.toggle('selected');
+          event.target.closest('li').classList.toggle('selected');
           updateCleanupCounter();
           return;
         case 'selectall':
@@ -155,8 +148,6 @@ window.addEventListener('click', (event) => {
           return;
       }
     }
-
-  }
 });
 
 document.querySelector('.search-input-field').addEventListener('input', (e) => {
