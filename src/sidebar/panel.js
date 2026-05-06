@@ -160,10 +160,9 @@ document.querySelector('.search-input-field').addEventListener('input', (e) => {
 /* ------------------------------------------------ */
 
 function fullRebuild(bookmarks) {
-  sidebarBookmarkList.replaceChildren();
-  for (const bookmark of bookmarks) {
-    sidebarBookmarkList.appendChild(renderBookmark(bookmark));
-  }
+  // render an array of all bookmarks
+  // the use spread operator to turn them into individual arguments for replaceChildren
+  sidebarBookmarkList.replaceChildren(...bookmarks.map(renderBookmark));
   if (cleanupMode) updateCleanupCounter();
   const scrollbarWidth = sidebarBookmarkList.offsetWidth - sidebarBookmarkList.clientWidth + 14;
   sidebarBookmarkList.style.width = `calc(100% + ${scrollbarWidth}px)`;
