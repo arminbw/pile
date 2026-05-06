@@ -35,7 +35,7 @@ function renderBookmark(bookmark) {
   a.appendChild(document.createTextNode(bookmark.title));
   let button = document.createElement('button');
   button.classList.add('delete-button');
-  button.setAttribute('data-deleteid', bookmark.id);
+  button.setAttribute('data-functionname', 'deletebookmark');
   button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
   let checkboxBorderWrapper = document.createElement('div');
   checkboxBorderWrapper.classList.add('cleanup-checkbox-border');
@@ -62,7 +62,6 @@ browser.bookmarks.onCreated.addListener((id, bookmark) => {
   const existing = sidebarBookmarkList.querySelector(`[data-url="${CSS.escape(bookmark.url)}"]`);
   if (existing) {
     existing.setAttribute('data-bookmarkid', id);
-    existing.querySelector('.delete-button').setAttribute('data-deleteid', id);
     sidebarBookmarkList.prepend(existing);
   } else {
     sidebarBookmarkList.prepend(renderBookmark(bookmark));
@@ -125,6 +124,9 @@ window.addEventListener('click', (event) => {
           startCleanupMode();
         }
         return;
+      case 'deletebookmark':
+        deleteBookmark(event.target.closest('li').dataset.bookmarkid);
+        return;
     }
 
     if (cleanupMode) {
@@ -149,11 +151,6 @@ window.addEventListener('click', (event) => {
       }
     }
 
-    // delete bookmark when close button is clicked
-    if (event.target.dataset.deleteid) {
-      deleteBookmark(event.target.dataset.deleteid);
-      return;
-    }
   }
 });
 
@@ -306,7 +303,7 @@ function filterList(terms) {
 
 /* ------------------------------------------------ */
 // Cleanup mode sidebar user interaction
-/* ------------------------------------------------ */
+/* ------------------------------------ ------------ */
 
 function startCleanupMode() {
   cleanupMode = true;

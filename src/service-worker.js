@@ -176,6 +176,7 @@ let cachedFolderId = null;
 
 async function getBookmarkFolderId() {
   if (cachedFolderId) return cachedFolderId;
+  // Research later: What if the user moves the folder?
   let bookmarks = await browser.bookmarks.search({ title: bookmarkFolderName });
   if (bookmarks.length > 0) {
     for (let bookmark of bookmarks) {
