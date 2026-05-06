@@ -153,9 +153,6 @@ window.addEventListener('click', (event) => {
     }
 });
 
-searchInputField.addEventListener('input', (e) => {
-  filterList(e.target.value)
-});
 
 
 /* ------------------------------------------------ */
@@ -251,19 +248,18 @@ function playCSSAnimation(htmlElement, cssClass, animationName) {
 async function addBookmark() {
   const tabs = await browser.tabs.query({active: true, currentWindow: true});
   const tab = tabs[0];
-  if (tab.url === 'about:blank') return;
+  if (!tab || tab.url === 'about:blank') return;
   const optimistic = renderBookmark({ id: '', url: tab.url, title: tab.title });
   sidebarBookmarkList.prepend(optimistic);
   playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
   try {
+    // onCreated fired → find element by data-url → updates data-bookmarkid → move it to top
     const response = await browser.runtime.sendMessage({ type: 'ADD_BOOKMARK', tab: { url: tab.url, title: tab.title } });
     pileFolderId = response.folderId;
-    // onCreated fires → finds element by data-url → updates data-bookmarkid → moves to top
   } catch(error) {
     logError('addBookmark', error);
     optimistic.remove();
-    const errorHtmlElement = addBookmarkButton;
-    playCSSAnimation(errorHtmlElement, 'shaking', 'animation-shake-x');
+    playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
   }
 }
 
@@ -274,8 +270,7 @@ function toggleSearch() {
     searchInputField.value = '';
     filterList('');
     toolbar.classList.remove(cssClassShowSearchField);
-    const bookmarkHtmlElement = addBookmarkButton;
-    playCSSAnimation(bookmarkHtmlElement, 'hide-search-field', 'transition-button-add-large');
+    playCSSAnimation(addBookmarkButton, 'hide-search-field', 'transition-button-add-large');
   } else {
     toolbar.classList.add(cssClassShowSearchField);
     searchInputField.focus();
@@ -302,7 +297,7 @@ function filterList(terms) {
 
 /* ------------------------------------------------ */
 // Cleanup mode sidebar user interaction
-/* ------------------------------------ ------------ */
+/* ------------------------------------------------ */
 
 function startCleanupMode() {
   cleanupMode = true;
@@ -320,19 +315,19 @@ function updateCleanupCounter() {
   const selectedCount = document.querySelectorAll('.selected').length;
   let cleanupCounterEl = document.querySelector('.cleanup-counter-selected');
   let cleanupCounterContextEl = document.querySelector('.cleanup-counter-context');
-  let SelectAllOrNoneEl = document.querySelector('.select-all-or-none-button');
+  let selectAllOrNoneEl = document.querySelector('.select-all-or-none-button');
   if (bookmarkCount === 0) {
     cleanupCounterEl.textContent = '';
     cleanupCounterContextEl.textContent = browser.i18n.getMessage("cleanedUp");
-    SelectAllOrNoneEl.classList.remove('none');
+    selectAllOrNoneEl.classList.remove('none');
   } else {
     let ofLan = browser.i18n.getMessage("of");
     cleanupCounterEl.textContent = selectedCount;
     cleanupCounterContextEl.textContent = ` ${ofLan} ${bookmarkCount}`;
-    if ((bookmarkCount !== 0) && (selectedCount === bookmarkCount)) {
-      SelectAllOrNoneEl.classList.add('none');
+    if (selectedCount === bookmarkCount) {
+      selectAllOrNoneEl.classList.add('none');
     } else {
-      SelectAllOrNoneEl.classList.remove('none');
+      selectAllOrNoneEl.classList.remove('none');
     }
   }
 }
@@ -350,7 +345,6 @@ function selectAllBookmarks() {
         bookmark.classList.add('selected');
       }
     }
-    document.querySelector('.select-all-or-none-button').classList.add('none');
     updateCleanupCounter();
   }
 }
@@ -363,7 +357,6 @@ function deselectAllBookmarks() {
       bookmark.classList.remove('selected');
     }
   }
-  document.querySelector('.select-all-or-none-button').classList.remove('none');
   updateCleanupCounter();
 }
 
@@ -381,7 +374,7 @@ function deleteSelectedBookmarks() {
   } else {
     const bookmarkIDs = Array.from(selectedNodes).map(el => el.dataset.bookmarkid);
     selectedNodes.forEach(node => node.remove());
-    Promise.all(bookmarkIDs.map(id => browser.bookmarks.remove(id)));
+    Promise.all(bookmarkIDs.map(id => browser.bookmarks.remove(id))).catch(error => logError('deleteSelectedBookmarks', error));
     if (cleanupMode && sidebarBookmarkList.children.length === 0) {
       stopCleanupMode();
     }
@@ -404,17 +397,11 @@ async function init() {
     document.body.classList.remove('no-animations');
   }, 650);
 
-  browser.storage.local.get('pile-theme').then((obj) => {
-    console.log(obj);
-    changeTheme(obj['pile-theme']);
-  }, logError);
-
   searchStyle = document.createElement('style');
-  searchStyle.appendChild(document.createTextNode(''));
   document.head.appendChild(searchStyle);
 
   contentArea.addEventListener('contextmenu', function(e) {
-    if (e.target.className !== 'link') {
+    if (!e.target.classList.contains('link')) {
       e.preventDefault();
     }
   }, false);
@@ -425,9 +412,12 @@ async function init() {
   document.querySelectorAll('[data-localize-title]').forEach(el => {
     el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
   });
-  searchInputField.textContent = browser.i18n.getMessage('search');
+  searchInputField.placeholder = browser.i18n.getMessage('search');
+  searchInputField.addEventListener('input', (e) => filterList(e.target.value));
 
   try {
+    const obj = await browser.storage.local.get('pile-theme');
+    changeTheme(obj['pile-theme']);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS' });
     pileFolderId = response.folderId;
     fullRebuild(response.bookmarks);
