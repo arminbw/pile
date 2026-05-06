@@ -5,6 +5,9 @@ let sidebarBookmarkList;
 let contentArea;
 let searchStyle;
 let themeCSSName;
+let searchInputField;
+let toolbar;
+let addBookmarkButton;
 
 let cleanupMode = false;
 
@@ -105,10 +108,10 @@ window.addEventListener('click', (event) => {
       case 'addbookmark':
         // add bookmark by clicking on the add button
         // clear search before adding, so the users sees the newly added bookmark
-        if (document.getElementById('toolbar').classList.contains('show-search-field')) {
-          document.querySelector('.search-input-field').value = '';
+        if (toolbar.classList.contains('show-search-field')) {
+          searchInputField.value = '';
           filterList('');
-          document.querySelector('.search-input-field').focus();
+          searchInputField.focus();
         }
         addBookmark();
         return;
@@ -150,7 +153,7 @@ window.addEventListener('click', (event) => {
     }
 });
 
-document.querySelector('.search-input-field').addEventListener('input', (e) => {
+searchInputField.addEventListener('input', (e) => {
   filterList(e.target.value)
 });
 
@@ -197,16 +200,18 @@ function deleteBookmark(id) {
   if (id) {
     console.log(`deleting ${id}`);
     let li = getBookmarkElement(id);
+    if (!li) return;
     li.classList.add('being-deleted');
     let scrollablePart = sidebarBookmarkList.scrollHeight - sidebarBookmarkList.offsetHeight;
     let distanceToBottom = scrollablePart - sidebarBookmarkList.scrollTop;
+    // Note: scrollTopMax is a Firefox-only property
     if ((sidebarBookmarkList.scrollTopMax > 38) && (distanceToBottom < 38)) {
       sidebarBookmarkList.classList.add('foldup');
       li.addEventListener('transitionend', (event) => {
         if (event.propertyName === 'transform') {
           let scrollTop = sidebarBookmarkList.scrollTop - 38;
           sidebarBookmarkList.removeChild(li);
-          browser.bookmarks.remove(id);
+          browser.bookmarks.remove(id).catch(error => logError('deleteBookmark', error));
           sidebarBookmarkList.classList.remove('foldup');
           sidebarBookmarkList.scrollTo(0, scrollTop);
         }
@@ -218,7 +223,7 @@ function deleteBookmark(id) {
       li.addEventListener('transitionend', (event) => {
         if (event.propertyName === 'transform') {
           sidebarBookmarkList.removeChild(li);
-          browser.bookmarks.remove(id);
+          browser.bookmarks.remove(id).catch(error => logError('deleteBookmark', error));
         }
       }, false);
     }
@@ -257,24 +262,23 @@ async function addBookmark() {
   } catch(error) {
     logError('addBookmark', error);
     optimistic.remove();
-    const errorHtmlElement = document.querySelector('.add-bookmark');
+    const errorHtmlElement = addBookmarkButton;
     playCSSAnimation(errorHtmlElement, 'shaking', 'animation-shake-x');
   }
 }
 
 // fold/unfold the search input field
 function toggleSearch() {
-  const toolbar = document.getElementById('toolbar');
   const cssClassShowSearchField = 'show-search-field';
   if (toolbar.classList.contains(cssClassShowSearchField)) {
-    document.querySelector('.search-input-field').value = '';
+    searchInputField.value = '';
     filterList('');
     toolbar.classList.remove(cssClassShowSearchField);
-    const bookmarkHtmlElement = document.querySelector('.add-bookmark');
+    const bookmarkHtmlElement = addBookmarkButton;
     playCSSAnimation(bookmarkHtmlElement, 'hide-search-field', 'transition-button-add-large');
   } else {
     toolbar.classList.add(cssClassShowSearchField);
-    document.querySelector('.search-input-field').focus();
+    searchInputField.focus();
   }
 }
 
@@ -302,13 +306,13 @@ function filterList(terms) {
 
 function startCleanupMode() {
   cleanupMode = true;
-  document.getElementById('content').classList.add('cleanup-mode');
+  contentArea.classList.add('cleanup-mode');
   updateCleanupCounter();
 }
 
 function stopCleanupMode() {
   cleanupMode = false;
-  document.getElementById('content').classList.remove('cleanup-mode');
+  contentArea.classList.remove('cleanup-mode');
 }
 
 function updateCleanupCounter() {
@@ -392,6 +396,9 @@ function deleteSelectedBookmarks() {
 async function init() {
   sidebarBookmarkList = document.querySelector('ul.bookmarks');
   contentArea = document.querySelector('#content');
+  searchInputField = document.querySelector('.search-input-field');
+  toolbar = document.getElementById('toolbar');
+  addBookmarkButton = document.querySelector('.add-bookmark');
 
   setTimeout(() => {
     document.body.classList.remove('no-animations');
@@ -418,7 +425,7 @@ async function init() {
   document.querySelectorAll('[data-localize-title]').forEach(el => {
     el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
   });
-  document.querySelector('.search-input-field').textContent = browser.i18n.getMessage('search');
+  searchInputField.textContent = browser.i18n.getMessage('search');
 
   try {
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS' });
