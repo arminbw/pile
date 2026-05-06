@@ -79,9 +79,14 @@ browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (cleanupMode) updateCleanupCounter();
 });
 
-browser.bookmarks.onChanged.addListener(async (id) => {
-  if (!getBookmarkElement(id)) return;
-  fullRebuild(await getSubTree());
+browser.bookmarks.onChanged.addListener((id, changeInfo) => {
+  const el = getBookmarkElement(id);
+  if (!el) return;
+  el.replaceWith(renderBookmark({
+    id,
+    title: changeInfo.title ?? el.getAttribute('title'),
+    url: changeInfo.url ?? el.dataset.url,
+  }));
 });
 
 browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
