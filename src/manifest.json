@@ -1,19 +1,19 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Pile - lightweight bookmarking",
   "description": "__MSG_extensionDescription__",
   "version": "1.7.0",
   "default_locale": "en",
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "strict_min_version": "58.0a11"
+      "strict_min_version": "128.0"
     }
   },
   "icons": {
     "48": "icons/pile.svg",
     "96": "icons/pile.svg"
   },
-  "browser_action": {
+  "action": {
     "browser_style": false,
     "default_icon": "icons/pile.svg",
     "default_title": "__MSG_buttonTitle__",
@@ -30,13 +30,11 @@
     "default_panel": "sidebar/panel.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["service-worker.js"]
   },
   "options_ui": {
       "page": "options/options.html",
-      "browser_style": true
+      "browser_style": false
   },
   "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs", "theme"],
   "commands": {
@@ -44,13 +42,13 @@
       "suggested_key": {
         "default": "Alt+Shift+S"
       },
-      "description": "Show/hide the Pile sidebar" 
+      "description": "Show/hide the Pile sidebar"
     },
-    "_execute_browser_action": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Alt+Shift+P"
       },
-      "description": "Put it on the Pile" 
+      "description": "Put it on the Pile"
     }
   }
 }

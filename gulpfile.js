@@ -9,7 +9,7 @@ export function clean() {
 
 function processJavascript() {
    return gulp
-      .src(['src/background.js', 'src/sidebar/panel.js'], { base: 'src/' })
+      .src(['src/service-worker.js', 'src/sidebar/panel.js'], { base: 'src/' })
       .pipe(stripDebug())
       .pipe(stripComments( { space:false, trim:true } ))
       .pipe(gulp.dest('./build/'));
