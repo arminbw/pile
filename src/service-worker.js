@@ -67,16 +67,13 @@ browser.runtime.onMessage.addListener((request, sender) => {
         return { bookmarks: tree[0].children ?? [], folderId };
       });
     case 'ADD_BOOKMARK':
-      return addBookmark(request.tab).then(async (bookmark) => ({
-        bookmark,
-        folderId: await getBookmarkFolderId()
-      }));
+      return addBookmark(request.tab).then((bookmark) => ({ bookmark }));  
   }
 });
 
 
 /* ------------------------------------------------ */
-// Add bookmarks
+// Add and remove bookmarks
 /* ------------------------------------------------ */
 
 function removeBookmark(id) {
@@ -85,7 +82,6 @@ function removeBookmark(id) {
 
 async function addBookmark(tab) {
   let badgeText = '+1';
-  let bookmark;
   try {
     let bookmarkFolderId = await getBookmarkFolderId();
     if (tab.url === 'about:blank') {
@@ -95,18 +91,20 @@ async function addBookmark(tab) {
     if (bookmarks.length > 0) {
       for (let existing of bookmarks) {
         if (bookmarkFolderId === existing.parentId) {
-          removeBookmark(existing.id);
+          // The bookmark already exists. We remove it and add a new one on top of the pile. 
+          await removeBookmark(existing.id);
+          badgeText = '↑';
         }
-        badgeText = '↑';
       }
     }
-    bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId });
+    const bookmark = await browser.bookmarks.create({ title: tab.title, url: tab.url, index: 0, parentId: bookmarkFolderId });
     showBadge(badgeText);
+    return bookmark;
   } catch(error) {
     logError('addBookmark', error);
     showErrorBadge();
+    throw error;
   }
-  return bookmark;
 }
 
 async function addBookmarkandClose(tab, removePinned) {

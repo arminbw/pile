@@ -10,6 +10,7 @@ let toolbar;
 let addBookmarkButton;
 
 let cleanupMode = false;
+let optimisticElement = null;
 
 
 /* ------------------------------------------------ */
@@ -62,10 +63,9 @@ function renderBookmark(bookmark) {
 browser.bookmarks.onCreated.addListener((id, bookmark) => {
   if (bookmark.parentId !== pileFolderId) return;
   if (!bookmark.url) return;
-  const existing = sidebarBookmarkList.querySelector(`[data-url="${CSS.escape(bookmark.url)}"]`);
-  if (existing) {
-    existing.setAttribute('data-bookmarkid', id);
-    sidebarBookmarkList.prepend(existing);
+  if (optimisticElement && bookmark.url === optimisticElement.dataset.url) {
+    optimisticElement.setAttribute('data-bookmarkid', id);
+    optimisticElement = null;
   } else {
     sidebarBookmarkList.prepend(renderBookmark(bookmark));
   }
@@ -245,20 +245,28 @@ function playCSSAnimation(htmlElement, cssClass, animationName) {
 }
 
 // add a bookmark and show an animation
+// When using the add button in the panel, the panel renders a bookmark optimistically
+// at the the top of the pile with an animation and sends a message to the service worker 
+// to create the bookmark.
+// If the bookmark already existed, the service worker will remove the original one.
 async function addBookmark() {
   const tabs = await browser.tabs.query({active: true, currentWindow: true});
   const tab = tabs[0];
   if (!tab || tab.url === 'about:blank') return;
-  const optimistic = renderBookmark({ id: '', url: tab.url, title: tab.title });
-  sidebarBookmarkList.prepend(optimistic);
+  if (optimisticElement) return; // guard against unlikely race condition
+  if (sidebarBookmarkList.firstChild?.dataset.url === tab.url) {
+    playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
+    return;
+  }
+  optimisticElement = renderBookmark({ id: '', url: tab.url, title: tab.title });
+  sidebarBookmarkList.prepend(optimisticElement);
   playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
   try {
-    // onCreated fired → find element by data-url → updates data-bookmarkid → move it to top
-    const response = await browser.runtime.sendMessage({ type: 'ADD_BOOKMARK', tab: { url: tab.url, title: tab.title } });
-    pileFolderId = response.folderId;
+    await browser.runtime.sendMessage({ type: 'ADD_BOOKMARK', tab: { url: tab.url, title: tab.title } });
   } catch(error) {
     logError('addBookmark', error);
-    optimistic.remove();
+    optimisticElement.remove();
+    optimisticElement = null;
     playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
   }
 }
