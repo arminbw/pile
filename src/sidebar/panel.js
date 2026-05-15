@@ -136,7 +136,6 @@ function fullRebuild(bookmarks) {
 /* ------------------------------------------------ */
 
 function changeTheme(newThemeCSSName) {
-  console.log(newThemeCSSName);
   document.body.classList.remove(themeCSSName);
   document.body.classList.add(newThemeCSSName);
   themeCSSName = newThemeCSSName;

@@ -1,4 +1,6 @@
-// @vitest-environment jsdom
+// @vitest-environment jsdom — required for DOM APIs used by panel.js
+// Integration tests load both service-worker.js and panel.js against the same browser mock,
+// so messages travel through the real service-worker logic and events update the real DOM.
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { beforeEach, test, expect, vi } from 'vitest';
@@ -8,10 +10,6 @@ const panelHTML = readFileSync(resolve('src/sidebar/panel.html'), 'utf-8');
 
 let browser;
 
-function setupDOM() {
-  document.documentElement.innerHTML = panelHTML;
-}
-
 // panel.js calls init() on import but doesn't await it.
 // This flushes all pending microtasks so init() fully completes before we assert.
 function flushPromises() {
@@ -19,18 +17,18 @@ function flushPromises() {
 }
 
 async function initModules() {
-  // service-worker must come first — panel's init() sends GET_BOOKMARKS_AND_FOLDERID
-  // immediately, so the onMessage listener must already be registered
+  // service-worker must be imported first — panel's init() sends GET_BOOKMARKS_AND_FOLDERID
+  // immediately, so the onMessage listener must already be registered before panel.js runs.
   await import('../src/service-worker.js');
   await import('../src/sidebar/panel.js');
   await flushPromises();
 }
 
 beforeEach(() => {
-  vi.resetModules();
+  vi.resetModules(); // resets module-level state in both service-worker.js and panel.js
   browser = createBrowserMock();
   global.browser = browser;
-  setupDOM();
+  document.documentElement.innerHTML = panelHTML;
 });
 
 
@@ -46,36 +44,6 @@ test('renders existing bookmarks on init', async () => {
   expect(items[0].dataset.url).toBe('https://a.com');
   expect(items[1].dataset.url).toBe('https://b.com');
 });
-
-test('adding a bookmark updates the DOM', async () => {
-  const folder = browser.seed({ title: 'Pile', type: 'folder' });
-  browser.seed({ title: 'Existing', url: 'https://existing.com', parentId: folder.id });
-
-  await initModules();
-
-  await browser.runtime.sendMessage({
-    type: 'ADD_BOOKMARK',
-    tab: { url: 'https://new.com', title: 'New Page' },
-  });
-
-  const items = document.querySelectorAll('li.bookmark');
-  expect(items).toHaveLength(2);
-  expect(items[0].dataset.url).toBe('https://new.com');
-});
-
-test('removing a bookmark updates the DOM', async () => {
-  const folder = browser.seed({ title: 'Pile', type: 'folder' });
-  const bookmark = browser.seed({ title: 'Page A', url: 'https://a.com', parentId: folder.id });
-
-  await initModules();
-
-  await browser.bookmarks.remove(bookmark.id);
-
-  expect(document.querySelectorAll('li.bookmark')).toHaveLength(0);
-});
-
-
-// more complex multi-operation tests
 
 test('re-adding an existing URL moves it to the top with the new title', async () => {
   const folder = browser.seed({ title: 'Pile', type: 'folder' });
@@ -137,6 +105,7 @@ test('editing a bookmark title updates it in place without reordering', async ()
 
   await initModules();
 
+  // onChanged.trigger simulates Firefox notifying that a bookmark was edited externally.
   browser.bookmarks.onChanged.trigger(pageB.id, { title: 'Updated Title' });
 
   const items = document.querySelectorAll('li.bookmark');
@@ -153,6 +122,8 @@ test('moving a bookmark to the top reorders the list', async () => {
 
   await initModules();
 
+  // onMoved.trigger simulates Firefox notifying that a bookmark was dragged to a new position.
+  // The panel's onMoved listener is async (it may call browser.bookmarks.get), so we need flushPromises.
   browser.bookmarks.onMoved.trigger(pageC.id, {
     parentId: folder.id,
     oldParentId: folder.id,
@@ -168,10 +139,27 @@ test('moving a bookmark to the top reorders the list', async () => {
 });
 
 
+test('removing the Pile folder clears the panel', async () => {
+  const folder = browser.seed({ title: 'Pile', type: 'folder' });
+  browser.seed({ title: 'Page A', url: 'https://a.com', parentId: folder.id });
+  browser.seed({ title: 'Page B', url: 'https://b.com', parentId: folder.id });
+
+  await initModules();
+
+  expect(document.querySelectorAll('li.bookmark')).toHaveLength(2);
+
+  // The panel's onRemoved listener detects that the removed id equals pileFolderId
+  // and calls fullRebuild([]) to clear the list.
+  await browser.bookmarks.remove(folder.id);
+
+  expect(document.querySelectorAll('li.bookmark')).toHaveLength(0);
+});
+
+
 test('handles 100 adds, 50 removes and 10 moves within performance bounds', async () => {
   await initModules();
 
-  // The service worker created the pile folder during init — grab its id for onMoved triggers
+  // The service worker created the Pile folder during init — grab its id for onMoved triggers.
   const [pileFolder] = await browser.bookmarks.search({ title: 'Pile' });
 
   const start = performance.now();
@@ -205,6 +193,7 @@ test('handles 100 adds, 50 removes and 10 moves within performance bounds', asyn
 
   const elapsed = performance.now() - start;
 
+  // browser.stats counts every API call — useful for spotting unexpected extra calls.
   const { messages, bookmarks: bm } = browser.stats;
 
   expect(document.querySelectorAll('li.bookmark')).toHaveLength(50);

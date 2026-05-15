@@ -1,4 +1,5 @@
-// @vitest-environment jsdom
+// @vitest-environment jsdom — runs this file in a browser-like DOM environment
+// instead of plain Node, so document.querySelector and click() work.
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { beforeEach, test, expect, vi } from 'vitest';
@@ -15,14 +16,16 @@ const BOOKMARKS = [
 
 let browser;
 
+// panel.js calls init() on import but doesn't await it.
+// This flushes all pending microtasks so init() fully completes before we assert.
 function flushPromises() {
   return new Promise(resolve => setTimeout(resolve, 0));
 }
 
-// Initialise the panel without a service worker.
-// sendMessage is stubbed to return data directly.
-// ADD_BOOKMARK fires onCreated synchronously inside sendMessage,
-// mirroring what the service worker would do in production.
+// Load panel.js with sendMessage stubbed out — no service worker is running.
+// This lets us test UI behaviour in isolation without the full message-routing stack.
+// ADD_BOOKMARK fires onCreated synchronously inside sendMessage, mirroring what
+// the service worker would do in production so the panel can reconcile the optimistic element.
 async function initPanel(bookmarks = BOOKMARKS) {
   browser.runtime.sendMessage = async (msg) => {
     if (msg.type === 'GET_BOOKMARKS_AND_FOLDERID')
@@ -42,7 +45,7 @@ function click(selector) {
 }
 
 beforeEach(() => {
-  vi.resetModules();
+  vi.resetModules(); // clears panel.js module state (pileFolderId, cleanupMode, etc.) between tests
   browser = createBrowserMock();
   global.browser = browser;
   document.documentElement.innerHTML = panelHTML;
@@ -61,7 +64,8 @@ test('clicking add creates a new bookmark at the top', async () => {
   const items = document.querySelectorAll('li.bookmark');
   expect(items).toHaveLength(4);
   expect(items[0].dataset.url).toBe('https://new.com');
-  expect(items[0].dataset.bookmarkid).toBe('new-id'); // reconciled via onCreated
+  // data-bookmarkid starts as '' (optimistic) and is reconciled to 'new-id' via onCreated.
+  expect(items[0].dataset.bookmarkid).toBe('new-id');
 });
 
 test('clicking add when the URL is already at the top does not create a duplicate', async () => {
@@ -117,6 +121,7 @@ test('deleting selected bookmarks removes them from the DOM', async () => {
   click('[data-functionname="deleteselected"]');
 
   expect(document.querySelectorAll('li.bookmark')).toHaveLength(0);
+  // stats.bookmarks.remove confirms the API was called for each deleted bookmark.
   expect(browser.stats.bookmarks.remove).toBe(3);
 });
 
