@@ -61,7 +61,7 @@ browser.runtime.onInstalled.addListener(() => {
 browser.runtime.onMessage.addListener((request, sender) => {
   if (sender.id !== browser.runtime.id) return;
   switch (request.type) {
-    case 'GET_BOOKMARKS':
+    case 'GET_BOOKMARKS_AND_FOLDERID':
       return getBookmarkFolderId().then(async (folderId) => {
         const tree = await browser.bookmarks.getSubTree(folderId);
         return { bookmarks: tree[0].children ?? [], folderId };

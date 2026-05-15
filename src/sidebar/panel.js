@@ -82,76 +82,38 @@ browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (cleanupMode) updateCleanupCounter();
 });
 
-browser.bookmarks.onChanged.addListener(async (id) => {
-  if (!getBookmarkElement(id)) return;
-  fullRebuild(await getSubTree());
+browser.bookmarks.onChanged.addListener((id, changeInfo) => {
+  const li = getBookmarkElement(id);
+  if (!li) return;
+  if (changeInfo.title) {
+    li.setAttribute('data-title', changeInfo.title.toLowerCase());
+    li.setAttribute('title', changeInfo.title);
+    li.querySelector('.link').textContent = changeInfo.title;
+  }
+  if (changeInfo.url) {
+    li.setAttribute('data-url', changeInfo.url);
+    li.querySelector('.link').setAttribute('href', changeInfo.url);
+  }
 });
 
 browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
-  if (moveInfo.parentId !== pileFolderId && moveInfo.oldParentId !== pileFolderId) return;
-  fullRebuild(await getSubTree());
-});
+  const newParentIsPile = moveInfo.parentId === pileFolderId;
+  const oldParentWasPile = moveInfo.oldParentId === pileFolderId;
+  if (!newParentIsPile && !oldParentWasPile) return;
 
-async function getSubTree() {
-  const tree = await browser.bookmarks.getSubTree(pileFolderId);
-  return tree[0].children ?? [];
-}
+  const li = getBookmarkElement(id);
+  li?.remove();
+
+  if (newParentIsPile) {
+    const el = li ?? renderBookmark((await browser.bookmarks.get(id))[0]);
+    sidebarBookmarkList.insertBefore(el, sidebarBookmarkList.children[moveInfo.index] ?? null);
+  }
+});
 
 
 /* ------------------------------------------------ */
-// UI event listeners
+// UI event listeners (registered inside init, scoped to contentArea)
 /* ------------------------------------------------ */
-
-window.addEventListener('click', (event) => {
-  const fn = event.target.dataset.functionname;
-  switch (fn) {
-      case 'addbookmark':
-        // add bookmark by clicking on the add button
-        // clear search before adding, so the users sees the newly added bookmark
-        if (toolbar.classList.contains('show-search-field')) {
-          searchInputField.value = '';
-          filterList('');
-          searchInputField.focus();
-        }
-        addBookmark();
-        return;
-      case 'togglesearch':
-        toggleSearch();
-        return;
-      case 'togglecleanup':
-        if (cleanupMode) {
-          stopCleanupMode();
-        } else {
-          startCleanupMode();
-        }
-        return;
-      case 'deletebookmark':
-        deleteBookmark(event.target.closest('li').dataset.bookmarkid);
-        return;
-    }
-
-    if (cleanupMode) {
-      switch (fn) {
-        case 'selectbookmark':
-          // highlight bookmark when checkbox is clicked
-          event.target.closest('li').classList.toggle('selected');
-          updateCleanupCounter();
-          return;
-        case 'selectall':
-          selectAllBookmarks();
-          return;
-        case 'deselectall':
-          deselectAllBookmarks();
-          return;
-        case 'deleteselected':
-          deleteSelectedBookmarks();
-          return;
-        case 'cancelcleanup':
-          stopCleanupMode();
-          return;
-      }
-    }
-});
 
 
 
@@ -408,6 +370,54 @@ async function init() {
   searchStyle = document.createElement('style');
   document.head.appendChild(searchStyle);
 
+  contentArea.addEventListener('click', (event) => {
+    const fn = event.target.dataset.functionname;
+    switch (fn) {
+      case 'addbookmark':
+        if (toolbar.classList.contains('show-search-field')) {
+          searchInputField.value = '';
+          filterList('');
+          searchInputField.focus();
+        }
+        addBookmark();
+        return;
+      case 'togglesearch':
+        toggleSearch();
+        return;
+      case 'togglecleanup':
+        if (cleanupMode) {
+          stopCleanupMode();
+        } else {
+          startCleanupMode();
+        }
+        return;
+      case 'deletebookmark':
+        deleteBookmark(event.target.closest('li').dataset.bookmarkid);
+        return;
+    }
+
+    if (cleanupMode) {
+      switch (fn) {
+        case 'selectbookmark':
+          event.target.closest('li').classList.toggle('selected');
+          updateCleanupCounter();
+          return;
+        case 'selectall':
+          selectAllBookmarks();
+          return;
+        case 'deselectall':
+          deselectAllBookmarks();
+          return;
+        case 'deleteselected':
+          deleteSelectedBookmarks();
+          return;
+        case 'cancelcleanup':
+          stopCleanupMode();
+          return;
+      }
+    }
+  });
+
   contentArea.addEventListener('contextmenu', function(e) {
     if (!e.target.classList.contains('link')) {
       e.preventDefault();
@@ -426,7 +436,7 @@ async function init() {
   try {
     const obj = await browser.storage.local.get('pile-theme');
     changeTheme(obj['pile-theme']);
-    const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS' });
+    const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
     fullRebuild(response.bookmarks);
   } catch (error) {
