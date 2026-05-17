@@ -124,7 +124,7 @@ button.add-bookmark:active {
   animation-name: transition-search-show;
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
-  width: calc(100% - 114px);
+  width: calc(100% - 92px);
 } 
 
 #toolbar.show-search-field input.search-input-field {
@@ -132,6 +132,7 @@ button.add-bookmark:active {
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
   width: calc(100% - 21px);
+  padding-left: 5px;
 } 
 #toolbar.show-search-field .search-show-hide-button {
   animation-name: transition-close-button-show;
@@ -176,6 +177,7 @@ button.add-bookmark:active {
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
   mask: url("search_button.svg") no-repeat 50% 50%;
+  mask-position: 4px 6px;
   background-color: var(--color-contrast-80);
 }
 #toolbar:not(.show-search-field) .search-show-hide-button:hover {
@@ -185,7 +187,7 @@ button.add-bookmark:active {
   background-color: var(--color-active);
 }
 #toolbar:not(.show-search-field) .add-bookmark {
-  width: calc(100% - 43px);
+  width: calc(100% - 42px);
 }
 button.add-bookmark.hide-search-field {
   animation-name: transition-button-add-large;
@@ -229,13 +231,13 @@ body.no-animations * {
     background: #fff;
   }
 }
-/* start revealing the input field at 80% */
+/* start revealing the input field at 20% */
 @keyframes transition-input-show {
   0% {
     padding-left: 0px;
   }
-  80% {
-    padding-left: 0px;
+  20% {
+    padding-left: 5px;
   }
   100% {
     padding-left: 5px;
@@ -246,7 +248,7 @@ body.no-animations * {
 /* searchfield folding */
 @keyframes transition-button-search {
   0% {
-    background-color: var(--color-input-contrast-02);
+    background-color: var(--color-contrast-02);
   }
   80% {
     background-color: transparent;

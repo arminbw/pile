@@ -429,7 +429,6 @@ async function init() {
   document.querySelectorAll('[data-localize-title]').forEach(el => {
     el.title = browser.i18n.getMessage(el.dataset.localizeTitle);
   });
-  searchInputField.placeholder = browser.i18n.getMessage('search');
   searchInputField.addEventListener('input', (e) => filterList(e.target.value));
 
   try {

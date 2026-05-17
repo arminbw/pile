@@ -7,7 +7,6 @@ html, body {
 height: 100%;
 margin: 0;
 box-sizing: border-box;
-background-color: var(--color-contrast-02);
 }
 input:focus,
 select:focus,
@@ -29,7 +28,6 @@ background-color: var(--color-contrast-02);
 height: 100%;
 overflow: hidden;
 width: 100%;
-border-right: solid 1px var(--color-contrast-06);
 }
 
 

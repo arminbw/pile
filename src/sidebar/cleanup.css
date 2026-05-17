@@ -114,7 +114,7 @@ input[type="checkbox"].cleanup-checkbox {
   width: 16px;
   height: 16px;
   margin: 0;
-  background-color: none;
+  background-color: transparent;
   opacity: 0;
   z-index: -1;
 }
@@ -132,7 +132,6 @@ input[type="checkbox"].cleanup-checkbox:active {
   background-color: var(--color-checkbox-active);
 }
 input[type="checkbox"].cleanup-checkbox:checked {
-  background: no-repeat center url("checkmark.svg") transparent;
   mask: url("checkmark.svg") no-repeat 50% 50%;
 }
 input[type="checkbox"].cleanup-checkbox:checked:hover {
@@ -149,7 +148,7 @@ input[type="checkbox"].cleanup-checkbox:active:checked {
   box-sizing: border-box;
   border-bottom: 1px solid var(--color-bookmark-selected-border);
 }
-#content.cleanup-mode li.bookmark.selected > a.link:hover {
+#content.cleanup-mode li.bookmark.selected:hover {
   background-color: var(--color-checkbox-active);
 }
 #content.cleanup-mode input.cleanup-checkbox,
@@ -164,7 +163,7 @@ input[type="checkbox"].cleanup-checkbox:active:checked {
   transition-duration: 100ms;
 }
 #content.cleanup-mode a.link {
-  width: calc(100% - 48px);
+  width: calc(100% - 56px);
 }
 #content.cleanup-mode .cleanup-checkbox-border {
   left: 8px;
@@ -262,7 +261,6 @@ button.cancel-cleanup-button {
   transition-duration: 120ms;
   transition-delay: calc(var(--timeCleanupUnfold) + 80ms);
 }
-#content.cleanup-mode button.add-bookmark {
 button.add-bookmark {
   z-index: 1;
   position: relative;
@@ -271,6 +269,7 @@ button.add-bookmark {
   transition-property: opacity;
   transition-duration: var(--timeCleanupFold);
 }
+#content.cleanup-mode button.add-bookmark {
   z-index: -1;
   position: absolute;
   opacity: 0;
@@ -336,7 +335,7 @@ button.add-bookmark {
   transition-duration: 300ms;
   transition: opacity;
 }
-.cleanup-counter {
+#content.cleanup-mode .cleanup-counter {
   width: 74px;
   transition: auto;
   transition-duration: 300ms;
