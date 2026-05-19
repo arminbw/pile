@@ -17,7 +17,8 @@
   --color-button-delete-active: #17617C;
   --color-toolbar-background: #CDE4E4;
   --color-toolbar-background-dark: #C1D8D8;
-  --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-bg-active: #CDE0E0;
+  --color-toolbar-button-bg-hover: var(--color-toolbar-background-dark);
   --color-toolbar-button-border-active: #1A6B88;
   --color-checkbox-border-hover: #1A6B88;
   --color-checkbox-border-active: #17617C;
@@ -48,6 +49,7 @@
   --color-toolbar-background: #95BCC3;
   --color-toolbar-background-dark: #95BCC3;
   --color-toolbar-button-active: #D7E7E7;
+  --color-toolbar-button-hover: #CDE0E0;
   --color-toolbar-button-border-active: #1A6B88;
   --color-checkbox-border-hover: #1A6B88;
   --color-checkbox-border-active: #17617C;
