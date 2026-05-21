@@ -48,7 +48,7 @@
 .select-none-button,
 .select-all-button {
   vertical-align:top;
-  width: 42px;
+  width: 45px;
   height: 18px;
   color: var(--color-contrast-80);
   font-size: 11px;
@@ -283,11 +283,10 @@ button.add-bookmark {
 }
 #content.cleanup-mode .select-all-or-none-button {
   z-index: 1;
-  position: relative;
+  position: absolute;
+  right: 0;
   opacity: 1;
   transition-property: opacity;
-  transition-duration: 0;
-  transition-delay: 0;
 }
 .cleanup-counter {
   z-index: -1;
@@ -325,10 +324,7 @@ button.add-bookmark {
   padding-left: 5px;
   transition: opacity;
 }
-#content.cleanup-mode #toolbar.show-search-field .cleanup-counter-selected {
-  width: 20px;
-}
-#content.cleanup-mode #toolbar.show-search-field .cleanup-counter-context {
+#content.cleanup-mode #toolbar.show-search-field .cleanup-counter {
   opacity: 0 !important;
   width: 0;
   padding: 0;
@@ -346,4 +342,9 @@ button.add-bookmark {
 #content.cleanup-mode #toolbar.show-search-field .cleanup-counter {
   width: 21px;
   transition: none;
+}
+#toolbar.show-search-field .cleanup-counter {
+  transition-property: opacity;
+  transition-duration: var(--timeCleanupFold);
+  transition-timing-function: step-end;
 }

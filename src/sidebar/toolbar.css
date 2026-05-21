@@ -4,7 +4,7 @@
   z-index: 4;
   width: 100%;
   height: 24px;
-  background-color: var(--color-toolbar-background-dark);
+  background-color: var(--color-toolbar-bg-dark);
   box-shadow:
     0 0.1px 1.4px rgba(0, 0, 0, 0.121),
     0 0.4px 4.7px rgba(0, 0, 0, 0.206),
@@ -13,7 +13,7 @@
 }
 
 .toolbar-top {
-  background-image: linear-gradient(var(--color-toolbar-background), var(--color-toolbar-background-dark));
+  background-image: linear-gradient(var(--color-toolbar-bg), var(--color-toolbar-bg-dark));
   height: 24px;
   display: flex;
 }
@@ -139,7 +139,7 @@ button.add-bookmark:active {
   animation-name: transition-search-show;
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
-  width: calc(100% - 92px);
+  width: calc(100% - 91px);
 }
 
 #toolbar.show-search-field input.search-input-field {
@@ -254,7 +254,7 @@ body.no-animations * {
   }
 
   50% {
-    width: calc(100% - 92px);
+    width: calc(100% - 70px);
     background-color: var(--color-toolbar-button-bg-active);
   }
 
@@ -267,6 +267,10 @@ body.no-animations * {
 /* 1. the close-button pops out after the animation finished */
 @keyframes transition-close-button-show {
   0% {
+    background-color: var(--color-toolbar-bg-active);
+  }
+
+  4% {
     background-color: var(--color-contrast-00);
   }
 
