@@ -21,6 +21,7 @@ font: caption;
 background-color: var(--color-contrast-02);
 --timeCleanupUnfold: 0.22s;
 --timeCleanupFold: 0.22s;
+--timeSearchContainer: 0.22s;
 }
 
 div#content {

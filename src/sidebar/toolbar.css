@@ -126,10 +126,6 @@ button.add-bookmark:active {
 }
 
 /* searchfield variables */
-#toolbar {
-  --timeSearchContainer: 4.22s;
-}
-
 #toolbar.search-container {
   width: calc(100% - 42px);
 }
@@ -155,13 +151,6 @@ button.add-bookmark:active {
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease-out;
   background-color: var(--color-contrast-00);
-}
-
-#toolbar.show-search-field .search-show-hide-button:active,
-#toolbar.show-search-field .search-show-hide-button:hover {
-  animation-name: transition-close-button-show;
-  animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
 }
 
 /* here the icon is done by using :before with content */
@@ -254,7 +243,7 @@ body.no-animations * {
   }
 
   50% {
-    width: calc(100% - 70px);
+    width: calc(100% - 91px);
     background-color: var(--color-toolbar-button-bg-active);
   }
 
@@ -322,7 +311,7 @@ body.no-animations * {
 
 @keyframes transition-search-hide {
   0% {
-    width: calc(100% - 93px);
+    width: calc(100% - 70px);
     color: transparent;
     background: none #fff;
   }
