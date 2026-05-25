@@ -84,8 +84,8 @@ async function addBookmark(tab) {
   let badgeText = '+1';
   try {
     let bookmarkFolderId = await getBookmarkFolderId();
-    if (tab.url === 'about:blank') {
-      throw 'Not adding about:blank page';
+    if (tab.url.startsWith('about:')) {
+      throw 'Not adding about: page';
     }
     let bookmarks = await browser.bookmarks.search({url: tab.url});
     if (bookmarks.length > 0) {

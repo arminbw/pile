@@ -112,12 +112,6 @@ browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
 
 
 /* ------------------------------------------------ */
-// UI event listeners (registered inside init, scoped to contentArea)
-/* ------------------------------------------------ */
-
-
-
-/* ------------------------------------------------ */
 // Update the list of Pile bookmarks in the panel
 /* ------------------------------------------------ */
 
@@ -143,7 +137,6 @@ function changeTheme(newThemeCSSName) {
 
 browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-theme']?.newValue) {
-    console.log(changes);
     changeTheme(changes['pile-theme'].newValue);
   }
 });
@@ -213,7 +206,10 @@ function playCSSAnimation(htmlElement, cssClass, animationName) {
 async function addBookmark() {
   const tabs = await browser.tabs.query({active: true, currentWindow: true});
   const tab = tabs[0];
-  if (!tab || tab.url === 'about:blank') return;
+  if (!tab || tab.url.startsWith('about:')) {
+    playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
+    return;
+  }
   if (optimisticElement) return; // guard against unlikely race condition
   if (sidebarBookmarkList.firstChild?.dataset.url === tab.url) {
     playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
