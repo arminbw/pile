@@ -134,14 +134,14 @@ button.add-bookmark:active {
 #toolbar.show-search-field .search-container {
   animation-name: transition-search-show;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
   width: calc(100% - 91px);
 }
 
 #toolbar.show-search-field input.search-input-field {
   animation-name: transition-input-show;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
   width: calc(100% - 21px);
   padding-left: 5px;
 }
@@ -149,7 +149,7 @@ button.add-bookmark:active {
 #toolbar.show-search-field .search-show-hide-button {
   animation-name: transition-close-button-show;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
   background-color: var(--color-contrast-00);
 }
 
@@ -187,7 +187,7 @@ button.add-bookmark:active {
 #toolbar:not(.show-search-field) .search-container {
   animation-name: transition-search-hide;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
   width: 21px;
   color: transparent;
 }
@@ -196,7 +196,7 @@ button.add-bookmark:active {
 #toolbar:not(.show-search-field) .search-show-hide-button {
   animation-name: transition-button-search;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
   mask: url("search_button.svg") no-repeat 50% 50%;
   mask-position: 4px 6px;
   background-color: var(--color-contrast-80);
@@ -222,7 +222,7 @@ button.add-bookmark:active {
 button.add-bookmark.hide-search-field {
   animation-name: transition-button-add-large;
   animation-duration: var(--timeSearchContainer);
-  animation-timing-function: ease-out;
+  animation-timing-function: ease;
 }
 
 

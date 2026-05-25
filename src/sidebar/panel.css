@@ -19,8 +19,8 @@ outline: none;
 body {
 font: caption;
 background-color: var(--color-contrast-02);
---timeCleanupUnfold: 0.22s;
---timeCleanupFold: 0.22s;
+--timeCleanupUnfold: 0.18s;
+--timeCleanupFold: 0.18s;
 --timeSearchContainer: 0.22s;
 }
 
