@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<defs>
-<style>.cls-1{fill:#565656;}.cls-2{fill:#a5a5a5;}.cls-3{fill:#727272;}.cls-4{fill:#515151;}.cls-5{fill:#575757;}.cls-6{fill:#7daaa5;}.cls-7{fill:#608787;}.cls-8{fill:#6b6b6b;}</style>
-<symbol id="a" data-name="New Symbol 2" viewBox="0 0 95.89 95.73">
-<polygon class="cls-1" points="48 43.1 0.12 61.07 48 81.21 95.89 61.07"/>
-<polygon class="cls-2" points="0.12 61.07 0.11 75.58 48 95.73 48 81.21"/>
-<polygon class="cls-3" points="95.88 61.09 95.88 75.54 48 95.73 48 81.21"/>
-<polygon class="cls-4" points="65.6 49.73 37.93 60.01 68.11 72.76 95.88 61.09"/>
-<polygon class="cls-5" points="48 0 0.11 17.97 48 38.11 95.88 17.97"/>
-<polygon class="cls-6" points="0.11 17.97 0 48.06 47.88 68.21 48 38.11"/>
-<polygon class="cls-7" points="95.88 17.97 95.88 48.06 48 68.25 48 38.11"/>
-<polygon class="cls-8" points="68.11 72.76 68.11 87.22 95.88 75.53 95.88 61.07"/>
-</symbol>
-</defs>
-<title>pile</title>
-<use transform="translate(0 .13)" width="95.89" height="95.73" data-name="New Symbol 2" xlink:href="#a"/>
-</svg>
+<svg id="b" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><style>.e{fill:#727272}.f{fill:#a5a5a5}.g{fill:#606060}.h{fill:#5f8983}.i{fill:#515151}.j{fill:#7eaaa5}.k{fill:#565656}.l{fill:#6b6b6b}</style></defs><g id="c"><polyline class="g" points="0 9.04 58.2 0 95.93 13.9 37.77 22.9 0 9.04"/></g><g id="d"><polygon class="f" points="0 81.81 37.77 96 37.77 75.63 0 61.77 0 81.81"/><polygon class="l" points="37.85 75.51 96 66.68 96 86.74 37.77 96 37.85 75.51"/><polygon class="i" points="32.92 56.7 58.2 52.82 96 66.68 72.76 70.25 32.92 56.7"/><polygon class="e" points="37.77 75.63 37.77 96 79.98 89.29 79.98 69.14 37.77 75.63"/><polygon class="k" points="79.98 69.14 42.21 55.28 0 61.77 37.77 75.63 79.98 69.14"/><polygon class="j" points="0 9.04 37.77 22.9 37.77 63.33 0 49.76 0 9.04"/><polygon class="h" points="37.77 22.9 95.93 13.9 95.93 54.33 37.77 63.33 37.77 22.9"/></g></svg>
