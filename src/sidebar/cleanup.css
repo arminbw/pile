@@ -2,13 +2,13 @@
 .delete-selected-button, .cancel-cleanup-button {
   display: inline-block;
   text-align: center;
-  width: calc(50%);
+  width: 50%;
   height: 24px;
   font-size: 11px;
   line-height: 18px;
 }
 .delete-selected-button {
-  background-color: var(--color-button-delete);
+  background-color: var(--color-cleanup-button);
   color: #fff;
 }
 .cancel-cleanup-button {
@@ -24,11 +24,11 @@
   color: #fff;
 }
 .delete-selected-button:hover {
-  background-color: var(--color-button-delete-hover);
+  background-color: var(--color-cleanup-button-hover);
   color: #FFF;
 }
 .delete-selected-button:active {
-  background-color: var(--color-button-delete-active);
+  background-color: var(--color-cleanup-button-active);
   color: #FFF;
 }
 .select-all-or-none-button {
@@ -55,7 +55,7 @@
   border-radius: 3px;
   border: solid 1px var(--color-contrast-80);
   padding: 0;
-  margin: 3px 4px 3px 4px;
+  margin: 3px 4px;
   text-align: center;
   text-decoration: none;
   background: none;
@@ -69,9 +69,9 @@
 }
 .select-none-button:active,
 .select-all-button:active {
-  background-color: var(--color-toolbar-button-active);
-  color: var(--color-contrast-100);
-  border-color: var(--color-contrast-100);
+  background-color: var(--color-toolbar-button-bg-active);
+  color: var(--color-toolbar-button-active);
+  border-color: var(---color-toolbar-button-border-active);
 }
 .select-none-button {
   display: none;
@@ -122,16 +122,7 @@ input[type="checkbox"].cleanup-checkbox {
   background-color: transparent;
   opacity: 0;
   z-index: -1;
-}
-input[type="checkbox"].cleanup-checkbox:before {
-  content: " ";
-  position: absolute;
-  z-index: -1;
-  width: 31px;
-  height: 37px;
-  right: -9px;
-  bottom: -11px;
-  background-color: transparent;
+  pointer-events: none;
 }
 input[type="checkbox"].cleanup-checkbox:checked {
   mask: url("checkmark.svg") no-repeat 50% 50%;
@@ -159,11 +150,13 @@ input[type="checkbox"].cleanup-checkbox:checked:active {
   opacity: 1;
   z-index: 1;
 }
+#content.cleanup-mode .cleanup-checkbox-container {
+  cursor: pointer;
+}
 #content.cleanup-mode button.delete-button {
   opacity: 0;
   visibility: hidden;
-  transition: all;
-  transition-duration: 100ms;
+  transition: all 100ms;
 }
 #content.cleanup-mode a.link {
   width: calc(100% - 56px);
@@ -213,7 +206,7 @@ input[type="checkbox"].cleanup-checkbox:checked:active {
   transition-timing-function: ease-out;
 }
 #content ul.bookmarks {
-  transform: translateY(0px);
+  transform: translateY(0);
   transition-property: transform;
   transition-duration: var(--timeCleanupFold);
   transition-timing-function: ease-in;
@@ -237,7 +230,7 @@ input[type="checkbox"].cleanup-checkbox:checked:active {
   transition-property: opacity;
   transition-delay: var(--timeCleanupUnfold);
   transition-duration: 120ms;
-  transform: translateY(0px);
+  transform: translateY(0);
 }
 button.delete-selected-button,
 button.cancel-cleanup-button {

@@ -43,11 +43,11 @@ function renderBookmark(bookmark) {
   button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
   let checkboxBorderWrapper = document.createElement('div');
   checkboxBorderWrapper.classList.add('cleanup-checkbox-container');
+  checkboxBorderWrapper.setAttribute('data-functionname', 'selectbookmark');
+  checkboxBorderWrapper.setAttribute('title', browser.i18n.getMessage('markForDeletion'));
   let checkbox = document.createElement('input');
   checkbox.classList.add('cleanup-checkbox');
   checkbox.setAttribute('type', 'checkbox');
-  checkbox.setAttribute('data-functionname', 'selectbookmark');
-  checkbox.setAttribute('title', browser.i18n.getMessage('markForDeletion'));
   checkboxBorderWrapper.appendChild(checkbox);
   li.appendChild(a);
   li.appendChild(button);
@@ -393,10 +393,13 @@ async function init() {
 
     if (cleanupMode) {
       switch (fn) {
-        case 'selectbookmark':
-          event.target.closest('li').classList.toggle('selected');
+        case 'selectbookmark': {
+          const li = event.target.closest('li');
+          li.classList.toggle('selected');
+          li.querySelector('.cleanup-checkbox').checked = li.classList.contains('selected');
           updateCleanupCounter();
           return;
+        }
         case 'selectall':
           selectAllBookmarks();
           return;

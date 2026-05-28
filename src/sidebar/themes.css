@@ -13,16 +13,16 @@
   --color-contrast-01:  #fff;
   --color-contrast-00:  #fff;
 
-  --color-teal:              #157A9F;
-  --color-teal-hover:        #1A6B88;
-  --color-teal-active:       #17617C;
-  --color-teal-subtle:       #CDE4E4;
-  --color-teal-subtle-dark:  #C1D8D8;
-  --color-teal-pale:         #EFF6F8;
+  --color-teal-100: #EFF6F8;
+  --color-teal-200: #CDE4E4;
+  --color-teal-300: #C1D8D8;
+  --color-teal-600: #157A9F;
+  --color-teal-700: #1A6B88;
+  --color-teal-800: #17617C;
 
   /* semantic tokens */
 
-  --color-active: var(--color-teal);
+  --color-active: var(--color-teal-600);
 
   /* bookmark list */
   --color-bookmark-bg:        var(--color-contrast-02);
@@ -36,27 +36,28 @@
 
   /* search close button — always white bg, always dark icon (theme-independent) */
   --color-search-close-bg:   #fff;
-  --color-search-close-icon: #555;
+  --color-search-close-icon: #DBDBDB;
+  --color-search-close-icon-hover: #333;
+  --color-search-close-icon-active: #000;
 
   /* toolbar */
-  --color-toolbar-bg:                var(--color-teal-subtle);
-  --color-toolbar-bg-dark:           var(--color-teal-subtle-dark);
-  --color-toolbar-top-bg:            linear-gradient(var(--color-teal-subtle), var(--color-teal-subtle-dark));
-  --color-toolbar-button-active:     var(--color-teal-subtle);
-  --color-toolbar-button-bg-active:  var(--color-teal-subtle);
-  --color-toolbar-button-bg-hover:   var(--color-teal-subtle-dark);
-  --color-toolbar-button-border-active: var(--color-teal-hover);
-  --color-toolbar-text:              var(--color-contrast-80);
+  --color-toolbar-bg:                   var(--color-teal-200);
+  --color-toolbar-top-bg:               linear-gradient(var(--color-teal-200), var(--color-teal-300));
+  --color-toolbar-button-bg-hover:      var(--color-teal-300);
+  --color-toolbar-button-active:        var(--color-contrast-100);
+  --color-toolbar-button-bg-active:     var(--color-teal-200);
+  --color-toolbar-button-border-active: var(--color-contrast-100);
+  --color-toolbar-text:                 var(--color-contrast-80);
 
   /* cleanup mode — selected bookmarks */
   --color-bookmark-selected-bg:        #E5EDF0;
   --color-bookmark-selected-bg-hover:  #E9EFF2;
-  --color-bookmark-selected-bg-border: var(--color-teal-subtle);
+  --color-bookmark-selected-bg-border: var(--color-teal-200);
 
   /* cleanup toolbar action buttons */
-  --color-button-delete:        var(--color-teal);
-  --color-button-delete-hover:  var(--color-teal-hover);
-  --color-button-delete-active: var(--color-teal-active);
+  --color-cleanup-button:        var(--color-teal-600);
+  --color-cleanup-button-hover:  var(--color-teal-700);
+  --color-cleanup-button-active: var(--color-teal-800);
 
   /* cancel button (neutral, follows contrast scale direction) */
   --color-cancel-button-bg:        var(--color-contrast-80);
@@ -64,21 +65,20 @@
   --color-cancel-button-bg-active: var(--color-contrast-100);
 
   /* checkbox */
-  --color-checkbox-active:              var(--color-teal-pale);
-  --color-checkmark-checked:            var(--color-teal-pale);
-  --color-checkmark-checked-hover:      var(--color-teal-pale);
-  --color-checkmark-checked-active:     var(--color-teal-pale);
+  --color-checkmark-checked:            var(--color-teal-100);
+  --color-checkmark-checked-hover:      var(--color-teal-100);
+  --color-checkmark-checked-active:     var(--color-teal-100);
   --color-checkbox-container-bg:        transparent;
   --color-checkbox-container-border:    var(--color-contrast-80);
-  --color-checkbox-container-hover-border:          var(--color-teal-hover);
-  --color-checkbox-container-active-bg:             var(--color-teal-subtle);
-  --color-checkbox-container-active-border:         var(--color-teal-active);
-  --color-checkbox-container-checked-bg:            var(--color-teal);
-  --color-checkbox-container-checked-border:        var(--color-teal);
-  --color-checkbox-container-checked-hover-bg:      var(--color-teal-hover);
-  --color-checkbox-container-checked-hover-border:  var(--color-teal-hover);
-  --color-checkbox-container-checked-active-bg:     var(--color-teal-active);
-  --color-checkbox-container-checked-active-border: var(--color-teal-active);
+  --color-checkbox-container-hover-border:          var(--color-teal-700);
+  --color-checkbox-container-active-bg:             var(--color-teal-200);
+  --color-checkbox-container-active-border:         var(--color-teal-800);
+  --color-checkbox-container-checked-bg:            var(--color-teal-600);
+  --color-checkbox-container-checked-border:        var(--color-teal-600);
+  --color-checkbox-container-checked-hover-bg:      var(--color-teal-700);
+  --color-checkbox-container-checked-hover-border:  var(--color-teal-700);
+  --color-checkbox-container-checked-active-bg:     var(--color-teal-800);
+  --color-checkbox-container-checked-active-border: var(--color-teal-800);
 }
 
 .theme-dark {
@@ -96,33 +96,36 @@
   --color-contrast-01:  #000;
   --color-contrast-00:  #000;
 
-  --color-teal:              #0E6080;
-  --color-teal-hover:        #0C5470;
-  --color-teal-active:       #0A4A60;
-  --color-teal-subtle:       #7AABAE;
-  --color-teal-subtle-dark:  #6B9CA0;
-  --color-teal-pale:         #1A3840;
+  --color-teal-100: #1A3840;
+  --color-teal-200: #7AABAE;
+  --color-teal-300: #6B9CA0;
+  --color-teal-600: #0E6080;
+  --color-teal-700: #0C5470;
+  --color-teal-800: #0A4A60;
 
   /* semantic overrides (different contrast step than light) */
 
-  /* active uses a muted teal in dark, independent of --color-teal */
-  --color-active: #174952;
+  /* active uses a muted teal in dark, independent of --color-teal-600 */
+  --color-active: var(--color-teal-200);
 
-  /* toolbar top is solid in dark, not a gradient */
-  --color-toolbar-top-bg:            #0A4A60;
-  --color-toolbar-bg-dark:           #0A4A60;
+  /* toolbar is solid dark teal (not a gradient) */
+  --color-toolbar-bg:                #39616E;
+  --color-toolbar-top-bg:            #39616E;
   --color-toolbar-text:              var(--color-contrast-87);
   --color-toolbar-button-bg-hover:   #0F5570;
-  --color-toolbar-button-active:     #083D52;
+  --color-toolbar-button-active:     var(--color-contrast-100);
   --color-toolbar-button-bg-active:  #083D52;
+  --color-toolbar-button-border-active: var(--color-contrast-100);
 
   /* bookmarks use mid-range steps in dark (not near-black) */
-  --color-bookmark-bg:        var(--color-contrast-20);
-  --color-bookmark-border:    var(--color-contrast-28);
-  --color-bookmark-bg-hover:  var(--color-contrast-14);
+  --color-bookmark-bg:        #292929;
+  --color-bookmark-border:    #343434;
+  --color-bookmark-bg-hover:  #2f2f2f;
 
   /* delete button sits one step higher on dark backgrounds */
   --color-delete-button: var(--color-contrast-40);
+  --color-delete-button-hover:  var(--color-contrast-100);
+  --color-delete-button-active: var(--color-active);
 
   /* cancel button needs explicit dark values — contrast scale inverts, so the
      default light value (#333) would resolve to #CCC in dark. TODO: simplify? */
@@ -131,9 +134,9 @@
   --color-cancel-button-bg-active: var(--color-contrast-20);
 
   /* selected bookmarks in cleanup mode */
-  --color-bookmark-selected-bg:        #1E3840;
+  --color-bookmark-selected-bg:        #283438;
   --color-bookmark-selected-bg-hover:  #243F48;
-  --color-bookmark-selected-bg-border: #3A6870;
+  --color-bookmark-selected-bg-border: #314245;
 
   /* checkmark: light so it's visible on the container bg */
   --color-checkmark-checked:        var(--color-contrast-87);
@@ -143,7 +146,6 @@
   /* checkbox container: use medium teal so it contrasts against selected bookmark bg (#1E3840) */
   --color-checkbox-container-bg:                    var(--color-contrast-28);
   --color-checkbox-container-border:                var(--color-contrast-87);
-  --color-checkbox-active:                          #1A3840;
   --color-checkbox-container-hover-border:          #4A8792;
   --color-checkbox-container-active-bg:             #1A3840;
   --color-checkbox-container-active-border:         #3A7280;
