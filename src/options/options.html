@@ -1,40 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pile Settings</title>
-    <script src="options.js"></script>
-<style>
-@media (prefers-color-scheme: dark) {
-    html {
-        height: 100%;
-        background-color: #23222b;
-    }
-    body {
-        height: 100%;
-        background-color: #23222b;
-        color: #fafafe;
-        margin-top: 16px;
-    }
-    select {
-        width: 180px;
-    }
-     
-    .description {
-        color: #b1b1b3;
-    }
+    <style>
+        :root {
+            --bg: #f9f9fa;
+            --color: #15141a;
+            --color-description: #5b5b66;
+            --select-width: 180px;
+        }
 
-    .input-checkbox:focus + .text-label {
-        outline: 1px dotted #f9f9fa;
-    }
-}
-</style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #23222b;
+                --color: #fafafe;
+                --color-description: #b1b1b3;
+            }
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--color);
+            font-family: system-ui, sans-serif;
+            font-size: 13px;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            min-width: 60px;
+        }
+
+        select {
+            width: var(--select-width);
+        }
+
+        .description {
+            color: var(--color-description);
+        }
+    </style>
 </head>
-<body>    
-    <label for="select-theme">Theme</label>
-    <select name="themes" id="select-theme">
-        <option value="theme-light">light</option>
-        <option value="theme-dark">dark</option>
-    </select>
+<body>
+    <div class="setting">
+        <label for="select-theme">Theme</label>
+        <select name="themes" id="select-theme">
+            <option value="theme-light">light</option>
+            <option value="theme-dark">dark</option>
+        </select>
+    </div>
+    <script src="options.js" defer></script>
 </body>
 </html>

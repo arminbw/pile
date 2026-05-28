@@ -13,13 +13,9 @@
 }
 
 .toolbar-top {
-  background-image: linear-gradient(var(--color-toolbar-bg), var(--color-toolbar-bg-dark));
+  background: var(--color-toolbar-top-bg);
   height: 24px;
   display: flex;
-}
-
-.theme-dark .toolbar-top {
-  background: #4A8792;
 }
 
 .search-input-field {
@@ -72,20 +68,28 @@
   background: no-repeat center var(--color-toolbar-button-bg-active);
 }
 
+.cleanup-button svg .cls-1 {
+  stroke: var(--color-toolbar-text);
+}
+
+.cleanup-button svg .cls-2 {
+  fill: var(--color-toolbar-text);
+}
+
 .cleanup-button:hover svg .cls-1 {
-  stroke: #000;
+  stroke: var(--color-contrast-100);
 }
 
 .cleanup-button:hover svg .cls-2 {
-  fill: #000;
+  fill: var(--color-contrast-100);
 }
 
 .cleanup-button:active svg .cls-1 {
-  stroke: var(--color-active);
+  stroke: var(--color-contrast-100);
 }
 
 .cleanup-button:active svg .cls-2 {
-  fill: var(--color-active);
+  fill: var(--color-contrast-100);
 }
 
 button.add-bookmark {
@@ -110,7 +114,7 @@ button.add-bookmark {
   text-decoration: none;
   border: 0;
   background-color: transparent;
-  color: var(--color-contrast-80);
+  color: var(--color-toolbar-text);
   transition: background-color 0.12s ease;
 }
 
@@ -121,7 +125,7 @@ button.add-bookmark:hover {
 }
 
 button.add-bookmark:active {
-  color: var(--color-active);
+  color: var(--color-contrast-100);
   background-color: var(--color-toolbar-button-bg-active);
 }
 
@@ -150,7 +154,7 @@ button.add-bookmark:active {
   animation-name: transition-close-button-show;
   animation-duration: var(--timeSearchContainer);
   animation-timing-function: ease;
-  background-color: var(--color-contrast-00);
+  background-color: var(--color-search-close-bg);
 }
 
 /* here the icon is done by using :before with content */
@@ -158,7 +162,7 @@ button.add-bookmark:active {
   content: '';
   display: block;
   mask: url("delete_bookmark.svg") no-repeat 50% 50%;
-  background-color: var(--color-contrast-14);
+  background-color: var(--color-search-close-icon);
   height: 100%;
   animation-name: transition-close-button-appear;
   animation-duration: var(--timeSearchContainer);
@@ -171,11 +175,11 @@ button.add-bookmark:active {
 }
 
 #toolbar.show-search-field .search-show-hide-button:hover::before {
-  background-color: var(--color-contrast-100);
+  background-color: var(--color-contrast-80);
 }
 
 #toolbar.show-search-field .search-show-hide-button:active::before {
-  background-color: var(--color-active);
+  background-color: var(--color-contrast-100);
 }
 
 #toolbar.show-search-field .add-bookmark {
@@ -199,11 +203,11 @@ button.add-bookmark:active {
   animation-timing-function: ease;
   mask: url("search_button.svg") no-repeat 50% 50%;
   mask-position: 4px 6px;
-  background-color: var(--color-contrast-80);
+  background-color: var(--color-toolbar-text);
 }
 
 #toolbar:not(.show-search-field) .search-show-hide-button:active {
-  background-color: var(--color-active);
+  background-color: var(--color-contrast-100);
 }
 
 /* the background is changed by using the container */
@@ -256,19 +260,19 @@ body.no-animations * {
 /* 1. the close-button pops out after the animation finished */
 @keyframes transition-close-button-show {
   0% {
-    background-color: var(--color-toolbar-bg-active);
+    background-color: var(--color-toolbar-button-bg-active);
   }
 
   4% {
-    background-color: var(--color-contrast-00);
+    background-color: var(--color-search-close-bg);
   }
 
   50% {
-    background-color: var(--color-contrast-00);
+    background-color: var(--color-search-close-bg);
   }
 
   100% {
-    background-color: var(--color-contrast-00);
+    background-color: var(--color-search-close-bg);
   }
 }
 

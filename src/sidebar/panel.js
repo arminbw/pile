@@ -42,7 +42,7 @@ function renderBookmark(bookmark) {
   button.setAttribute('data-functionname', 'deletebookmark');
   button.setAttribute('title', browser.i18n.getMessage('deleteBookmark'));
   let checkboxBorderWrapper = document.createElement('div');
-  checkboxBorderWrapper.classList.add('cleanup-checkbox-border');
+  checkboxBorderWrapper.classList.add('cleanup-checkbox-container');
   let checkbox = document.createElement('input');
   checkbox.classList.add('cleanup-checkbox');
   checkbox.setAttribute('type', 'checkbox');

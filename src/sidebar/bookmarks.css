@@ -5,7 +5,7 @@ ul.bookmarks {
   width: calc(100% + 30px);
   overflow-y: scroll;
   overflow-x: hidden;
-  background-color: var(--color-contrast-02);
+  background-color: var(--color-bookmark-bg);
   margin: 24px 0 0 0;
   padding: 0 0 0 0;
   scroll-behavior: smooth;
@@ -15,12 +15,12 @@ li.bookmark {
   position: relative;
   display: flex;
   box-sizing: content-box;
-  border-bottom: 1px solid var(--color-contrast-06);
+  border-bottom: 1px solid var(--color-bookmark-border);
   height: 36px;
   line-height: 36px;
   margin: 0;
   padding: 0;
-  background-color: var(--color-contrast-02);
+  background-color: var(--color-bookmark-bg);
   list-style: none;
   font-size: 12px;
 }
@@ -32,15 +32,7 @@ li.bookmark:first-child {
 }
 li.bookmark:hover,
 li.bookmark:active {
-  background-color: var(--color-contrast-01);
-}
-.theme-dark li.bookmark {
-  background-color: var(--color-contrast-20);
-  border-bottom: 1px solid var(--color-contrast-28);
-}
-.theme-dark li.bookmark:hover,
-.theme-dark li.bookmark:active {
-  background-color: var(--color-contrast-14);
+  background-color: var(--color-bookmark-bg-hover);
 }
 ul.bookmarks.adding li.bookmark {
   animation-duration: 0.18s;
@@ -104,9 +96,6 @@ a.link, a.link:visited {
 .bookmark > a.link:active {
   color: var(--color-active);
 }
-.theme-dark a.link, a.link:visited {
-  color: var(--color-contrast-80);
-}
 .bookmark.shaking {
   animation: animation-shake-y 0.42s linear;
   z-index: 3;
@@ -162,20 +151,11 @@ button.delete-button {
   mask: url("delete_bookmark.svg") no-repeat 50% 50%;
 }
 button.delete-button, button.delete-button:visited {
-  background-color: var(--color-contrast-14);
+  background-color: var(--color-delete-button);
 }
 button.delete-button:hover {
-  background-color: var(--color-contrast-100); 
+  background-color: var(--color-delete-button-hover);
 }
 button.delete-button:active {
-  background-color: var(--color-active);
-}
-.theme-dark button.delete-button, button.delete-button:visited {
-  background-color: var(--color-contrast-40);
-}
-.theme-dark button.delete-button:hover {
-  background-color: var(--color-contrast-100);
-}
-.theme-dark button.delete-button:active {
-  background-color: var(--color-active);
+  background-color: var(--color-delete-button-active);
 }
