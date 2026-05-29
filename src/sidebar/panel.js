@@ -4,7 +4,7 @@ let pileFolderId;
 let sidebarBookmarkList;
 let contentArea;
 let searchStyle;
-let themeCSSName;
+let themeCSSName = 'theme-light';
 let searchInputField;
 let toolbar;
 let addBookmarkButton;
@@ -432,7 +432,7 @@ async function init() {
 
   try {
     const obj = await browser.storage.local.get('pile-theme');
-    changeTheme(obj['pile-theme']);
+    if (obj['pile-theme']) changeTheme(obj['pile-theme']);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
     fullRebuild(response.bookmarks);
