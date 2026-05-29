@@ -30,7 +30,7 @@
   --color-bookmark-bg-hover:  var(--color-contrast-01);
 
   /* delete button on each bookmark row */
-  --color-delete-button:        var(--color-contrast-14);
+  --color-delete-button:        var(--color-contrast-20);
   --color-delete-button-hover:  var(--color-contrast-100);
   --color-delete-button-active: var(--color-active);
 

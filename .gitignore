@@ -17,6 +17,7 @@ testGerman
 testBuild
 testBuildDev
 testBuildRealdata
+testBuildPersist
 
 design
 test-profile

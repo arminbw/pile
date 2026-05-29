@@ -366,7 +366,7 @@ async function init() {
   document.head.appendChild(searchStyle);
 
   contentArea.addEventListener('click', (event) => {
-    const fn = event.target.dataset.functionname;
+    const fn = event.target.closest('[data-functionname]')?.dataset.functionname;
     switch (fn) {
       case 'addbookmark':
         if (toolbar.classList.contains('show-search-field')) {
