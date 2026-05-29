@@ -49,11 +49,11 @@
   vertical-align:top;
   width: 62px;
   height: 18px;
-  color: var(--color-contrast-80);
+  color: var(--color-toolbar-text);
   font-size: 11px;
   line-height: 16px;
   border-radius: 3px;
-  border: solid 1px var(--color-contrast-80);
+  border: solid 1px var(--color-toolbar-text);
   padding: 0;
   margin: 3px 4px;
   text-align: center;
@@ -63,7 +63,7 @@
 }
 .select-none-button:hover,
 .select-all-button:hover {
-  background-color: var(--color-bookmark-selected-bg-border);
+  background-color: var(--color-toolbar-button-bg-hover);
   color: var(--color-contrast-100);
   border-color: var(--color-contrast-100);
 }

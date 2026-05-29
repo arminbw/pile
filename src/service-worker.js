@@ -147,7 +147,7 @@ async function addAllBookmarksAndClose(windowId) {
 
 function showBadge(badgeText) {
   setTimeout(() => {
-    browser.action.setBadgeBackgroundColor({color: '#5591FF'});
+    browser.action.setBadgeBackgroundColor({color: '#a7bee8'});
     browser.action.setBadgeText({text: badgeText});
   }, 120);
   setTimeout(() => {
@@ -157,8 +157,8 @@ function showBadge(badgeText) {
 
 function showErrorBadge() {
   setTimeout(() => {
-    browser.action.setBadgeBackgroundColor({color: '#E23B03'});
-    browser.action.setBadgeText({text: 'X'});
+    browser.action.setBadgeBackgroundColor({color: '#fa7f28'});
+    browser.action.setBadgeText({text: '✕'});
   }, 120);
   setTimeout(() => {
     browser.action.setBadgeText({text: ''});

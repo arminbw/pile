@@ -12,7 +12,7 @@
     "description": "Show or hide the Pile sidebar."
   },
   "putOnPileMessage": {
-    "message": "Put the page on the Pile and close it.",
+    "message": "Put this page on the Pile and close it.",
     "description": "Close the tab and put a bookmark in the Pile bookmark folder."
   },
   "putAllOnPileMessage": {

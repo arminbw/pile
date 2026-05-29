@@ -2,12 +2,13 @@
   --color-contrast-100: #000;
   --color-contrast-87:  #212121;
   --color-contrast-80:  #333;
-  --color-contrast-70:  #4D4D4D;
   --color-contrast-40:  #999;
   --color-contrast-29:  #B5B5B5;
   --color-contrast-28:  #B8B8B8;
+  --color-contrast-25:  #C0C0C0;
   --color-contrast-20:  #CCC;
-  --color-contrast-14:  #DBDBDB;
+  --color-contrast-18:  #D0D0D0;
+  --color-contrast-16:  #D6D6D6;
   --color-contrast-06:  #F0F0F0;
   --color-contrast-02:  #FAFAFA;
   --color-contrast-01:  #fff;
@@ -41,6 +42,7 @@
   --color-search-close-icon-active: #000;
 
   /* toolbar */
+  --color-toolbar-shadow:               0 0.1px 1.4px rgba(0, 0, 0, 0.121), 0 0.4px 4.7px rgba(0, 0, 0, 0.206), 0 1px 21px rgba(0, 0, 0, 0.34);
   --color-toolbar-bg:                   var(--color-teal-200);
   --color-toolbar-top-bg:               linear-gradient(var(--color-teal-200), var(--color-teal-300));
   --color-toolbar-button-bg-hover:      var(--color-teal-300);
@@ -69,7 +71,7 @@
   --color-checkmark-checked-hover:      var(--color-teal-100);
   --color-checkmark-checked-active:     var(--color-teal-100);
   --color-checkbox-container-bg:        transparent;
-  --color-checkbox-container-border:    var(--color-contrast-80);
+  --color-checkbox-container-border:    var(--color-contrast-40);
   --color-checkbox-container-hover-border:          var(--color-teal-700);
   --color-checkbox-container-active-bg:             var(--color-teal-200);
   --color-checkbox-container-active-border:         var(--color-teal-800);
@@ -85,12 +87,13 @@
   --color-contrast-100: #fff;
   --color-contrast-87:  #DEDEDE;
   --color-contrast-80:  #CCC;
-  --color-contrast-70:  #B3B3B3;
   --color-contrast-40:  #666;
-  --color-contrast-29:  #b6b6b6;
+  --color-contrast-29:  #494949;
   --color-contrast-28:  #474747;
+  --color-contrast-25:  #3f3f3f;
   --color-contrast-20:  #333333;
-  --color-contrast-14:  #242424;
+  --color-contrast-18:  #2f2f2f;
+  --color-contrast-16:  #292929;
   --color-contrast-06:  #0F0F0F;
   --color-contrast-02:  #050505;
   --color-contrast-01:  #000;
@@ -108,19 +111,20 @@
   /* active uses a muted teal in dark, independent of --color-teal-600 */
   --color-active: var(--color-teal-200);
 
-  /* toolbar is solid dark teal (not a gradient) */
-  --color-toolbar-bg:                #39616E;
-  --color-toolbar-top-bg:            #39616E;
+  /* toolbar is solid dark teal (no gradient, no shadow) */
+  --color-toolbar-shadow:            0 1px 0 rgb(0, 37, 45);
+  --color-toolbar-bg:                #003743;
+  --color-toolbar-top-bg:            #003743;
   --color-toolbar-text:              var(--color-contrast-87);
-  --color-toolbar-button-bg-hover:   #0F5570;
+  --color-toolbar-button-bg-hover:   #093849;
   --color-toolbar-button-active:     var(--color-contrast-100);
-  --color-toolbar-button-bg-active:  #083D52;
+  --color-toolbar-button-bg-active:  #063d49;
   --color-toolbar-button-border-active: var(--color-contrast-100);
 
   /* bookmarks use mid-range steps in dark (not near-black) */
-  --color-bookmark-bg:        #292929;
-  --color-bookmark-border:    #343434;
-  --color-bookmark-bg-hover:  #2f2f2f;
+  --color-bookmark-bg:        var(--color-contrast-16);
+  --color-bookmark-border:    var(--color-contrast-20);
+  --color-bookmark-bg-hover:  var(--color-contrast-18);
 
   /* delete button sits one step higher on dark backgrounds */
   --color-delete-button: var(--color-contrast-40);
@@ -128,15 +132,15 @@
   --color-delete-button-active: var(--color-active);
 
   /* cancel button needs explicit dark values — contrast scale inverts, so the
-     default light value (#333) would resolve to #CCC in dark. TODO: simplify? */
-  --color-cancel-button-bg:        var(--color-contrast-28);
-  --color-cancel-button-bg-hover:  var(--color-contrast-40);
-  --color-cancel-button-bg-active: var(--color-contrast-20);
+     default light value (#333) would resolve to #CCC in dark */
+  --color-cancel-button-bg:        var(--color-contrast-29);
+  --color-cancel-button-bg-hover:  var(--color-contrast-25);
+  --color-cancel-button-bg-active: #2e4a50;
 
   /* selected bookmarks in cleanup mode */
-  --color-bookmark-selected-bg:        #283438;
-  --color-bookmark-selected-bg-hover:  #243F48;
-  --color-bookmark-selected-bg-border: #314245;
+  --color-bookmark-selected-bg:        #333a3d;
+  --color-bookmark-selected-bg-hover:  #24343a;
+  --color-bookmark-selected-bg-border: #304649;
 
   /* checkmark: light so it's visible on the container bg */
   --color-checkmark-checked:        var(--color-contrast-87);
@@ -147,7 +151,7 @@
   --color-checkbox-container-bg:                    var(--color-contrast-28);
   --color-checkbox-container-border:                var(--color-contrast-87);
   --color-checkbox-container-hover-border:          #4A8792;
-  --color-checkbox-container-active-bg:             #1A3840;
+  --color-checkbox-container-active-bg:             var(--color-teal-100);
   --color-checkbox-container-active-border:         #3A7280;
   --color-checkbox-container-checked-bg:            #4A8792;
   --color-checkbox-container-checked-border:        #4A8792;

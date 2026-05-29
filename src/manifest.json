@@ -14,6 +14,7 @@
     }
   },
   "icons": {
+    "32": "icons/pile.svg",
     "48": "icons/pile.svg",
     "96": "icons/pile.svg"
   },
@@ -29,7 +30,11 @@
     "default_area": "navbar"
   },
   "sidebar_action": {
-    "default_icon": "icons/pile.svg",
+    "default_icon": {
+      "32": "icons/pile.svg",
+      "48": "icons/pile.svg",
+      "96": "icons/pile.svg"
+    },
     "default_title" : "Pile",
     "default_panel": "sidebar/panel.html"
   },
@@ -37,8 +42,7 @@
     "scripts": ["service-worker.js"]
   },
   "options_ui": {
-      "page": "options/options.html",
-      "browser_style": false
+      "page": "options/options.html"
   },
   "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs", "theme"],
   "commands": {
