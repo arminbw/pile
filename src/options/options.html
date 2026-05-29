@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pile Settings</title>
+    <style>
+        :root {
+            --bg: #f9f9fa;
+            --color: #15141a;
+            --color-description: #5b5b66;
+            --select-width: 180px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #23222b;
+                --color: #fafafe;
+                --color-description: #b1b1b3;
+            }
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--color);
+            font-family: system-ui, sans-serif;
+            font-size: 13px;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            min-width: 60px;
+        }
+
+        select {
+            width: var(--select-width);
+        }
+
+        .description {
+            color: var(--color-description);
+        }
+    </style>
+</head>
+<body>
+    <div class="setting">
+        <label for="select-theme">Theme</label>
+        <select name="themes" id="select-theme">
+            <option value="theme-light">light</option>
+            <option value="theme-dark">dark</option>
+        </select>
+    </div>
+    <script src="options.js" defer></script>
+</body>
+</html>

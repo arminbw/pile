@@ -12,9 +12,12 @@ package-lock.json
 
 testdata
 test
+testDev
 testGerman
 testBuild
 testBuildDev
 testBuildRealdata
+testBuildPersist
 
-onboarding
+design
+test-profile

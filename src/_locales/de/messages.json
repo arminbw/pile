@@ -30,7 +30,7 @@
     "message": "Keine"
   },
   "addPage": {
-    "message": "HINZUFÜGEN"
+    "message": "Hinzufügen"
   },
   "addPageToPileTitle": {
     "message": "Die aktuelle Seite hinzufügen"
@@ -50,5 +50,8 @@
   "deleteSelectedTitle": {
     "message": "Ausgewählte Lesezeichen löschen",
     "description": "Delete selected bookmarks confirmation button title"
+  },
+  "search": {
+    "message": "Suche Zeigen/Verstecken"
   }
 }

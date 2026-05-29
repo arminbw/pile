@@ -1,19 +1,24 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Pile - lightweight bookmarking",
   "description": "__MSG_extensionDescription__",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "default_locale": "en",
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "strict_min_version": "57.0"
+      "id": "{732ba6f4-483f-4d28-879f-008950fe4bd2}",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
   "icons": {
+    "32": "icons/pile.svg",
     "48": "icons/pile.svg",
     "96": "icons/pile.svg"
   },
-  "browser_action": {
+  "action": {
     "browser_style": false,
     "default_icon": "icons/pile.svg",
     "default_title": "__MSG_buttonTitle__",
@@ -21,31 +26,37 @@
       "dark": "icons/pile.svg",
       "light": "icons/pile.svg",
       "size": 32
-    }]
+    }],
+    "default_area": "navbar"
   },
   "sidebar_action": {
-    "default_icon": "icons/pile.svg",
+    "default_icon": {
+      "32": "icons/pile.svg",
+      "48": "icons/pile.svg",
+      "96": "icons/pile.svg"
+    },
     "default_title" : "Pile",
     "default_panel": "sidebar/panel.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["service-worker.js"]
   },
-  "permissions": ["bookmarks", "contextMenus", "activeTab", "tabs", "storage"],
+  "options_ui": {
+      "page": "options/options.html"
+  },
+  "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs", "theme"],
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
         "default": "Alt+Shift+S"
       },
-      "description": "Show/hide the Pile sidebar" 
+      "description": "Show/hide the Pile sidebar"
     },
-    "_execute_browser_action": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Alt+Shift+P"
       },
-      "description": "Put it on the Pile" 
+      "description": "Put it on the Pile"
     }
   }
 }

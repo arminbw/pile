@@ -1,19 +1,23 @@
 {
   "name": "pile",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "description": "A lightweight bookmarking tool for the avid reader",
   "main": "background.js",
   "devDependencies": {
-    "del": "^5.1.0",
-    "eslint": "^6.8.0",
-    "eslint-plugin-no-unsanitized": "^3.1.5",
-    "gulp": "^4.0.2",
-    "gulp-strip-comments": "^2.5.2",
-    "gulp-strip-debug": "^3.0.0"
+    "del": "^8.0.1",
+    "eslint": "^10.2.0",
+    "eslint-plugin-no-unsanitized": "^4.1.5",
+    "gulp": "^5.0.1",
+    "gulp-strip-comments": "^2.6.0",
+    "gulp-strip-css-comments": "^3.0.0",
+    "gulp-strip-debug": "^7.0.0",
+    "jsdom": "^29.1.1",
+    "vitest": "^4.1.6"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "lint": "eslint src/.;exit 0",
+    "lint:ext": "web-ext lint --source-dir build",
     "build": "gulp build",
     "clean": "gulp clean"
   },
@@ -27,8 +31,8 @@
   "author": "Armin Wagner",
   "license": "MIT",
   "dependencies": {
-    "core-js": "^3.17.3",
-    "update": "^0.7.4",
-    "web-ext": "^4.3.0"
-  }
+    "core-js": "^3.49.0",
+    "web-ext": "^10.1.0"
+  },
+  "type": "module"
 }

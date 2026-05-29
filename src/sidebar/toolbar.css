@@ -1,0 +1,326 @@
+/* the toolbar */
+#toolbar {
+  position: fixed;
+  z-index: 4;
+  width: 100%;
+  height: 24px;
+  background-color: var(--color-toolbar-bg);
+  box-shadow: var(--color-toolbar-shadow);
+}
+
+.toolbar-top {
+  background: var(--color-toolbar-top-bg);
+  height: 24px;
+  display: flex;
+}
+
+.search-input-field {
+  display: block;
+  float: left;
+  height: 24px;
+  line-height: 24px;
+  width: 0;
+  font-size: 11px;
+  font-weight: 400;
+  border: 0;
+  padding: 0;
+}
+
+.search-show-hide-button {
+  display: block;
+  float: left;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.cleanup-button {
+  display: block;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0;
+  width: 21px;
+  height: 24px;
+  line-height: 24px;
+  background-color: transparent;
+  transition: background-color 0.08s ease;
+}
+
+.cleanup-button:hover {
+  background-color: var(--color-toolbar-button-bg-hover);
+}
+
+.cleanup-button:active {
+  background-color: var(--color-toolbar-button-bg-active);
+}
+
+.cleanup-button svg .cls-1 {
+  stroke: var(--color-toolbar-text);
+}
+
+.cleanup-button svg .cls-2 {
+  fill: var(--color-toolbar-text);
+}
+
+.cleanup-button:hover svg .cls-1 {
+  stroke: var(--color-contrast-100);
+}
+
+.cleanup-button:hover svg .cls-2 {
+  fill: var(--color-contrast-100);
+}
+
+.cleanup-button:active svg .cls-1 {
+  stroke: var(--color-contrast-100);
+}
+
+.cleanup-button:active svg .cls-2 {
+  fill: var(--color-contrast-100);
+}
+
+button.add-bookmark {
+  z-index: 1;
+  display: inline-block;
+  opacity: 1;
+  height: 24px;
+  line-height: 24px;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  margin: auto;
+  text-align: center;
+  text-decoration: none;
+  border: 0;
+  background-color: transparent;
+  color: var(--color-toolbar-text);
+  transition: background-color 0.12s ease;
+}
+
+button.add-bookmark:hover {
+  color: var(--color-contrast-100);
+  background-color: var(--color-toolbar-button-bg-hover);
+  transition: background-color 0.08s ease;
+}
+
+button.add-bookmark:active {
+  color: var(--color-contrast-100);
+  background-color: var(--color-toolbar-button-bg-active);
+}
+
+/* .search-container grows after clicking on search symbol */
+#toolbar.show-search-field .search-container {
+  animation-name: transition-search-show;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+  width: calc(100% - 91px);
+}
+
+#toolbar.show-search-field input.search-input-field {
+  animation-name: transition-input-show;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+  width: calc(100% - 21px);
+  padding-left: 5px;
+}
+
+#toolbar.show-search-field .search-show-hide-button {
+  animation-name: transition-close-button-show;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+  background-color: var(--color-search-close-bg);
+}
+
+/* here the icon is done by using :before with content */
+#toolbar.show-search-field .search-show-hide-button:before {
+  content: '';
+  display: block;
+  mask: url("delete_bookmark.svg") no-repeat 50% 50%;
+  background-color: var(--color-search-close-icon);
+  height: 100%;
+  animation-name: transition-close-button-appear;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: linear;
+}
+
+@keyframes transition-close-button-appear {
+  0%, 85% { opacity: 0; }
+  86%, 100% { opacity: 1; }
+}
+
+#toolbar.show-search-field .search-show-hide-button:hover::before {
+  background-color:  var(--color-search-close-icon-hover);
+}
+
+#toolbar.show-search-field .search-show-hide-button:active::before {
+  background-color: var(--color-search-close-icon-active);
+}
+
+#toolbar.show-search-field .add-bookmark {
+  float: right;
+  min-width: 70px;
+}
+
+/* searchfield gets hidden after clicking close button */
+#toolbar:not(.show-search-field) .search-container {
+  animation-name: transition-search-hide;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+  width: 21px;
+  color: transparent;
+}
+
+/* here the icon is done by using a mask directly on the button */
+#toolbar:not(.show-search-field) .search-show-hide-button {
+  animation-name: transition-button-search;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+  mask: url("search_button.svg") no-repeat 50% 50%;
+  mask-position: 4px 6px;
+  background-color: var(--color-toolbar-text);
+}
+
+#toolbar:not(.show-search-field) .search-show-hide-button:active {
+  background-color: var(--color-contrast-100);
+}
+
+/* the background is changed by using the container */
+#toolbar:not(.show-search-field) .search-container:hover {
+  background-color: var(--color-toolbar-button-bg-hover);
+}
+
+#toolbar:not(.show-search-field) .search-container:active {
+  background-color: var(--color-toolbar-button-bg-active);
+}
+
+#toolbar:not(.show-search-field) .add-bookmark {
+  width: calc(100% - 42px);
+}
+
+button.add-bookmark.hide-search-field {
+  animation-name: transition-button-add-large;
+  animation-duration: var(--timeSearchContainer);
+  animation-timing-function: ease;
+}
+
+
+/* ANIMATIONS and TRANSITIONS */
+
+/* suppress all animations during page load */
+body.no-animations * {
+  animation-duration: 0s !important;
+}
+
+/* user clicked the search symbol */
+/* increase width at 0%-50% */
+/* change background-color to white at 50%-80% */
+@keyframes transition-search-show {
+  0% {
+    width: 21px;
+    background-color: var(--color-toolbar-button-bg-active);
+  }
+
+  50% {
+    width: calc(100% - 91px);
+    background-color: var(--color-toolbar-button-bg-active);
+  }
+
+  80% {
+    background-color: var(--color-contrast-00);
+    color: var(--color-contrast-100);
+  }
+}
+
+/* 1. the close-button pops out after the animation finished */
+@keyframes transition-close-button-show {
+  0% {
+    background-color: var(--color-toolbar-button-bg-active);
+  }
+
+  4% {
+    background-color: var(--color-search-close-bg);
+  }
+
+  50% {
+    background-color: var(--color-search-close-bg);
+  }
+
+  100% {
+    background-color: var(--color-search-close-bg);
+  }
+}
+
+/* start revealing the input field at 0% */
+@keyframes transition-input-show {
+  0% {
+    padding-left: 0;
+    caret-color: transparent;
+  }
+
+  99% {
+    padding-left: 0;
+    caret-color: transparent;
+  }
+
+  100% {
+    display: inline-block;
+    padding-left: 5px;
+    color: #3B3B3B;
+    caret-color: transparent;
+  }
+}
+
+/* searchfield folding, search icon appears at the end */
+@keyframes transition-button-search {
+  0% {
+    background-color: transparent;
+  }
+
+  80% {
+    background-color: transparent;
+  }
+
+  100% {
+    background-color: var(--color-contrast-100);
+  }
+}
+
+@keyframes transition-search-hide {
+  0% {
+    width: calc(100% - 70px);
+    color: transparent;
+    background: none #fff;
+  }
+
+  80% {
+    width: 21px;
+    padding-left: 0;
+    background: none transparent;
+    color: #fff;
+  }
+
+  100% {
+    color: #fff;
+  }
+}
+
+@keyframes transition-button-add-large {
+  0% {
+    width: 70px;
+  }
+
+  80% {
+    width: calc(100% - 42px);
+  }
+}

@@ -1,37 +1,40 @@
-"use strict";
+import gulp from "gulp";
+import { deleteAsync } from "del";
+import stripComments from "gulp-strip-comments";
+import stripCssComments from "gulp-strip-css-comments";
+import stripDebug from "gulp-strip-debug";
 
-const gulp = require('gulp');
-const del = require('del');
-const stripComments = require('gulp-strip-comments');
-const stripDebug = require('gulp-strip-debug');
-
-function clean() {
-   return del(['build/**/*']);
+export function clean() {
+   return deleteAsync(['build/**'], { dot: true });
 }
 
 function processJavascript() {
    return gulp
-      .src(['./src/background.js', './src/sidebar/*.js'], { base: 'src/' })
-      .pipe(stripComments( { space:false, trim:true } ))
+      .src(['src/service-worker.js', 'src/sidebar/panel.js', 'src/options/options.js'], { base: 'src/' })
       .pipe(stripDebug())
+      .pipe(stripComments( { space:false, trim:true } ))
       .pipe(gulp.dest('./build/'));
 }
 
 function processOtherCode() {
-   // comments are not stripped from CSS as decomment still has troubles with regular expressions
    return gulp
-      .src(['src/manifest.json', './src/sidebar/*.html', './src/_locales/**'], { base: 'src/' })
+      .src(['src/manifest.json', 'src/sidebar/*.html', 'src/options/*.html', 'src/_locales/**'], { base: 'src/' })
       .pipe(stripComments())
-      .pipe(gulp.dest('./build/'));
+      .pipe(gulp.dest('build/'));
+}
+
+function processCss() {
+   return gulp
+      .src(['src/sidebar/*.css', 'src/options/*.css'], { base: 'src/' })
+      .pipe(stripCssComments())
+      .pipe(gulp.dest('build/'));
 }
 
 function moveAssets() {
    return gulp
-      .src(['src/icons/**/*.*', 'src/sidebar/*.svg',  'src/sidebar/*.css'], { base: 'src/' })
-      .pipe(gulp.dest('./build/'))
+      .src(['src/icons/**/*.*', 'src/sidebar/*.svg'], { base: 'src/' })
+      .pipe(gulp.dest('build/'))
 }
 
-const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, moveAssets));
+export const build = gulp.series(clean, gulp.parallel(processJavascript, processOtherCode, processCss, moveAssets));
 
-exports.build = build;
-exports.clean = clean;
