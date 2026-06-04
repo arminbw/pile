@@ -6,8 +6,8 @@
   "default_locale": "en",
   "browser_specific_settings": {
     "gecko": {
-      "id": "{732ba6f4-483f-4d28-879f-008950fe4bd2}",
-      "strict_min_version": "140.0",
+      "id": "{12b48d24-912c-4e23-a817-8e89a3f32639}",
+      "strict_min_version": "142.0",
       "data_collection_permissions": {
         "required": ["none"]
       }

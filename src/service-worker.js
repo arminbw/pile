@@ -1,7 +1,5 @@
 'use strict';
 
-const bookmarkFolderName = 'Pile';
-
 /* ------------------------------------------------ */
 // Debugging
 /* ------------------------------------------------ */
@@ -22,6 +20,26 @@ browser.action.onClicked.addListener((activeTab) => {
 
 browser.bookmarks.onRemoved.addListener((id) => {
   if (id === cachedFolderId) cachedFolderId = null;
+});
+
+browser.storage.onChanged.addListener(async (changes) => {
+  if (!('pile-folder-name' in changes)) return;
+  const newName = (changes['pile-folder-name'].newValue || '').trim() || 'Pile';
+  if (cachedFolderId) {
+    await browser.bookmarks.update(cachedFolderId, { title: newName })
+      .catch(error => logError('renamePileFolder', error));
+  } else {
+    const oldName = (changes['pile-folder-name'].oldValue || '').trim() || 'Pile';
+    const results = await browser.bookmarks.search({ title: oldName });
+    for (const b of results) {
+      if (b.type === 'folder') {
+        await browser.bookmarks.update(b.id, { title: newName })
+          .catch(error => logError('renamePileFolder', error));
+        cachedFolderId = b.id;
+        break;
+      }
+    }
+  }
 });
 
 
@@ -172,10 +190,15 @@ function showErrorBadge() {
 
 let cachedFolderId = null;
 
+async function getFolderName() {
+  const result = await browser.storage.local.get('pile-folder-name');
+  return (result['pile-folder-name'] || '').trim() || 'Pile';
+}
+
 async function getBookmarkFolderId() {
   if (cachedFolderId) return cachedFolderId;
-  // Research later: What if the user moves the folder?
-  let bookmarks = await browser.bookmarks.search({ title: bookmarkFolderName });
+  const folderName = await getFolderName();
+  let bookmarks = await browser.bookmarks.search({ title: folderName });
   if (bookmarks.length > 0) {
     for (let bookmark of bookmarks) {
       if (Object.prototype.hasOwnProperty.call(bookmark, 'type')) {
@@ -186,7 +209,7 @@ async function getBookmarkFolderId() {
       }
     }
   }
-  let folder = await browser.bookmarks.create({ title: bookmarkFolderName })
+  let folder = await browser.bookmarks.create({ title: folderName })
     .catch(error => {
       logError('getBookmarkFolderId', error);
       throw error;

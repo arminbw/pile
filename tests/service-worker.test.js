@@ -78,6 +78,68 @@ describe('Pile folder removal', () => {
 });
 
 
+describe('Folder name configuration', () => {
+  test('creates folder with custom name when set in storage', async () => {
+    await browser.storage.local.set({ 'pile-folder-name': 'Reading List' });
+
+    await sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
+
+    const folders = await browser.bookmarks.search({ title: 'Reading List' });
+    expect(folders).toHaveLength(1);
+    expect(folders[0].type).toBe('folder');
+    expect(await browser.bookmarks.search({ title: 'Pile' })).toHaveLength(0);
+  });
+
+  test('falls back to "Pile" when storage value is empty', async () => {
+    await browser.storage.local.set({ 'pile-folder-name': '   ' });
+
+    await sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
+
+    const folders = await browser.bookmarks.search({ title: 'Pile' });
+    expect(folders).toHaveLength(1);
+  });
+
+  test('renames existing folder when name changes with warm cache', async () => {
+    await sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
+
+    await browser.storage.local.set({ 'pile-folder-name': 'My Reading' });
+
+    expect(await browser.bookmarks.search({ title: 'My Reading' })).toHaveLength(1);
+    expect(await browser.bookmarks.search({ title: 'Pile' })).toHaveLength(0);
+    expect(browser.stats.bookmarks.update).toBe(1);
+  });
+
+  test('renames existing folder by searching old name when cache is cold', async () => {
+    browser.seed({ title: 'Pile', type: 'folder' });
+
+    await browser.storage.local.set({ 'pile-folder-name': 'My Reading' });
+
+    expect(await browser.bookmarks.search({ title: 'My Reading' })).toHaveLength(1);
+    expect(await browser.bookmarks.search({ title: 'Pile' })).toHaveLength(0);
+  });
+
+  test('does nothing when no folder with the old name exists and cache is cold', async () => {
+    await browser.storage.local.set({ 'pile-folder-name': 'My Reading' });
+
+    expect(await browser.bookmarks.search({ title: 'My Reading' })).toHaveLength(0);
+    expect(browser.stats.bookmarks.update).toBe(0);
+  });
+
+  test('bookmarks added after a rename land in the renamed folder', async () => {
+    await sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
+    await browser.storage.local.set({ 'pile-folder-name': 'My Reading' });
+
+    await sendMessage({ type: 'ADD_BOOKMARK', tab: { url: 'https://example.com', title: 'Example' } });
+
+    const response = await sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
+    expect(response.bookmarks).toHaveLength(1);
+    expect(response.bookmarks[0].url).toBe('https://example.com');
+    const folders = await browser.bookmarks.search({ title: 'My Reading' });
+    expect(folders[0].id).toBe(response.folderId);
+  });
+});
+
+
 describe('ADD_BOOKMARK', () => {
   test('creates a bookmark in the Pile folder', async () => {
     const response = await sendMessage({

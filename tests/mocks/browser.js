@@ -7,7 +7,7 @@ export function createBrowserMock() {
   // Counts every API call — read in tests to verify efficiency.
   const stats = {
     messages: 0,
-    bookmarks: { create: 0, remove: 0, get: 0, search: 0, getSubTree: 0 },
+    bookmarks: { create: 0, remove: 0, update: 0, get: 0, search: 0, getSubTree: 0 },
   };
 
   const messageListeners = [];
@@ -15,13 +15,15 @@ export function createBrowserMock() {
   const onRemovedListeners = [];
   const onChangedListeners = [];
   const onMovedListeners = [];
+  const onStorageChangedListeners = [];
+  const storageData = {};
 
   // Returns an { addListener, trigger } pair so tests can both register listeners
   // (via addListener, same as production code) and fire them directly (via trigger).
   function makeEvent(listeners) {
     return {
       addListener: fn => listeners.push(fn),
-      trigger: (...args) => listeners.forEach(fn => fn(...args)),
+      trigger: (...args) => Promise.all(listeners.map(fn => fn(...args))),
     };
   }
 
@@ -101,6 +103,13 @@ export function createBrowserMock() {
         return bookmark;
       },
 
+      update: async (id, changes) => {
+        stats.bookmarks.update++;
+        const item = bookmarkStore.get(id);
+        if (item) Object.assign(item, changes);
+        return item;
+      },
+
       remove: async (id) => {
         stats.bookmarks.remove++;
         const bookmark = bookmarkStore.get(id);
@@ -142,10 +151,23 @@ export function createBrowserMock() {
       create:    () => {},
     },
 
-    // storage.local.get always returns {} (no theme set); onChanged is a no-op stub.
     storage: {
-      local:     { get: async () => ({}) },
-      onChanged: { addListener: () => {} },
+      local: {
+        get: async (keys) => {
+          if (!keys) return { ...storageData };
+          const keyList = Array.isArray(keys) ? keys : [keys];
+          return Object.fromEntries(keyList.filter(k => k in storageData).map(k => [k, storageData[k]]));
+        },
+        set: async (obj) => {
+          const changes = {};
+          for (const [k, v] of Object.entries(obj)) {
+            changes[k] = { oldValue: storageData[k], newValue: v };
+            storageData[k] = v;
+          }
+          await Promise.all(onStorageChangedListeners.map(fn => fn(changes, 'local')));
+        },
+      },
+      onChanged: makeEvent(onStorageChangedListeners),
     },
 
     // i18n returns the key itself, so localized strings in the DOM equal their key names.

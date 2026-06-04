@@ -45,8 +45,24 @@
             width: var(--select-width);
         }
 
+        input[type="text"] {
+            width: 130px;
+            font-size: 13px;
+            font-family: system-ui, sans-serif;
+        }
+
+        button {
+            font-size: 13px;
+            font-family: system-ui, sans-serif;
+            cursor: pointer;
+        }
+
         .description {
             color: var(--color-description);
+        }
+
+        .description.error {
+            color: #d7264b;
         }
     </style>
 </head>
@@ -58,6 +74,12 @@
             <option value="theme-dark">dark</option>
         </select>
     </div>
+    <div class="setting">
+        <label for="input-folder-name">Folder</label>
+        <input type="text" id="input-folder-name" placeholder="Pile" maxlength="64">
+        <button id="btn-save-folder-name">Save</button>
+    </div>
+    <p class="description" id="folder-name-error"></p>
     <script src="options.js" defer></script>
 </body>
 </html>
