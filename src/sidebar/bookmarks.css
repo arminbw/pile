@@ -27,9 +27,31 @@ li.bookmark {
 li.bookmark:last-child {
   margin-bottom: 63px;
 }
+/* every other browsing session gets a slightly different shade (see assignSessionInfo).
+   declared before :hover so the equal-specificity hover rule still wins */
+li.bookmark.session-b {
+  background-color: var(--color-bookmark-session-bg);
+  border-bottom: 1px solid var(--color-bookmark-session-border);
+}
 li.bookmark:hover,
 li.bookmark:active {
   background-color: var(--color-bookmark-bg-hover);
+}
+/* the last bookmark of each shaded block gets a darker bottom-border to divide it from
+   the next session (declared after .session-b so it wins the equal-specificity border tie) */
+li.bookmark.session-end {
+  border-bottom: 1px solid var(--color-bookmark-session-border-end);
+}
+/* while searching, hidden non-matches make the shading and session dividers meaningless, so flatten them */
+ul.bookmarks.is-filtered li.bookmark.session-b {
+  background-color: var(--color-bookmark-bg);
+}
+ul.bookmarks.is-filtered li.bookmark.session-b:hover,
+ul.bookmarks.is-filtered li.bookmark.session-b:active {
+  background-color: var(--color-bookmark-bg-hover);
+}
+ul.bookmarks.is-filtered li.bookmark.session-end {
+  border-bottom: 1px solid var(--color-bookmark-border);
 }
 ul.bookmarks.adding li.bookmark {
   animation-duration: 0.18s;

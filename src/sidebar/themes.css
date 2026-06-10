@@ -26,9 +26,12 @@
   --color-active: var(--color-teal-600);
 
   /* bookmark list */
-  --color-bookmark-bg:        var(--color-contrast-02);
-  --color-bookmark-border:    var(--color-contrast-06);
-  --color-bookmark-bg-hover:  var(--color-contrast-01);
+  --color-bookmark-bg:           var(--color-contrast-02);
+  --color-bookmark-session-bg: #F0F0F0;
+  --color-bookmark-session-border: #E7E7E7;
+  --color-bookmark-session-border-end: #DCDCDC;
+  --color-bookmark-border:       var(--color-contrast-06);
+  --color-bookmark-bg-hover:     var(--color-contrast-01);
 
   /* delete button on each bookmark row */
   --color-delete-button:        var(--color-contrast-20);
@@ -122,9 +125,12 @@
   --color-toolbar-button-border-active: var(--color-contrast-100);
 
   /* bookmarks use mid-range steps in dark (not near-black) */
-  --color-bookmark-bg:        var(--color-contrast-16);
-  --color-bookmark-border:    var(--color-contrast-20);
-  --color-bookmark-bg-hover:  var(--color-contrast-18);
+  --color-bookmark-bg:           var(--color-contrast-16);
+  --color-bookmark-session-bg: #242424;
+  --color-bookmark-session-border: #161616;
+  --color-bookmark-session-border-end: #181818;
+  --color-bookmark-border:       var(--color-contrast-20);
+  --color-bookmark-bg-hover:     var(--color-contrast-18);
 
   /* delete button sits one step higher on dark backgrounds */
   --color-delete-button: var(--color-contrast-40);

@@ -115,10 +115,55 @@ browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
 // Update the list of Pile bookmarks in the panel
 /* ------------------------------------------------ */
 
+const SESSION_GAP_MS = 60 * 60 * 2000; // bookmarks added more than 2h apart belong to different browsing sessions
+const MIN_SESSION_SIZE = 2; // a lone bookmark doesn't get a different shade
+
+// Returns - per bookmark - a 0 or 1 for the alternating background 
+// and an "end" flag for the divider on the last row of a session
+function assignSessionInfo(bookmarks) {
+  const n = bookmarks.length;
+
+  // Group bookmarks into sessions
+  const sessionOf = []; // sessionOf[i] is the session number of bookmarks[i]
+  const sizeOf = [];    // sizeOf[s] is the number of bookmarks in session s
+  for (let i = 0, session = 0; i < n; i++) {
+    if (i > 0 && bookmarks[i - 1].dateAdded - bookmarks[i].dateAdded > SESSION_GAP_MS) session++;
+    sessionOf[i] = session;
+    sizeOf[session] = (sizeOf[session] ?? 0) + 1;
+  }
+
+  // The shade alternates between sessions, but only sessions of MIN_SESSION_SIZE+ flip it,
+  // so lone bookmarks keep the shade of the block above to minimize visual noise.
+  const shades = [];
+  let shaded = false;
+  let seenQualifyingSession = false;
+  for (let i = 0; i < n; i++) {
+    const startsNewSession = i === 0 || sessionOf[i] !== sessionOf[i - 1];
+    const qualifies = sizeOf[sessionOf[i]] >= MIN_SESSION_SIZE;
+    if (startsNewSession && qualifies) {
+      if (seenQualifyingSession) shaded = !shaded; // the first qualifying block keeps the default shade
+      seenQualifyingSession = true;
+    }
+    shades[i] = shaded;
+  }
+
+  // A divider marks the last row of each shaded block — where the shade is about to change.
+  const ends = shades.map((shade, i) => i === n - 1 || shades[i + 1] !== shade);
+
+  return { shades, ends };
+}
+
 function fullRebuild(bookmarks) {
   // render an array of all bookmarks
   // the use spread operator to turn them into individual arguments for replaceChildren
-  sidebarBookmarkList.replaceChildren(...bookmarks.map(renderBookmark));
+  const { shades, ends } = assignSessionInfo(bookmarks);
+  const elements = bookmarks.map((bookmark, i) => {
+    const li = renderBookmark(bookmark);
+    if (shades[i]) li.classList.add('session-b');
+    if (ends[i]) li.classList.add('session-end');
+    return li;
+  });
+  sidebarBookmarkList.replaceChildren(...elements);
   if (cleanupMode) updateCleanupCounter();
   const scrollbarWidth = sidebarBookmarkList.offsetWidth - sidebarBookmarkList.clientWidth + 14;
   sidebarBookmarkList.style.width = `calc(100% + ${scrollbarWidth}px)`;
@@ -244,6 +289,7 @@ function toggleSearch() {
 
 // hackish search/filter functionality (don't try this at home!)
 function filterList(terms) {
+  sidebarBookmarkList.classList.toggle('is-filtered', !!terms);
   if (searchStyle.sheet.cssRules.length > 1) {
     searchStyle.sheet.deleteRule(0);
     searchStyle.sheet.deleteRule(0);

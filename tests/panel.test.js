@@ -147,3 +147,58 @@ test('cancelling cleanup mode removes the cleanup-mode class', async () => {
 
   expect(document.querySelector('#content').classList.contains('cleanup-mode')).toBe(false);
 });
+
+
+// --- browsing session shading ---
+
+const DAY = 24 * 60 * 60 * 1000;
+const T = 1_700_000_000_000; // arbitrary fixed "now", newest bookmark first
+
+// Two sessions, then a lone save, then a third session. Between-session gaps are
+// whole days so the fixture splits the same way regardless of the exact SESSION_GAP_MS
+// threshold; within a session the saves are only a minute apart.
+// Expected shading (session-b = the alternate grey):
+//   session 1 (idx 0,1)  → default      (no class)
+//   session 2 (idx 2,3)  → session-b
+//   lone save (idx 4)    → session-b    (absorbed into the block above, no flip)
+//   session 3 (idx 5,6)  → default      (flips back)
+// Expected session-end (darker divider on the bottom row of each shaded block, so the
+// absorbed lone save at idx 4 is the end of the session-b block, not idx 3):
+//   idx 1, 4, 6
+const SESSIONED = [
+  { id: '1', title: 'A1', url: 'https://a1.com', parentId: FOLDER_ID, dateAdded: T },
+  { id: '2', title: 'A2', url: 'https://a2.com', parentId: FOLDER_ID, dateAdded: T - 60_000 },
+  { id: '3', title: 'B1', url: 'https://b1.com', parentId: FOLDER_ID, dateAdded: T - 2 * DAY },
+  { id: '4', title: 'B2', url: 'https://b2.com', parentId: FOLDER_ID, dateAdded: T - 2 * DAY - 60_000 },
+  { id: '5', title: 'L',  url: 'https://l.com',  parentId: FOLDER_ID, dateAdded: T - 4 * DAY },
+  { id: '6', title: 'C1', url: 'https://c1.com', parentId: FOLDER_ID, dateAdded: T - 6 * DAY },
+  { id: '7', title: 'C2', url: 'https://c2.com', parentId: FOLDER_ID, dateAdded: T - 6 * DAY - 60_000 },
+];
+
+test('alternating sessions shade with isolated saves absorbed into the block above', async () => {
+  await initPanel(SESSIONED);
+  const shaded = [...document.querySelectorAll('li.bookmark')]
+    .map(li => li.classList.contains('session-b'));
+  expect(shaded).toEqual([false, false, true, true, true, false, false]);
+});
+
+test('the last bookmark of each session is marked session-end', async () => {
+  await initPanel(SESSIONED);
+  const ends = [...document.querySelectorAll('li.bookmark')]
+    .map(li => li.classList.contains('session-end'));
+  expect(ends).toEqual([false, true, false, false, true, false, true]);
+});
+
+test('search flattens the session shading via is-filtered on the list', async () => {
+  await initPanel(SESSIONED);
+  const list = document.querySelector('ul.bookmarks');
+  const input = document.querySelector('.search-input-field');
+
+  input.value = 'b1';
+  input.dispatchEvent(new Event('input'));
+  expect(list.classList.contains('is-filtered')).toBe(true);
+
+  input.value = '';
+  input.dispatchEvent(new Event('input'));
+  expect(list.classList.contains('is-filtered')).toBe(false);
+});
