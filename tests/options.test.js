@@ -117,3 +117,48 @@ describe('Options page - folder name', () => {
     expect(feedbackEl.textContent).toBe('Folder renamed to "Pile".');
   });
 });
+
+describe('Options page - sessions', () => {
+  test('defaults to enabled with a 2 hour gap when nothing is stored', async () => {
+    await initOptions();
+
+    expect(document.querySelector('#checkbox-session-enabled').checked).toBe(true);
+    expect(document.querySelector('#input-session-gap').value).toBe('2');
+    expect(document.querySelector('#input-session-gap').disabled).toBe(false);
+  });
+
+  test('reflects stored values and disables the gap input when sessions are off', async () => {
+    await browser.storage.local.set({ 'pile-session-enabled': false, 'pile-session-gap-hours': 5 });
+    await initOptions();
+
+    expect(document.querySelector('#checkbox-session-enabled').checked).toBe(false);
+    expect(document.querySelector('#input-session-gap').value).toBe('5');
+    expect(document.querySelector('#input-session-gap').disabled).toBe(true);
+  });
+
+  test('toggling the checkbox saves the flag and disables the gap input', async () => {
+    await initOptions();
+
+    const checkbox = document.querySelector('#checkbox-session-enabled');
+    checkbox.checked = false;
+    checkbox.dispatchEvent(new Event('change'));
+    await flushPromises();
+
+    const stored = await browser.storage.local.get('pile-session-enabled');
+    expect(stored['pile-session-enabled']).toBe(false);
+    expect(document.querySelector('#input-session-gap').disabled).toBe(true);
+  });
+
+  test('changing the gap clamps out-of-range values and saves', async () => {
+    await initOptions();
+
+    const input = document.querySelector('#input-session-gap');
+    input.value = '999';
+    input.dispatchEvent(new Event('change'));
+    await flushPromises();
+
+    expect(input.value).toBe('168');
+    const stored = await browser.storage.local.get('pile-session-gap-hours');
+    expect(stored['pile-session-gap-hours']).toBe(168);
+  });
+});

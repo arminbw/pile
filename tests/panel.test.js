@@ -189,6 +189,22 @@ test('the last bookmark of each session is marked session-end', async () => {
   expect(ends).toEqual([false, true, false, false, true, false, true]);
 });
 
+test('sessions disabled in settings leaves no shading or dividers', async () => {
+  await browser.storage.local.set({ 'pile-session-enabled': false });
+  await initPanel(SESSIONED);
+  const items = [...document.querySelectorAll('li.bookmark')];
+  expect(items.some(li => li.classList.contains('session-b'))).toBe(false);
+  expect(items.some(li => li.classList.contains('session-end'))).toBe(false);
+});
+
+test('a larger configured session gap merges everything into one session', async () => {
+  await browser.storage.local.set({ 'pile-session-gap-hours': 72 }); // SESSIONED gaps are ~2 days
+  await initPanel(SESSIONED);
+  const shaded = [...document.querySelectorAll('li.bookmark')]
+    .map(li => li.classList.contains('session-b'));
+  expect(shaded.every(s => s === false)).toBe(true);
+});
+
 test('search flattens the session shading via is-filtered on the list', async () => {
   await initPanel(SESSIONED);
   const list = document.querySelector('ul.bookmarks');

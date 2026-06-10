@@ -115,19 +115,30 @@ browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
 // Update the list of Pile bookmarks in the panel
 /* ------------------------------------------------ */
 
-const SESSION_GAP_MS = 60 * 60 * 2000; // bookmarks added more than 2h apart belong to different browsing sessions
 const MIN_SESSION_SIZE = 2; // a lone bookmark doesn't get a different shade
 
-// Returns - per bookmark - a 0 or 1 for the alternating background 
+// Configurable via the options page (see applySessionSettings). Defaults: sessions on,
+// bookmarks added more than 2h apart belong to different browsing sessions.
+let sessionsEnabled = true;
+let sessionGapMs = 2 * 60 * 60 * 1000;
+
+function applySessionSettings(values) {
+  if (values['pile-session-enabled'] !== undefined) sessionsEnabled = values['pile-session-enabled'];
+  const hours = values['pile-session-gap-hours'];
+  if (typeof hours === 'number' && hours > 0) sessionGapMs = hours * 60 * 60 * 1000;
+}
+
+// Returns - per bookmark - a 0 or 1 for the alternating background
 // and an "end" flag for the divider on the last row of a session
 function assignSessionInfo(bookmarks) {
+  if (!sessionsEnabled) return { shades: [], ends: [] }; // feature off: no shading, no dividers
   const n = bookmarks.length;
 
   // Group bookmarks into sessions
   const sessionOf = []; // sessionOf[i] is the session number of bookmarks[i]
   const sizeOf = [];    // sizeOf[s] is the number of bookmarks in session s
   for (let i = 0, session = 0; i < n; i++) {
-    if (i > 0 && bookmarks[i - 1].dateAdded - bookmarks[i].dateAdded > SESSION_GAP_MS) session++;
+    if (i > 0 && bookmarks[i - 1].dateAdded - bookmarks[i].dateAdded > sessionGapMs) session++;
     sessionOf[i] = session;
     sizeOf[session] = (sizeOf[session] ?? 0) + 1;
   }
@@ -183,6 +194,15 @@ function changeTheme(newThemeCSSName) {
 browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-theme']?.newValue) {
     changeTheme(changes['pile-theme'].newValue);
+  }
+  if (changes['pile-session-enabled'] || changes['pile-session-gap-hours']) {
+    applySessionSettings({
+      'pile-session-enabled': changes['pile-session-enabled']?.newValue,
+      'pile-session-gap-hours': changes['pile-session-gap-hours']?.newValue,
+    });
+    browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' })
+      .then((response) => fullRebuild(response.bookmarks))
+      .catch((error) => logError('applySessionSettings', error));
   }
 });
 
@@ -477,8 +497,9 @@ async function init() {
   searchInputField.addEventListener('input', (e) => filterList(e.target.value));
 
   try {
-    const obj = await browser.storage.local.get('pile-theme');
+    const obj = await browser.storage.local.get(['pile-theme', 'pile-session-enabled', 'pile-session-gap-hours']);
     if (obj['pile-theme']) changeTheme(obj['pile-theme']);
+    applySessionSettings(obj);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
     fullRebuild(response.bookmarks);
