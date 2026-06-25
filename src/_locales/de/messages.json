@@ -44,6 +44,9 @@
   "deleteBookmark": {
     "message": "Lesezeichen löschen"
   },
+  "openInTab": {
+    "message": "Bereits geöffnet — klicken, um dorthin zu wechseln"
+  },
   "markForDeletion": {
     "message": "Lesezeichen auswählen"
   },

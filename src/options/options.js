@@ -10,6 +10,8 @@ function updateOptionMenus() {
     const gapInput = document.querySelector('#input-session-gap');
     gapInput.value = result['pile-session-gap-hours'] || DEFAULT_SESSION_GAP_HOURS;
     gapInput.disabled = !enabled;
+
+    document.querySelector('#checkbox-open-in-new-tab').checked = result['pile-open-in-new-tab'] !== false; // on by default
   }
 
   function onError(error) {
@@ -17,7 +19,7 @@ function updateOptionMenus() {
   }
 
   browser.storage.local
-    .get(['pile-theme', 'pile-folder-name', 'pile-session-enabled', 'pile-session-gap-hours'])
+    .get(['pile-theme', 'pile-folder-name', 'pile-session-enabled', 'pile-session-gap-hours', 'pile-open-in-new-tab'])
     .then(setCurrentChoice, onError);
 }
 
@@ -40,6 +42,10 @@ function setSessionGap() {
   if (hours > 168) hours = 168;
   input.value = hours;
   browser.storage.local.set({ 'pile-session-gap-hours': hours });
+}
+
+function setOpenInNewTab() {
+  browser.storage.local.set({ 'pile-open-in-new-tab': document.querySelector('#checkbox-open-in-new-tab').checked });
 }
 
 async function saveFolderName() {
@@ -70,4 +76,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#btn-save-folder-name').addEventListener('click', saveFolderName);
   document.querySelector('#checkbox-session-enabled').addEventListener('change', setSessionEnabled);
   document.querySelector('#input-session-gap').addEventListener('change', setSessionGap);
+  document.querySelector('#checkbox-open-in-new-tab').addEventListener('change', setOpenInNewTab);
 });

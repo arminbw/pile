@@ -11,6 +11,10 @@ let addBookmarkButton;
 
 let cleanupMode = false;
 let optimisticElement = null;
+let optimisticTabId, optimisticWindowId;
+
+let myWindowId;
+let openInNewTab = true; // default matches current confirmed behavior; overwritten in init()
 
 
 /* ------------------------------------------------ */
@@ -20,6 +24,116 @@ let optimisticElement = null;
 function logError(functionName, error) {
   console.error(`Pile panel error: ${functionName}, ${error}`);
 }
+
+
+/* ------------------------------------------------ */
+// Tab tracking — bookmarks already open in one of this window's tabs
+/* ------------------------------------------------ */
+
+let trackedTabs = new Map();        // bookmarkId -> { tabId, windowId }
+let tabIdToBookmarkId = new Map();  // tabId -> bookmarkId  (reverse lookup for cleanup)
+
+function trackTab(bookmarkId, tabId, windowId) {
+  trackedTabs.set(bookmarkId, { tabId, windowId });
+  tabIdToBookmarkId.set(tabId, bookmarkId);
+}
+
+// Used whenever a tabId stops being "ours": tab closed, navigated away, detached to
+// another window, or about to be claimed for a different bookmark.
+function untrackByTabId(tabId) {
+  const bookmarkId = tabIdToBookmarkId.get(tabId);
+  if (!bookmarkId) return;
+  tabIdToBookmarkId.delete(tabId);
+  trackedTabs.delete(bookmarkId);
+  getBookmarkElement(bookmarkId)?.classList.remove('is-open');
+}
+
+// Used when the bookmark itself goes away or its URL changes underneath the tracked tab.
+function untrackByBookmarkId(bookmarkId) {
+  const tracked = trackedTabs.get(bookmarkId);
+  if (!tracked) return;
+  trackedTabs.delete(bookmarkId);
+  tabIdToBookmarkId.delete(tracked.tabId);
+  getBookmarkElement(bookmarkId)?.classList.remove('is-open');
+}
+
+function normalizeUrl(url) {
+  if (!url) return url;
+  try {
+    const u = new URL(url);
+    u.hash = '';
+    return u.toString().replace(/\/$/, '');
+  } catch {
+    return url;
+  }
+}
+
+async function seedTrackedTabs(bookmarks) {
+  const tabs = await browser.tabs.query({ windowId: myWindowId });
+  const tabByUrl = new Map(); // normalizedUrl -> tab; first match wins if duplicates are open
+  for (const tab of tabs) {
+    const key = normalizeUrl(tab.url);
+    if (!tabByUrl.has(key)) tabByUrl.set(key, tab);
+  }
+  for (const bookmark of bookmarks) {
+    const tab = tabByUrl.get(normalizeUrl(bookmark.url));
+    if (tab) trackTab(bookmark.id, tab.id, tab.windowId);
+  }
+}
+
+async function openBookmarkUrl(url) {
+  if (openInNewTab) {
+    return browser.tabs.create({ url, windowId: myWindowId, active: true });
+  }
+  const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+  return browser.tabs.update(activeTab.id, { url });
+}
+
+async function openOrFocusBookmark(li) {
+  const bookmarkId = li.dataset.bookmarkid;
+  const tracked = trackedTabs.get(bookmarkId);
+
+  if (tracked) {
+    try {
+      await browser.tabs.update(tracked.tabId, { active: true });
+      const win = await browser.windows.get(tracked.windowId);
+      await browser.windows.update(tracked.windowId, {
+        focused: true,
+        ...(win.state === 'minimized' ? { state: 'normal' } : {}),
+      });
+      return;
+    } catch {
+      // tab/window no longer exists; fall through and open below
+      untrackByTabId(tracked.tabId);
+    }
+  }
+
+  const tab = await openBookmarkUrl(li.dataset.url);
+  untrackByTabId(tab.id); // evicts a stale owner when openInNewTab is false; no-op otherwise
+  trackTab(bookmarkId, tab.id, tab.windowId);
+  li.classList.add('is-open');
+}
+
+browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  if (removeInfo.windowId !== myWindowId) return;
+  untrackByTabId(tabId);
+});
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tab.windowId !== myWindowId || !changeInfo.url) return;
+  const bookmarkId = tabIdToBookmarkId.get(tabId);
+  if (!bookmarkId) return;
+  const li = getBookmarkElement(bookmarkId);
+  if (normalizeUrl(changeInfo.url) === normalizeUrl(li?.dataset.url)) return; // same page (hash/trailing-slash change)
+  untrackByTabId(tabId);
+});
+
+// Tab dragged to another window: once detached, this tab is no longer "ours" —
+// the destination window's panel (if any) has no record of it either, so just drop tracking.
+browser.tabs.onDetached.addListener((tabId, detachInfo) => {
+  if (detachInfo.oldWindowId !== myWindowId) return;
+  untrackByTabId(tabId);
+});
 
 
 /* ------------------------------------------------ */
@@ -33,10 +147,14 @@ function renderBookmark(bookmark) {
   li.setAttribute('data-title', bookmark.title.toLowerCase());
   li.setAttribute('data-url', bookmark.url);
   li.setAttribute('title', bookmark.title);
+  if (trackedTabs.has(bookmark.id)) li.classList.add('is-open');
   let a = document.createElement('a');
   a.classList.add('link');
   a.setAttribute('href', bookmark.url);
   a.appendChild(document.createTextNode(bookmark.title));
+  let openIndicator = document.createElement('span');
+  openIndicator.classList.add('open-indicator');
+  openIndicator.setAttribute('title', browser.i18n.getMessage('openInTab'));
   let button = document.createElement('button');
   button.classList.add('delete-button');
   button.setAttribute('data-functionname', 'deletebookmark');
@@ -50,6 +168,7 @@ function renderBookmark(bookmark) {
   checkbox.setAttribute('type', 'checkbox');
   checkboxBorderWrapper.appendChild(checkbox);
   li.appendChild(a);
+  li.appendChild(openIndicator);
   li.appendChild(button);
   li.appendChild(checkboxBorderWrapper);
   return li;
@@ -60,13 +179,21 @@ function renderBookmark(bookmark) {
 // Bookmark event listeners
 /* ------------------------------------------------ */
 
-browser.bookmarks.onCreated.addListener((id, bookmark) => {
+browser.bookmarks.onCreated.addListener(async (id, bookmark) => {
   if (bookmark.parentId !== pileFolderId) return;
   if (!bookmark.url) return;
   if (optimisticElement && bookmark.url === optimisticElement.dataset.url) {
     optimisticElement.setAttribute('data-bookmarkid', id);
-    optimisticElement = null;
+    if (optimisticTabId) {
+      trackTab(id, optimisticTabId, optimisticWindowId);
+      optimisticElement.classList.add('is-open');
+    }
+    optimisticElement = optimisticTabId = optimisticWindowId = undefined;
   } else {
+    const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (activeTab && normalizeUrl(activeTab.url) === normalizeUrl(bookmark.url)) {
+      trackTab(id, activeTab.id, activeTab.windowId);
+    }
     sidebarBookmarkList.prepend(renderBookmark(bookmark));
   }
 });
@@ -74,11 +201,14 @@ browser.bookmarks.onCreated.addListener((id, bookmark) => {
 browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (id === pileFolderId) {
     pileFolderId = null;
+    trackedTabs.clear();
+    tabIdToBookmarkId.clear();
     fullRebuild([]);
     return;
   }
   if (removeInfo.parentId !== pileFolderId) return;
   getBookmarkElement(id)?.remove();
+  untrackByBookmarkId(id);
   if (cleanupMode) updateCleanupCounter();
 });
 
@@ -93,6 +223,7 @@ browser.bookmarks.onChanged.addListener((id, changeInfo) => {
   if (changeInfo.url) {
     li.setAttribute('data-url', changeInfo.url);
     li.querySelector('.link').setAttribute('href', changeInfo.url);
+    untrackByBookmarkId(id);
   }
 });
 
@@ -103,6 +234,7 @@ browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
 
   const li = getBookmarkElement(id);
   li?.remove();
+  if (oldParentWasPile && !newParentIsPile) untrackByBookmarkId(id); // left the Pile folder entirely
 
   if (newParentIsPile) {
     const el = li ?? renderBookmark((await browser.bookmarks.get(id))[0]);
@@ -195,6 +327,9 @@ browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-theme']?.newValue) {
     changeTheme(changes['pile-theme'].newValue);
   }
+  if (changes['pile-open-in-new-tab']) {
+    openInNewTab = changes['pile-open-in-new-tab'].newValue !== false;
+  }
   if (changes['pile-session-enabled'] || changes['pile-session-gap-hours']) {
     applySessionSettings({
       'pile-session-enabled': changes['pile-session-enabled']?.newValue,
@@ -281,6 +416,8 @@ async function addBookmark() {
     return;
   }
   optimisticElement = renderBookmark({ id: '', url: tab.url, title: tab.title });
+  optimisticTabId = tab.id;
+  optimisticWindowId = tab.windowId;
   sidebarBookmarkList.prepend(optimisticElement);
   playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
   try {
@@ -288,7 +425,7 @@ async function addBookmark() {
   } catch(error) {
     logError('addBookmark', error);
     optimisticElement.remove();
-    optimisticElement = null;
+    optimisticElement = optimisticTabId = optimisticWindowId = undefined;
     playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
   }
 }
@@ -432,6 +569,13 @@ async function init() {
   document.head.appendChild(searchStyle);
 
   contentArea.addEventListener('click', (event) => {
+    const linkEl = event.target.closest('.link');
+    if (linkEl && event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      event.preventDefault();
+      openOrFocusBookmark(linkEl.closest('li')).catch(error => logError('openOrFocusBookmark', error));
+      return;
+    }
+
     const fn = event.target.closest('[data-functionname]')?.dataset.functionname;
     switch (fn) {
       case 'addbookmark':
@@ -497,11 +641,14 @@ async function init() {
   searchInputField.addEventListener('input', (e) => filterList(e.target.value));
 
   try {
-    const obj = await browser.storage.local.get(['pile-theme', 'pile-session-enabled', 'pile-session-gap-hours']);
+    myWindowId = (await browser.windows.getCurrent()).id;
+    const obj = await browser.storage.local.get(['pile-theme', 'pile-open-in-new-tab', 'pile-session-enabled', 'pile-session-gap-hours']);
     if (obj['pile-theme']) changeTheme(obj['pile-theme']);
+    openInNewTab = obj['pile-open-in-new-tab'] !== false;
     applySessionSettings(obj);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
+    await seedTrackedTabs(response.bookmarks);
     fullRebuild(response.bookmarks);
   } catch (error) {
     logError('init', error);

@@ -59,6 +59,10 @@
     "message": "Delete Bookmark",
     "description": "remove bookmark"
   },
+  "openInTab": {
+    "message": "Already open — click to switch to it",
+    "description": "Tooltip on the indicator shown when a bookmark is already open in a tab"
+  },
   "markForDeletion": {
     "message": "Mark for deletion",
     "description": "Mark bookmark for cleanup"

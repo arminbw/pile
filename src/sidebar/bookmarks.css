@@ -154,6 +154,20 @@ a.link, a.link:visited {
   }
 }
 
+span.open-indicator {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+li.bookmark.is-open span.open-indicator {
+  display: block;
+  background-color: var(--color-active);
+}
+
 button.delete-button {
   z-index: 1;
   display: block;
