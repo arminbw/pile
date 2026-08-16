@@ -165,14 +165,18 @@ const T = 1_700_000_000_000; // arbitrary fixed "now", newest bookmark first
 // Two sessions, then a lone save, then a third session. Between-session gaps are
 // whole days so the fixture splits the same way regardless of the exact SESSION_GAP_MS
 // threshold; within a session the saves are only a minute apart.
+// The alternation is anchored at the BOTTOM: the oldest qualifying session keeps the
+// default shade and the flips walk upward, so new sessions at the top never recolor
+// existing blocks.
 // Expected shading (session-b = the alternate grey):
-//   session 1 (idx 0,1)  → default      (no class)
-//   session 2 (idx 2,3)  → session-b
-//   lone save (idx 4)    → session-b    (absorbed into the block above, no flip)
-//   session 3 (idx 5,6)  → default      (flips back)
-// Expected session-end (darker divider on the bottom row of each shaded block, so the
-// absorbed lone save at idx 4 is the end of the session-b block, not idx 3):
-//   idx 1, 4, 6
+//   session 1 (idx 0,1)  → default      (flipped again)
+//   session 2 (idx 2,3)  → session-b    (flipped once)
+//   lone save (idx 4)    → default      (absorbed into the block below, no flip)
+//   session 3 (idx 5,6)  → default      (oldest block anchors the default shade)
+// Expected session-end (darker divider on the bottom row of each shaded block; the
+// absorbed lone save at idx 4 belongs to the bottom block, so the session-b block
+// ends at idx 3):
+//   idx 1, 3, 6
 const SESSIONED = [
   { id: '1', title: 'A1', url: 'https://a1.com', parentId: FOLDER_ID, dateAdded: T },
   { id: '2', title: 'A2', url: 'https://a2.com', parentId: FOLDER_ID, dateAdded: T - 60_000 },
@@ -183,18 +187,33 @@ const SESSIONED = [
   { id: '7', title: 'C2', url: 'https://c2.com', parentId: FOLDER_ID, dateAdded: T - 6 * DAY - 60_000 },
 ];
 
-test('alternating sessions shade with isolated saves absorbed into the block above', async () => {
+test('alternating sessions shade with isolated saves absorbed into the block below', async () => {
   await initPanel(SESSIONED);
   const shaded = [...document.querySelectorAll('li.bookmark')]
     .map(li => li.classList.contains('session-b'));
-  expect(shaded).toEqual([false, false, true, true, true, false, false]);
+  expect(shaded).toEqual([false, false, true, true, false, false, false]);
 });
 
 test('the last bookmark of each session is marked session-end', async () => {
   await initPanel(SESSIONED);
   const ends = [...document.querySelectorAll('li.bookmark')]
     .map(li => li.classList.contains('session-end'));
-  expect(ends).toEqual([false, true, false, false, true, false, true]);
+  expect(ends).toEqual([false, true, false, true, false, false, true]);
+});
+
+// Guards the anchor choice itself: a brand-new session appearing at the top must take
+// the next shade in the sequence while every block the user already knows keeps its
+// color. (Anchored at the top instead, a new session would recolor everything below.)
+test('a new session on top leaves the shades of all existing blocks unchanged', async () => {
+  const NEW_SESSION = [
+    { id: '8', title: 'N1', url: 'https://n1.com', parentId: FOLDER_ID, dateAdded: T + 2 * DAY },
+    { id: '9', title: 'N2', url: 'https://n2.com', parentId: FOLDER_ID, dateAdded: T + 2 * DAY - 60_000 },
+  ];
+  await initPanel([...NEW_SESSION, ...SESSIONED]);
+  const shaded = [...document.querySelectorAll('li.bookmark')]
+    .map(li => li.classList.contains('session-b'));
+  expect(shaded.slice(2)).toEqual([false, false, true, true, false, false, false]); // as in the fixture test
+  expect(shaded.slice(0, 2)).toEqual([true, true]); // the newcomer takes the next shade
 });
 
 test('sessions disabled in settings leaves no shading or dividers', async () => {
@@ -228,9 +247,9 @@ test('search flattens the session shading via is-filtered on the list', async ()
 });
 
 
-// --- tab tracking: clicking a bookmark ---
+// --- opening bookmarks ---
 
-test('clicking an untracked bookmark opens it in a new foreground tab and marks it open', async () => {
+test('clicking a bookmark that is not open anywhere opens it in a new foreground tab', async () => {
   await initPanel();
 
   clickLink('li.bookmark[data-bookmarkid="1"] .link');
@@ -240,11 +259,10 @@ test('clicking an untracked bookmark opens it in a new foreground tab and marks 
   expect(tabs).toHaveLength(1);
   expect(tabs[0].url).toBe('https://a.com');
   expect(tabs[0].active).toBe(true);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(true);
 });
 
-test('with "open in new tab" off, clicking an untracked bookmark replaces the active tab instead', async () => {
-  await browser.storage.local.set({ 'pile-open-in-new-tab': false });
+test('with "open in active tab" on, clicking a bookmark replaces the active tab instead', async () => {
+  await browser.storage.local.set({ 'pile-open-in-active-tab': true });
   browser.seedTab({ url: 'https://current.com', active: true });
   await initPanel();
 
@@ -254,63 +272,13 @@ test('with "open in new tab" off, clicking an untracked bookmark replaces the ac
   const tabs = await browser.tabs.query({});
   expect(tabs).toHaveLength(1); // no new tab created — the seeded active tab was reused
   expect(tabs[0].url).toBe('https://a.com');
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(true);
 });
 
-test('clicking an already-open bookmark focuses its tab and window instead of opening a new one', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-  await browser.tabs.update(tab.id, { active: false });
-
-  const updateWindowSpy = vi.fn(browser.windows.update);
-  browser.windows.update = updateWindowSpy;
-
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-
-  expect(updateWindowSpy).toHaveBeenCalledWith(tab.windowId, { focused: true });
-  const tabsAfter = await browser.tabs.query({});
-  expect(tabsAfter).toHaveLength(1); // still just the one tab
-  expect(tabsAfter[0].active).toBe(true);
-});
-
-test('clicking two different untracked bookmarks opens two separate tabs, both tracked independently', async () => {
-  await initPanel();
-
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  clickLink('li.bookmark[data-bookmarkid="2"] .link');
-  await flushPromises();
-
-  expect(await browser.tabs.query({})).toHaveLength(2);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(true);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('is-open')).toBe(true);
-});
-
-test('with "open in new tab" off, clicking a second bookmark from the same tab untracks the first', async () => {
-  await browser.storage.local.set({ 'pile-open-in-new-tab': false });
-  browser.seedTab({ url: 'https://current.com', active: true });
-  await initPanel();
-
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(true);
-
-  clickLink('li.bookmark[data-bookmarkid="2"] .link');
-  await flushPromises();
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('is-open')).toBe(true);
-  expect(await browser.tabs.query({})).toHaveLength(1); // same tab reused both times
-});
-
-test('toggling the new-tab setting live changes behavior on the next click', async () => {
+test('toggling the active-tab setting live changes behavior on the next click', async () => {
   await initPanel();
   browser.seedTab({ url: 'https://current.com', active: true });
 
-  await browser.storage.local.set({ 'pile-open-in-new-tab': false });
+  await browser.storage.local.set({ 'pile-open-in-active-tab': true });
   clickLink('li.bookmark[data-bookmarkid="1"] .link');
   await flushPromises();
 
@@ -319,45 +287,136 @@ test('toggling the new-tab setting live changes behavior on the next click', asy
   expect(tabs[0].url).toBe('https://a.com');
 });
 
-test('jumping to a tracked bookmark in a minimized window restores it', async () => {
+test('clicking a bookmark already open in this window focuses that tab instead of duplicating it', async () => {
+  const open = browser.seedTab({ url: 'https://b.com', active: false });
+  browser.seedTab({ url: 'https://current.com', active: true });
   await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-  await browser.windows.update(tab.windowId, { state: 'minimized' });
 
-  const updateWindowSpy = vi.fn(browser.windows.update);
-  browser.windows.update = updateWindowSpy;
-
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  clickLink('li.bookmark[data-bookmarkid="2"] .link');
   await flushPromises();
 
-  expect(updateWindowSpy).toHaveBeenCalledWith(tab.windowId, { focused: true, state: 'normal' });
+  expect(browser.stats.tabs.create).toBe(0);
+  expect((await browser.tabs.get(open.id)).active).toBe(true);
 });
 
-test('jumping to a tracked bookmark in a normal window does not touch window state', async () => {
+// With "open in active tab" on, the setting wins: the page loads in the active tab
+// even if it is already open elsewhere. No duplicate check runs in this mode —
+// reusing the active tab never adds a tab, and the user asked to stay put.
+test('with "open in active tab" on, an already-open page still loads in the active tab', async () => {
+  await browser.storage.local.set({ 'pile-open-in-active-tab': true });
+  const open = browser.seedTab({ url: 'https://b.com', active: false });
+  const active = browser.seedTab({ url: 'https://current.com', active: true });
   await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
 
-  const updateWindowSpy = vi.fn(browser.windows.update);
-  browser.windows.update = updateWindowSpy;
-
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  clickLink('li.bookmark[data-bookmarkid="2"] .link');
   await flushPromises();
 
-  expect(updateWindowSpy).toHaveBeenCalledWith(tab.windowId, { focused: true });
+  expect((await browser.tabs.get(active.id)).url).toBe('https://b.com'); // loaded here
+  expect((await browser.tabs.get(active.id)).active).toBe(true);         // focus stays put
+  expect((await browser.tabs.get(open.id)).active).toBe(false);
+  expect(browser.stats.tabs.create).toBe(0);
 });
 
-test('ctrl-click on a bookmark does not intercept or track it', async () => {
+test('a tab in a different window is not treated as a match', async () => {
+  browser.seedTab({ url: 'https://b.com', windowId: 99 });
+  await initPanel();
+
+  clickLink('li.bookmark[data-bookmarkid="2"] .link');
+  await flushPromises();
+
+  expect(browser.stats.tabs.create).toBe(1); // opened here rather than jumping windows
+});
+
+test('duplicate open tabs for the same URL focus one of them without opening another', async () => {
+  browser.seedTab({ id: 501, url: 'https://b.com' });
+  browser.seedTab({ id: 502, url: 'https://b.com' });
+  await initPanel();
+
+  clickLink('li.bookmark[data-bookmarkid="2"] .link');
+  await flushPromises();
+
+  expect(browser.stats.tabs.create).toBe(0);
+  const active = (await browser.tabs.query({ active: true })).map(t => t.id);
+  expect(active).toHaveLength(1);
+  expect([501, 502]).toContain(active[0]);
+});
+
+test('a tab with no URL at all does not break matching', async () => {
+  browser.seedTab({ url: undefined });
+  await initPanel();
+
+  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  await flushPromises();
+
+  expect(browser.stats.tabs.create).toBe(1);
+});
+
+
+// --- URL matching ---
+//
+// normalizeUrl is internal to panel.js (loaded as a classic script, so nothing is exported),
+// so both tables exercise it through the behaviour that depends on it: a match reuses the
+// open tab, a non-match opens a new one.
+
+test.each([
+  ['identical',            'https://example.com/article', 'https://example.com/article'],
+  ['trailing slash',       'https://example.com/article', 'https://example.com/article/'],
+  ['slash before a query', 'https://example.com/article?page=2', 'https://example.com/article/?page=2'],
+  ['fragment',             'https://example.com/article', 'https://example.com/article#part-2'],
+  ['http vs https',        'http://example.com/article',  'https://example.com/article'],
+  ['www prefix',           'https://example.com/article', 'https://www.example.com/article'],
+  ['host casing',          'https://example.com/article', 'https://EXAMPLE.com/article'],
+  ['utm params',           'https://example.com/article', 'https://example.com/article?utm_source=rss'],
+  ['fbclid',               'https://example.com/article', 'https://example.com/article?fbclid=abc123'],
+  ['query order',          'https://example.com/a?x=1&y=2', 'https://example.com/a?y=2&x=1'],
+])('treats %s as the same page and reuses the open tab', async (_label, bookmarkUrl, tabUrl) => {
+  const open = browser.seedTab({ url: tabUrl });
+  await initPanel([{ id: '1', title: 'Page', url: bookmarkUrl, parentId: FOLDER_ID }]);
+
+  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  await flushPromises();
+
+  expect(browser.stats.tabs.create).toBe(0);
+  expect((await browser.tabs.get(open.id)).active).toBe(true);
+});
+
+test.each([
+  ['a different path',     'https://example.com/article', 'https://example.com/other'],
+  ['a different host',     'https://example.com/article', 'https://example.org/article'],
+  ['a subdomain',          'https://example.com/article', 'https://blog.example.com/article'],
+  ['a meaningful param',   'https://example.com/a?page=1', 'https://example.com/a?page=2'],
+  ['a missing param',      'https://example.com/a?page=1', 'https://example.com/a'],
+])('treats %s as a different page and opens a new tab', async (_label, bookmarkUrl, tabUrl) => {
+  browser.seedTab({ url: tabUrl });
+  await initPanel([{ id: '1', title: 'Page', url: bookmarkUrl, parentId: FOLDER_ID }]);
+
+  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  await flushPromises();
+
+  expect(browser.stats.tabs.create).toBe(1);
+});
+
+// The normalized form is a comparison key only — what actually opens is the raw bookmark URL.
+test('opens the bookmark URL verbatim rather than its normalized form', async () => {
+  await initPanel([{ id: '1', title: 'Page', url: 'http://www.example.com/a/', parentId: FOLDER_ID }]);
+
+  clickLink('li.bookmark[data-bookmarkid="1"] .link');
+  await flushPromises();
+
+  const [tab] = await browser.tabs.query({});
+  expect(tab.url).toBe('http://www.example.com/a/');
+});
+
+
+// --- click interception ---
+
+test('ctrl-click on a bookmark is left to the browser', async () => {
   await initPanel();
 
   clickLink('li.bookmark[data-bookmarkid="1"] .link', { ctrlKey: true });
   await flushPromises();
 
   expect(await browser.tabs.query({})).toHaveLength(0);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
 });
 
 test('a non-primary-button click does not intercept', async () => {
@@ -369,157 +428,3 @@ test('a non-primary-button click does not intercept', async () => {
   expect(await browser.tabs.query({})).toHaveLength(0);
 });
 
-test('the open-indicator element carries the i18n tooltip', async () => {
-  await initPanel();
-
-  const indicator = document.querySelector('li.bookmark[data-bookmarkid="1"] .open-indicator');
-  expect(indicator).not.toBeNull();
-  expect(indicator.title).toBe('openInTab');
-});
-
-
-// --- tab tracking: liveness ---
-
-test('closing a tracked tab clears its open indicator', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-
-  await browser.tabs.remove(tab.id);
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-});
-
-test('dragging a tracked tab to another window clears its open indicator', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-
-  await browser.tabs.onDetached.trigger(tab.id, { oldWindowId: tab.windowId, oldPosition: 0 });
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-});
-
-test('navigating a tracked tab to a different URL clears its open indicator', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-
-  await browser.tabs.update(tab.id, { url: 'https://elsewhere.com' });
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-});
-
-test('navigating within the same page (hash change) keeps the open indicator', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-  const [tab] = await browser.tabs.query({});
-
-  await browser.tabs.update(tab.id, { url: 'https://a.com/#section' });
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(true);
-});
-
-
-// --- tab tracking: bookmark creation, removal, edit, move ---
-
-test('bookmarking the active tab via the + button marks it open immediately (optimistic path)', async () => {
-  await initPanel();
-  browser.tabs.query = async () => [{ id: 99, windowId: 1, url: 'https://new.com', title: 'New Page', active: true }];
-
-  click('[data-functionname="addbookmark"]');
-  await flushPromises();
-
-  const newLi = document.querySelector('li.bookmark[data-bookmarkid="new-id"]');
-  expect(newLi.classList.contains('is-open')).toBe(true);
-});
-
-test('a bookmark created externally for the active tab is marked open (non-optimistic path)', async () => {
-  await initPanel();
-  browser.tabs.query = async () => [{ id: 42, windowId: 1, url: 'https://external.com', title: 'External', active: true }];
-
-  await browser.bookmarks.onCreated.trigger('ext-id', { id: 'ext-id', url: 'https://external.com', title: 'External', parentId: FOLDER_ID });
-  await flushPromises();
-
-  const newLi = document.querySelector('li.bookmark[data-bookmarkid="ext-id"]');
-  expect(newLi).not.toBeNull();
-  expect(newLi.classList.contains('is-open')).toBe(true);
-});
-
-test('changing a tracked bookmark\'s URL clears its open indicator', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-
-  await browser.bookmarks.onChanged.trigger('1', { url: 'https://changed.com' });
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-});
-
-test('removing the entire Pile folder clears the list including any open indicators', async () => {
-  await initPanel();
-  clickLink('li.bookmark[data-bookmarkid="1"] .link');
-  await flushPromises();
-
-  await browser.bookmarks.onRemoved.trigger(FOLDER_ID, {});
-
-  expect(document.querySelectorAll('li.bookmark')).toHaveLength(0);
-});
-
-test('moving a tracked bookmark out of the Pile folder clears its open indicator, even after moving back in', async () => {
-  const folder = browser.seed({ title: 'Pile', type: 'folder' });
-  const otherFolder = browser.seed({ title: 'Other' });
-  const bookmark = browser.seed({ title: 'Page A', url: 'https://a.com', parentId: folder.id });
-
-  browser.runtime.sendMessage = async (msg) => {
-    if (msg.type === 'GET_BOOKMARKS_AND_FOLDERID') {
-      const tree = await browser.bookmarks.getSubTree(folder.id);
-      return { bookmarks: tree[0].children ?? [], folderId: folder.id };
-    }
-  };
-  await import('../src/sidebar/panel.js');
-  await flushPromises();
-
-  clickLink(`li.bookmark[data-bookmarkid="${bookmark.id}"] .link`);
-  await flushPromises();
-  expect(document.querySelector(`li.bookmark[data-bookmarkid="${bookmark.id}"]`).classList.contains('is-open')).toBe(true);
-
-  await browser.bookmarks.onMoved.trigger(bookmark.id, { parentId: otherFolder.id, oldParentId: folder.id, index: 0, oldIndex: 0 });
-  expect(document.querySelector(`li.bookmark[data-bookmarkid="${bookmark.id}"]`)).toBeNull();
-
-  await browser.bookmarks.onMoved.trigger(bookmark.id, { parentId: folder.id, oldParentId: otherFolder.id, index: 0, oldIndex: 0 });
-
-  const restored = document.querySelector(`li.bookmark[data-bookmarkid="${bookmark.id}"]`);
-  expect(restored).not.toBeNull();
-  expect(restored.classList.contains('is-open')).toBe(false);
-});
-
-
-// --- tab tracking: startup seeding ---
-
-test('a bookmark whose URL is already open in this window is marked open on init', async () => {
-  browser.seedTab({ url: 'https://b.com', windowId: 1 });
-  await initPanel();
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('is-open')).toBe(true);
-  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('is-open')).toBe(false);
-});
-
-test('a tab in a different window is not considered open on init', async () => {
-  browser.seedTab({ url: 'https://b.com', windowId: 99 });
-  await initPanel();
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('is-open')).toBe(false);
-});
-
-test('duplicate open tabs for the same URL still result in exactly one tracked match, no crash', async () => {
-  browser.seedTab({ id: 501, url: 'https://b.com', windowId: 1 });
-  browser.seedTab({ id: 502, url: 'https://b.com', windowId: 1 });
-  await initPanel();
-
-  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('is-open')).toBe(true);
-});

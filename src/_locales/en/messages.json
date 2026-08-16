@@ -59,10 +59,6 @@
     "message": "Delete Bookmark",
     "description": "remove bookmark"
   },
-  "openInTab": {
-    "message": "Already open — click to switch to it",
-    "description": "Tooltip on the indicator shown when a bookmark is already open in a tab"
-  },
   "markForDeletion": {
     "message": "Mark for deletion",
     "description": "Mark bookmark for cleanup"
@@ -74,5 +70,55 @@
   "search": {
     "message": "Show/Hide Search",
     "description": "Filter bookmarks by title"
+  },
+  "optionsTitle": {
+    "message": "Pile Settings",
+    "description": "Title of the options page"
+  },
+  "optionTheme": {
+    "message": "Theme",
+    "description": "Label of the sidebar color scheme option"
+  },
+  "optionThemeLight": {
+    "message": "light",
+    "description": "Theme dropdown entry"
+  },
+  "optionThemeDark": {
+    "message": "dark",
+    "description": "Theme dropdown entry"
+  },
+  "optionFolderName": {
+    "message": "Folder name",
+    "description": "Label of the bookmark folder rename option"
+  },
+  "optionRename": {
+    "message": "Rename",
+    "description": "Button that renames the bookmark folder"
+  },
+  "optionShowSessions": {
+    "message": "Show sessions",
+    "description": "Checkbox label: visually group bookmarks saved around the same time"
+  },
+  "optionSessionGap": {
+    "message": "hours apart starts a new session",
+    "description": "Follows a number input: '[2] hours apart starts a new session'"
+  },
+  "optionOpenInActiveTab": {
+    "message": "Open in active tab",
+    "description": "Checkbox label: open bookmarks in the active tab instead of a new one"
+  },
+  "folderRenamed": {
+    "message": "Folder renamed to \"$NAME$\".",
+    "description": "Feedback after renaming the bookmark folder",
+    "placeholders": {
+      "name": { "content": "$1", "example": "Reading List" }
+    }
+  },
+  "folderExists": {
+    "message": "A folder named \"$NAME$\" already exists.",
+    "description": "Feedback when the new folder name collides with an existing folder",
+    "placeholders": {
+      "name": { "content": "$1", "example": "Reading List" }
+    }
   }
 }

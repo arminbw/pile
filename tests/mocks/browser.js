@@ -1,3 +1,29 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+// The real English messages, so tests can assert actual UI strings and the
+// placeholder substitution is exercised the way Firefox performs it.
+// Resolved from the project root, like the HTML fixtures in the test files.
+const i18nMessages = JSON.parse(
+  readFileSync(resolve('src/_locales/en/messages.json'), 'utf-8')
+);
+
+// Mirrors browser.i18n.getMessage: resolves the key in the en locale and fills
+// $NAME$ placeholders from the substitutions ($1 = first substitution, ...).
+// Unknown keys return the key itself (Firefox returns '', but the key makes
+// broken lookups visible in test failures instead of silently blank).
+function getMessage(key, substitutions = []) {
+  const entry = i18nMessages[key];
+  if (!entry) return key;
+  const subs = Array.isArray(substitutions) ? substitutions : [substitutions];
+  let message = entry.message;
+  for (const [name, def] of Object.entries(entry.placeholders ?? {})) {
+    const index = parseInt(def.content.slice(1), 10) - 1;
+    message = message.replace(new RegExp(`\\$${name}\\$`, 'gi'), subs[index] ?? '');
+  }
+  return message;
+}
+
 export function createBrowserMock() {
   // Single in-memory bookmarkStore shared across all bookmark API methods.
   // Every entry is keyed by its string id and carries { id, parentId, index, title, url?, type? }.
@@ -16,7 +42,7 @@ export function createBrowserMock() {
   const stats = {
     messages: 0,
     bookmarks: { create: 0, remove: 0, update: 0, get: 0, search: 0, getSubTree: 0 },
-    tabs: { create: 0, update: 0, remove: 0 },
+    tabs: { create: 0, update: 0 },
   };
 
   const messageListeners = [];
@@ -25,9 +51,6 @@ export function createBrowserMock() {
   const onChangedListeners = [];
   const onMovedListeners = [];
   const onStorageChangedListeners = [];
-  const onTabRemovedListeners = [];
-  const onTabUpdatedListeners = [];
-  const onTabDetachedListeners = [];
   const storageData = {};
 
   // Returns an { addListener, trigger } pair so tests can both register listeners
@@ -65,18 +88,9 @@ export function createBrowserMock() {
     return tab;
   }
 
-  // Add/update a window's state (e.g. 'minimized') without firing any events.
-  function seedWindow(entry) {
-    const id = entry.id ?? DEFAULT_WINDOW_ID;
-    const window = { id, state: entry.state ?? 'normal' };
-    windowStore.set(id, window);
-    return window;
-  }
-
   const mock = {
     seed,
     seedTab,
-    seedWindow,
     stats,
 
     runtime: {
@@ -173,15 +187,6 @@ export function createBrowserMock() {
     },
 
     tabs: {
-      onRemoved: makeEvent(onTabRemovedListeners),
-      onDetached: makeEvent(onTabDetachedListeners),
-
-      onUpdated: {
-        addListener: fn => onTabUpdatedListeners.push(fn),
-        trigger: (tabId, changeInfo, tab) =>
-          Promise.all(onTabUpdatedListeners.map(fn => fn(tabId, changeInfo, tab ?? tabStore.get(tabId)))),
-      },
-
       // Supports the filters this codebase actually uses: windowId, active, currentWindow.
       query: async (queryInfo = {}) => {
         let results = [...tabStore.values()];
@@ -217,36 +222,12 @@ export function createBrowserMock() {
           for (const t of tabStore.values()) if (t.windowId === tab.windowId) t.active = false;
         }
         Object.assign(tab, changes);
-        if (changes.url !== undefined) {
-          await Promise.all(onTabUpdatedListeners.map(fn => fn(tabId, { url: changes.url }, tab)));
-        }
         return tab;
-      },
-
-      remove: async (tabId) => {
-        stats.tabs.remove++;
-        const tab = tabStore.get(tabId);
-        if (!tab) return;
-        tabStore.delete(tabId);
-        await Promise.all(onTabRemovedListeners.map(fn => fn(tabId, { windowId: tab.windowId, isWindowClosing: false })));
       },
     },
 
     windows: {
       getCurrent: async () => windowStore.get(DEFAULT_WINDOW_ID),
-
-      get: async (windowId) => {
-        const window = windowStore.get(windowId);
-        if (!window) throw new Error(`No window with id: ${windowId}`);
-        return window;
-      },
-
-      update: async (windowId, changes) => {
-        const window = windowStore.get(windowId) ?? { id: windowId, state: 'normal' };
-        Object.assign(window, changes);
-        windowStore.set(windowId, window);
-        return window;
-      },
     },
 
     // Stubs — tests don't assert on badge or menu behavior.
@@ -280,8 +261,7 @@ export function createBrowserMock() {
       onChanged: makeEvent(onStorageChangedListeners),
     },
 
-    // i18n returns the key itself, so localized strings in the DOM equal their key names.
-    i18n:  { getMessage: key => key },
+    i18n: { getMessage },
   };
 
   return mock;

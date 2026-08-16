@@ -11,10 +11,9 @@ let addBookmarkButton;
 
 let cleanupMode = false;
 let optimisticElement = null;
-let optimisticTabId, optimisticWindowId;
 
 let myWindowId;
-let openInNewTab = true; // default matches current confirmed behavior; overwritten in init()
+let openInActiveTab = false; // off by default: bookmarks open in a new tab; overwritten in init()
 
 
 /* ------------------------------------------------ */
@@ -27,113 +26,82 @@ function logError(functionName, error) {
 
 
 /* ------------------------------------------------ */
-// Tab tracking — bookmarks already open in one of this window's tabs
+// Opening bookmarks
 /* ------------------------------------------------ */
+// How a click on a bookmark plays out:
+//   1. init() intercepts plain left-clicks on bookmark links. Modified clicks
+//      (ctrl/cmd/shift, non-primary buttons) keep their normal browser meaning.
+//   2. Unless the "open in active tab" option is on, openOrFocusBookmark()
+//      first looks through this window's tabs for one already showing the
+//      page, and switches to it instead of opening a duplicate.
+//   3. Otherwise the URL is opened: in a new tab by default, or in the active
+//      tab with the option on. Reusing the active tab never adds a tab, so
+//      that mode needs no duplicate check: the click simply loads the page here.
+//
+// There is deliberately no state here: no tab tracking, no tab listeners.
+// The browser already knows which tabs exist, so we ask it at the only moment
+// the answer matters — the moment of the click. Nothing can go stale.
+//
+// Known limitation: a page that redirects (link shortener, consent page, login)
+// leaves its tab on a URL that no longer matches the bookmark, so clicking that
+// bookmark opens a duplicate instead of finding the redirected tab.
 
-let trackedTabs = new Map();        // bookmarkId -> { tabId, windowId }
-let tabIdToBookmarkId = new Map();  // tabId -> bookmarkId  (reverse lookup for cleanup)
+// Query parameters that identify the visit rather than the page.
+// "utm_" matches as a prefix; the others must match the whole parameter name.
+const TRACKING_PARAM = /^(utm_|fbclid$|gclid$|mc_[ce]id$|ref$|ref_src$)/;
 
-function trackTab(bookmarkId, tabId, windowId) {
-  trackedTabs.set(bookmarkId, { tabId, windowId });
-  tabIdToBookmarkId.set(tabId, bookmarkId);
-}
-
-// Used whenever a tabId stops being "ours": tab closed, navigated away, detached to
-// another window, or about to be claimed for a different bookmark.
-function untrackByTabId(tabId) {
-  const bookmarkId = tabIdToBookmarkId.get(tabId);
-  if (!bookmarkId) return;
-  tabIdToBookmarkId.delete(tabId);
-  trackedTabs.delete(bookmarkId);
-  getBookmarkElement(bookmarkId)?.classList.remove('is-open');
-}
-
-// Used when the bookmark itself goes away or its URL changes underneath the tracked tab.
-function untrackByBookmarkId(bookmarkId) {
-  const tracked = trackedTabs.get(bookmarkId);
-  if (!tracked) return;
-  trackedTabs.delete(bookmarkId);
-  tabIdToBookmarkId.delete(tracked.tabId);
-  getBookmarkElement(bookmarkId)?.classList.remove('is-open');
-}
-
+// Two URLs can differ as text but still mean the same page: http vs https,
+// a "www." prefix, a #fragment, a trailing slash, tracking parameters, query
+// order. This boils a URL down to a comparison key with those differences
+// removed. The key is only ever compared — never opened, shown, or stored —
+// which is what makes the lossy rewriting safe. What actually gets opened is
+// always the raw bookmark URL.
 function normalizeUrl(url) {
   if (!url) return url;
   try {
     const u = new URL(url);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return url;
+    u.protocol = 'https:';
+    u.hostname = u.hostname.replace(/^www\./, '');
     u.hash = '';
-    return u.toString().replace(/\/$/, '');
-  } catch {
-    return url;
-  }
-}
-
-async function seedTrackedTabs(bookmarks) {
-  const tabs = await browser.tabs.query({ windowId: myWindowId });
-  const tabByUrl = new Map(); // normalizedUrl -> tab; first match wins if duplicates are open
-  for (const tab of tabs) {
-    const key = normalizeUrl(tab.url);
-    if (!tabByUrl.has(key)) tabByUrl.set(key, tab);
-  }
-  for (const bookmark of bookmarks) {
-    const tab = tabByUrl.get(normalizeUrl(bookmark.url));
-    if (tab) trackTab(bookmark.id, tab.id, tab.windowId);
-  }
-}
-
-async function openBookmarkUrl(url) {
-  if (openInNewTab) {
-    return browser.tabs.create({ url, windowId: myWindowId, active: true });
-  }
-  const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-  return browser.tabs.update(activeTab.id, { url });
-}
-
-async function openOrFocusBookmark(li) {
-  const bookmarkId = li.dataset.bookmarkid;
-  const tracked = trackedTabs.get(bookmarkId);
-
-  if (tracked) {
-    try {
-      await browser.tabs.update(tracked.tabId, { active: true });
-      const win = await browser.windows.get(tracked.windowId);
-      await browser.windows.update(tracked.windowId, {
-        focused: true,
-        ...(win.state === 'minimized' ? { state: 'normal' } : {}),
-      });
-      return;
-    } catch {
-      // tab/window no longer exists; fall through and open below
-      untrackByTabId(tracked.tabId);
+    for (const key of [...u.searchParams.keys()]) {
+      if (TRACKING_PARAM.test(key)) u.searchParams.delete(key);
     }
+    u.searchParams.sort();
+    // Strip the trailing slash off the path, not the whole string, so it also
+    // works when a query string follows ("/article/?p=2" vs "/article?p=2").
+    // A bare root path is unaffected: the URL serializer restores its "/".
+    u.pathname = u.pathname.replace(/\/$/, '');
+    return u.toString();
+  } catch {
+    return url; // not a parseable URL — compare it as plain text
   }
-
-  const tab = await openBookmarkUrl(li.dataset.url);
-  untrackByTabId(tab.id); // evicts a stale owner when openInNewTab is false; no-op otherwise
-  trackTab(bookmarkId, tab.id, tab.windowId);
-  li.classList.add('is-open');
 }
 
-browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  if (removeInfo.windowId !== myWindowId) return;
-  untrackByTabId(tabId);
-});
+// Opens the bookmark's page fresh: in the active tab if the user chose that,
+// otherwise in a new tab.
+async function openBookmarkUrl(url) {
+  if (openInActiveTab) {
+    const [activeTab] = await browser.tabs.query({ active: true, windowId: myWindowId });
+    return browser.tabs.update(activeTab.id, { url });
+  }
+  return browser.tabs.create({ url, windowId: myWindowId, active: true });
+}
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tab.windowId !== myWindowId || !changeInfo.url) return;
-  const bookmarkId = tabIdToBookmarkId.get(tabId);
-  if (!bookmarkId) return;
-  const li = getBookmarkElement(bookmarkId);
-  if (normalizeUrl(changeInfo.url) === normalizeUrl(li?.dataset.url)) return; // same page (hash/trailing-slash change)
-  untrackByTabId(tabId);
-});
-
-// Tab dragged to another window: once detached, this tab is no longer "ours" —
-// the destination window's panel (if any) has no record of it either, so just drop tracking.
-browser.tabs.onDetached.addListener((tabId, detachInfo) => {
-  if (detachInfo.oldWindowId !== myWindowId) return;
-  untrackByTabId(tabId);
-});
+// Only this window's tabs count: the sidebar is per-window, and yanking the
+// user to a different window would be more jarring than a duplicate tab.
+// With "open in active tab" on there is nothing to look for — the user asked
+// for pages to load right here, and reusing the active tab can't add a tab anyway.
+async function openOrFocusBookmark(li) {
+  const url = li.dataset.url;
+  if (!openInActiveTab) {
+    const key = normalizeUrl(url);
+    const tabs = await browser.tabs.query({ windowId: myWindowId });
+    const match = tabs.find(tab => normalizeUrl(tab.url) === key);
+    if (match) return browser.tabs.update(match.id, { active: true });
+  }
+  return openBookmarkUrl(url);
+}
 
 
 /* ------------------------------------------------ */
@@ -147,14 +115,10 @@ function renderBookmark(bookmark) {
   li.setAttribute('data-title', bookmark.title.toLowerCase());
   li.setAttribute('data-url', bookmark.url);
   li.setAttribute('title', bookmark.title);
-  if (trackedTabs.has(bookmark.id)) li.classList.add('is-open');
   let a = document.createElement('a');
   a.classList.add('link');
   a.setAttribute('href', bookmark.url);
   a.appendChild(document.createTextNode(bookmark.title));
-  let openIndicator = document.createElement('span');
-  openIndicator.classList.add('open-indicator');
-  openIndicator.setAttribute('title', browser.i18n.getMessage('openInTab'));
   let button = document.createElement('button');
   button.classList.add('delete-button');
   button.setAttribute('data-functionname', 'deletebookmark');
@@ -168,7 +132,6 @@ function renderBookmark(bookmark) {
   checkbox.setAttribute('type', 'checkbox');
   checkboxBorderWrapper.appendChild(checkbox);
   li.appendChild(a);
-  li.appendChild(openIndicator);
   li.appendChild(button);
   li.appendChild(checkboxBorderWrapper);
   return li;
@@ -179,21 +142,13 @@ function renderBookmark(bookmark) {
 // Bookmark event listeners
 /* ------------------------------------------------ */
 
-browser.bookmarks.onCreated.addListener(async (id, bookmark) => {
+browser.bookmarks.onCreated.addListener((id, bookmark) => {
   if (bookmark.parentId !== pileFolderId) return;
   if (!bookmark.url) return;
   if (optimisticElement && bookmark.url === optimisticElement.dataset.url) {
     optimisticElement.setAttribute('data-bookmarkid', id);
-    if (optimisticTabId) {
-      trackTab(id, optimisticTabId, optimisticWindowId);
-      optimisticElement.classList.add('is-open');
-    }
-    optimisticElement = optimisticTabId = optimisticWindowId = undefined;
+    optimisticElement = null;
   } else {
-    const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-    if (activeTab && normalizeUrl(activeTab.url) === normalizeUrl(bookmark.url)) {
-      trackTab(id, activeTab.id, activeTab.windowId);
-    }
     sidebarBookmarkList.prepend(renderBookmark(bookmark));
   }
 });
@@ -201,14 +156,11 @@ browser.bookmarks.onCreated.addListener(async (id, bookmark) => {
 browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (id === pileFolderId) {
     pileFolderId = null;
-    trackedTabs.clear();
-    tabIdToBookmarkId.clear();
     fullRebuild([]);
     return;
   }
   if (removeInfo.parentId !== pileFolderId) return;
   getBookmarkElement(id)?.remove();
-  untrackByBookmarkId(id);
   if (cleanupMode) updateCleanupCounter();
 });
 
@@ -223,7 +175,6 @@ browser.bookmarks.onChanged.addListener((id, changeInfo) => {
   if (changeInfo.url) {
     li.setAttribute('data-url', changeInfo.url);
     li.querySelector('.link').setAttribute('href', changeInfo.url);
-    untrackByBookmarkId(id);
   }
 });
 
@@ -234,7 +185,6 @@ browser.bookmarks.onMoved.addListener(async (id, moveInfo) => {
 
   const li = getBookmarkElement(id);
   li?.remove();
-  if (oldParentWasPile && !newParentIsPile) untrackByBookmarkId(id); // left the Pile folder entirely
 
   if (newParentIsPile) {
     const el = li ?? renderBookmark((await browser.bookmarks.get(id))[0]);
@@ -276,15 +226,21 @@ function assignSessionInfo(bookmarks) {
   }
 
   // The shade alternates between sessions, but only sessions of MIN_SESSION_SIZE+ flip it,
-  // so lone bookmarks keep the shade of the block above to minimize visual noise.
+  // so lone bookmarks keep the shade of the neighboring block to minimize visual noise.
+  //
+  // The alternation is anchored at the BOTTOM of the list (the oldest session gets the
+  // default shade) and walks upward. New sessions only ever appear at the top, so this
+  // way a new session takes the next shade in the sequence while every existing block
+  // keeps the color the user already knows it by. Anchored at the top, each new session
+  // would flip the shade of everything below it — disorienting after every rebuild.
   const shades = [];
   let shaded = false;
   let seenQualifyingSession = false;
-  for (let i = 0; i < n; i++) {
-    const startsNewSession = i === 0 || sessionOf[i] !== sessionOf[i - 1];
+  for (let i = n - 1; i >= 0; i--) {
+    const startsNewSession = i === n - 1 || sessionOf[i] !== sessionOf[i + 1];
     const qualifies = sizeOf[sessionOf[i]] >= MIN_SESSION_SIZE;
     if (startsNewSession && qualifies) {
-      if (seenQualifyingSession) shaded = !shaded; // the first qualifying block keeps the default shade
+      if (seenQualifyingSession) shaded = !shaded; // the oldest qualifying block keeps the default shade
       seenQualifyingSession = true;
     }
     shades[i] = shaded;
@@ -327,8 +283,8 @@ browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-theme']?.newValue) {
     changeTheme(changes['pile-theme'].newValue);
   }
-  if (changes['pile-open-in-new-tab']) {
-    openInNewTab = changes['pile-open-in-new-tab'].newValue !== false;
+  if (changes['pile-open-in-active-tab']) {
+    openInActiveTab = changes['pile-open-in-active-tab'].newValue === true;
   }
   if (changes['pile-session-enabled'] || changes['pile-session-gap-hours']) {
     applySessionSettings({
@@ -416,8 +372,6 @@ async function addBookmark() {
     return;
   }
   optimisticElement = renderBookmark({ id: '', url: tab.url, title: tab.title });
-  optimisticTabId = tab.id;
-  optimisticWindowId = tab.windowId;
   sidebarBookmarkList.prepend(optimisticElement);
   playCSSAnimation(sidebarBookmarkList, 'adding', 'animation-slidein');
   try {
@@ -425,7 +379,7 @@ async function addBookmark() {
   } catch(error) {
     logError('addBookmark', error);
     optimisticElement.remove();
-    optimisticElement = optimisticTabId = optimisticWindowId = undefined;
+    optimisticElement = null;
     playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
   }
 }
@@ -569,6 +523,9 @@ async function init() {
   document.head.appendChild(searchStyle);
 
   contentArea.addEventListener('click', (event) => {
+    // A plain left-click on a bookmark link is Pile's to handle (see "Opening
+    // bookmarks" at the top of this file). Modified clicks fall through to the
+    // browser's own link behavior.
     const linkEl = event.target.closest('.link');
     if (linkEl && event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
       event.preventDefault();
@@ -642,13 +599,12 @@ async function init() {
 
   try {
     myWindowId = (await browser.windows.getCurrent()).id;
-    const obj = await browser.storage.local.get(['pile-theme', 'pile-open-in-new-tab', 'pile-session-enabled', 'pile-session-gap-hours']);
+    const obj = await browser.storage.local.get(['pile-theme', 'pile-open-in-active-tab', 'pile-session-enabled', 'pile-session-gap-hours']);
     if (obj['pile-theme']) changeTheme(obj['pile-theme']);
-    openInNewTab = obj['pile-open-in-new-tab'] !== false;
+    openInActiveTab = obj['pile-open-in-active-tab'] === true;
     applySessionSettings(obj);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
-    await seedTrackedTabs(response.bookmarks);
     fullRebuild(response.bookmarks);
   } catch (error) {
     logError('init', error);

@@ -44,9 +44,6 @@
   "deleteBookmark": {
     "message": "Lesezeichen löschen"
   },
-  "openInTab": {
-    "message": "Bereits geöffnet — klicken, um dorthin zu wechseln"
-  },
   "markForDeletion": {
     "message": "Lesezeichen auswählen"
   },
@@ -56,5 +53,44 @@
   },
   "search": {
     "message": "Suche Zeigen/Verstecken"
+  },
+  "optionsTitle": {
+    "message": "Pile-Einstellungen"
+  },
+  "optionTheme": {
+    "message": "Theme"
+  },
+  "optionThemeLight": {
+    "message": "hell"
+  },
+  "optionThemeDark": {
+    "message": "dunkel"
+  },
+  "optionFolderName": {
+    "message": "Ordnername"
+  },
+  "optionRename": {
+    "message": "Umbenennen"
+  },
+  "optionShowSessions": {
+    "message": "Sessions anzeigen"
+  },
+  "optionSessionGap": {
+    "message": "Stunden Abstand starten eine neue Session"
+  },
+  "optionOpenInActiveTab": {
+    "message": "Im aktiven Tab öffnen"
+  },
+  "folderRenamed": {
+    "message": "Ordner in „$NAME$“ umbenannt.",
+    "placeholders": {
+      "name": { "content": "$1" }
+    }
+  },
+  "folderExists": {
+    "message": "Ein Ordner namens „$NAME$“ existiert bereits.",
+    "placeholders": {
+      "name": { "content": "$1" }
+    }
   }
 }

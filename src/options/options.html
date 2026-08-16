@@ -30,15 +30,33 @@
             box-sizing: border-box;
         }
 
-        .setting {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+        /* The options form is a simple two-column table: labels in the first
+           column, fields in the second. Checkboxes sit left of their label
+           text inside the label itself. The label column sizes itself to the
+           widest label, so the fields always line up. */
+        .settings {
+            display: table;
         }
 
-        label {
-            min-width: 60px;
+        .setting {
+            display: table-row;
+        }
+
+        .setting > * {
+            display: table-cell;
+            vertical-align: middle;
+            padding: 0 12px 32px 0;
+        }
+
+        /* Flush left like the other labels, small gap to the label text.
+           vertical-align: middle gets the checkbox close to the text's center;
+           the 1px relative nudge is optical correction for how Firefox paints
+           the control — adjust it, not vertical-align, if it still looks off. */
+        input[type="checkbox"] {
+            margin: 0 6px 0 0;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
         }
 
         select {
@@ -73,29 +91,36 @@
     </style>
 </head>
 <body>
-    <div class="setting">
-        <label for="select-theme">Theme</label>
-        <select name="themes" id="select-theme">
-            <option value="theme-light">light</option>
-            <option value="theme-dark">dark</option>
-        </select>
-    </div>
-    <div class="setting">
-        <label for="input-folder-name">Folder</label>
-        <input type="text" id="input-folder-name" placeholder="Pile" maxlength="64">
-        <button id="btn-save-folder-name">Save</button>
-    </div>
-    <p class="description" id="folder-name-error"></p>
-    <div class="setting">
-        <label for="checkbox-session-enabled">Sessions</label>
-        <input type="checkbox" id="checkbox-session-enabled">
-        <input type="number" id="input-session-gap" min="1" max="168" step="1">
-        <span class="description">hours apart starts a new session</span>
-    </div>
-    <div class="setting">
-        <label for="checkbox-open-in-new-tab">New tab</label>
-        <input type="checkbox" id="checkbox-open-in-new-tab">
-        <span class="description">open bookmarks in a new tab</span>
+    <div class="settings">
+        <div class="setting">
+            <label for="select-theme" data-localize-text="optionTheme">Theme</label>
+            <span>
+                <select name="themes" id="select-theme">
+                    <option value="theme-light" data-localize-text="optionThemeLight">light</option>
+                    <option value="theme-dark" data-localize-text="optionThemeDark">dark</option>
+                </select>
+            </span>
+        </div>
+        <div class="setting">
+            <label for="input-folder-name" data-localize-text="optionFolderName">Folder name</label>
+            <span>
+                <input type="text" id="input-folder-name" placeholder="Pile" maxlength="64">
+                <button id="btn-save-folder-name" data-localize-text="optionRename">Rename</button>
+                <span class="description" id="folder-name-error"></span>
+            </span>
+        </div>
+        <div class="setting">
+            <!-- The label text sits in its own span: the localizer replaces textContent,
+                 which would wipe out the nested checkbox if it targeted the label itself. -->
+            <label><input type="checkbox" id="checkbox-session-enabled"><span data-localize-text="optionShowSessions">Show sessions</span></label>
+            <span>
+                <input type="number" id="input-session-gap" min="1" max="168" step="1">
+                <span class="description" data-localize-text="optionSessionGap">hours apart starts a new session</span>
+            </span>
+        </div>
+        <div class="setting">
+            <label><input type="checkbox" id="checkbox-open-in-active-tab"><span data-localize-text="optionOpenInActiveTab">Open in active tab</span></label>
+        </div>
     </div>
     <script src="options.js" defer></script>
 </body>

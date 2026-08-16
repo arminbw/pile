@@ -1,5 +1,14 @@
 const DEFAULT_SESSION_GAP_HOURS = 2;
 
+// Same mechanism as the sidebar (see panel.js): elements carry the message key
+// in a data attribute, and this pass fills in the user's language on load.
+function localizePage() {
+  document.title = browser.i18n.getMessage('optionsTitle');
+  document.querySelectorAll('[data-localize-text]').forEach(el => {
+    el.textContent = browser.i18n.getMessage(el.dataset.localizeText);
+  });
+}
+
 function updateOptionMenus() {
   function setCurrentChoice(result) {
     document.querySelector('#select-theme').value = result['pile-theme'] || 'theme-light';
@@ -11,7 +20,7 @@ function updateOptionMenus() {
     gapInput.value = result['pile-session-gap-hours'] || DEFAULT_SESSION_GAP_HOURS;
     gapInput.disabled = !enabled;
 
-    document.querySelector('#checkbox-open-in-new-tab').checked = result['pile-open-in-new-tab'] !== false; // on by default
+    document.querySelector('#checkbox-open-in-active-tab').checked = result['pile-open-in-active-tab'] === true; // off by default
   }
 
   function onError(error) {
@@ -19,7 +28,7 @@ function updateOptionMenus() {
   }
 
   browser.storage.local
-    .get(['pile-theme', 'pile-folder-name', 'pile-session-enabled', 'pile-session-gap-hours', 'pile-open-in-new-tab'])
+    .get(['pile-theme', 'pile-folder-name', 'pile-session-enabled', 'pile-session-gap-hours', 'pile-open-in-active-tab'])
     .then(setCurrentChoice, onError);
 }
 
@@ -44,8 +53,8 @@ function setSessionGap() {
   browser.storage.local.set({ 'pile-session-gap-hours': hours });
 }
 
-function setOpenInNewTab() {
-  browser.storage.local.set({ 'pile-open-in-new-tab': document.querySelector('#checkbox-open-in-new-tab').checked });
+function setOpenInActiveTab() {
+  browser.storage.local.set({ 'pile-open-in-active-tab': document.querySelector('#checkbox-open-in-active-tab').checked });
 }
 
 async function saveFolderName() {
@@ -60,21 +69,22 @@ async function saveFolderName() {
 
   const existing = await browser.bookmarks.search({ title: newName });
   if (existing.some(b => b.type === 'folder')) {
-    feedbackEl.textContent = `A folder named "${newName}" already exists.`;
+    feedbackEl.textContent = browser.i18n.getMessage('folderExists', newName);
     feedbackEl.classList.add('error');
     return;
   }
 
   browser.storage.local.set({ 'pile-folder-name': value });
-  feedbackEl.textContent = `Folder renamed to "${newName}".`;
+  feedbackEl.textContent = browser.i18n.getMessage('folderRenamed', newName);
   feedbackEl.classList.remove('error');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  localizePage();
   updateOptionMenus();
   document.querySelector('#select-theme').addEventListener('change', setTheme);
   document.querySelector('#btn-save-folder-name').addEventListener('click', saveFolderName);
   document.querySelector('#checkbox-session-enabled').addEventListener('change', setSessionEnabled);
   document.querySelector('#input-session-gap').addEventListener('change', setSessionGap);
-  document.querySelector('#checkbox-open-in-new-tab').addEventListener('change', setOpenInNewTab);
+  document.querySelector('#checkbox-open-in-active-tab').addEventListener('change', setOpenInActiveTab);
 });
