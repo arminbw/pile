@@ -26,7 +26,7 @@
             color: var(--color);
             font-family: system-ui, sans-serif;
             font-size: 13px;
-            padding: 16px;
+            padding: 32px 16px 16px 16px;
             box-sizing: border-box;
         }
 
@@ -83,6 +83,11 @@
 
         .description {
             color: var(--color-description);
+        }
+
+        /* Breathing room between the session gap number field and its unit text. */
+        #input-session-gap + .description {
+            margin-left: 4px;
         }
 
         .description.error {

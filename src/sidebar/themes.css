@@ -126,9 +126,11 @@
 
   /* bookmarks use mid-range steps in dark (not near-black) */
   --color-bookmark-bg:           var(--color-contrast-16);
-  --color-bookmark-session-bg: #242424;
-  --color-bookmark-session-border: #161616;
-  --color-bookmark-session-border-end: #181818;
+  /* the zebra effect relies on the background difference alone: session rows keep
+     the same subtle separators as plain rows, no darker dividing lines */
+  --color-bookmark-session-bg: #1F1F1F;
+  --color-bookmark-session-border: var(--color-contrast-20);
+  --color-bookmark-session-border-end: var(--color-contrast-20);
   --color-bookmark-border:       var(--color-contrast-20);
   --color-bookmark-bg-hover:     var(--color-contrast-18);
 
