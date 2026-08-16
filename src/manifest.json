@@ -44,7 +44,7 @@
   "options_ui": {
       "page": "options/options.html"
   },
-  "permissions": ["bookmarks", "storage", "contextMenus", "activeTab", "tabs", "theme"],
+  "permissions": ["bookmarks", "storage", "menus", "activeTab", "tabs", "theme"],
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {

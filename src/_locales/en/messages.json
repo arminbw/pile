@@ -114,6 +114,14 @@
       "name": { "content": "$1", "example": "Reading List" }
     }
   },
+  "highlightBookmark": {
+    "message": "Highlight",
+    "description": "Context menu action on a sidebar bookmark: mark it visually"
+  },
+  "unhighlightBookmark": {
+    "message": "Remove highlight",
+    "description": "Context menu action on a highlighted sidebar bookmark"
+  },
   "folderExists": {
     "message": "A folder named \"$NAME$\" already exists.",
     "description": "Feedback when the new folder name collides with an existing folder",

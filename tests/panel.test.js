@@ -86,6 +86,26 @@ test('clicking add when the URL is already at the top does not create a duplicat
   expect(document.querySelectorAll('li.bookmark')).toHaveLength(3);
 });
 
+// Regression test for a real crash: on a brand-new profile, getBookmarkFolderId()
+// has to create the Pile folder first, which widens the window between the click
+// listener being registered and fullRebuild() actually populating the list. A click
+// on "Add Page" landing inside that window used to find the list's raw HTML content
+// (a whitespace text node before the first element) still in place. addBookmark()
+// read that via .firstChild, which has no .dataset, and threw. This test recreates
+// the same shape of DOM directly, decoupled from the exact whitespace in panel.html
+// (which could drift), to pin the .firstElementChild fix itself.
+test('clicking add when the list starts with a stray non-element node does not crash', async () => {
+  await initPanel([]);
+  document.querySelector('ul.bookmarks').prepend(document.createTextNode('\n  '));
+  browser.tabs.query = async () => [{ url: 'https://new.com', title: 'New Page' }];
+
+  click('[data-functionname="addbookmark"]');
+  await flushPromises();
+
+  expect(document.querySelectorAll('li.bookmark')).toHaveLength(1);
+  expect(document.querySelector('li.bookmark .link').textContent).toBe('New Page');
+});
+
 test('optimistic element is removed when sendMessage fails', async () => {
   await initPanel([]);
   browser.tabs.query = async () => [{ url: 'https://new.com', title: 'New Page' }];
@@ -405,6 +425,94 @@ test('opens the bookmark URL verbatim rather than its normalized form', async ()
 
   const [tab] = await browser.tabs.query({});
   expect(tab.url).toBe('http://www.example.com/a/');
+});
+
+
+// --- highlighted bookmarks ---
+
+function simulateMenuClick(bookmarkId) {
+  browser.menus.getTargetElement = () =>
+    document.querySelector(`li.bookmark[data-bookmarkid="${bookmarkId}"] .link`);
+  return browser.menus.onClicked.trigger({ menuItemId: 'toggle-highlight', targetElementId: 1 });
+}
+
+test('the menu action toggles the highlight and persists it', async () => {
+  await initPanel();
+
+  await simulateMenuClick('1');
+  await flushPromises();
+  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('highlighted')).toBe(true);
+  expect((await browser.storage.local.get('pile-highlighted'))['pile-highlighted']).toEqual(['1']);
+
+  await simulateMenuClick('1');
+  await flushPromises();
+  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('highlighted')).toBe(false);
+  expect((await browser.storage.local.get('pile-highlighted'))['pile-highlighted']).toEqual([]);
+});
+
+test('stored highlights are applied on init', async () => {
+  await browser.storage.local.set({ 'pile-highlighted': ['2'] });
+  await initPanel();
+
+  expect(document.querySelector('li.bookmark[data-bookmarkid="2"]').classList.contains('highlighted')).toBe(true);
+  expect(document.querySelector('li.bookmark[data-bookmarkid="1"]').classList.contains('highlighted')).toBe(false);
+});
+
+test('ids of bookmarks that no longer exist are pruned from storage on init', async () => {
+  await browser.storage.local.set({ 'pile-highlighted': ['2', 'long-gone'] });
+  await initPanel();
+
+  expect((await browser.storage.local.get('pile-highlighted'))['pile-highlighted']).toEqual(['2']);
+});
+
+test('removing a highlighted bookmark removes its stored id', async () => {
+  await browser.storage.local.set({ 'pile-highlighted': ['1'] });
+  await initPanel();
+
+  await browser.bookmarks.onRemoved.trigger('1', { parentId: FOLDER_ID });
+  await flushPromises();
+
+  expect((await browser.storage.local.get('pile-highlighted'))['pile-highlighted']).toEqual([]);
+});
+
+test('a highlight made in one sidebar reaches another via storage', async () => {
+  await initPanel();
+
+  // another window's sidebar wrote a new highlight set
+  await browser.storage.local.set({ 'pile-highlighted': ['3'] });
+  await flushPromises();
+
+  expect(document.querySelector('li.bookmark[data-bookmarkid="3"]').classList.contains('highlighted')).toBe(true);
+});
+
+// Regression test: the menus.onShown/onClicked registration for the highlight
+// feature happens at module load, before init() runs at the bottom of the
+// file. If that registration throws, it must not be able to take init() —
+// and therefore bookmark rendering — down with it. This is deliberately not
+// wrapped by initPanel(), since the failure would happen during the import
+// that initPanel() performs.
+test('bookmarks still render even if the menus API registration fails', async () => {
+  browser.menus.onShown.addListener = () => { throw new Error('boom'); };
+  await initPanel();
+
+  expect(document.querySelectorAll('li.bookmark')).toHaveLength(3);
+});
+
+test('right-click on a bookmark overrides the native menu, elsewhere it does not', async () => {
+  await initPanel();
+  const overrideSpy = vi.fn();
+  browser.menus.overrideContext = overrideSpy;
+
+  document.querySelector('li.bookmark[data-bookmarkid="1"] .link').dispatchEvent(
+    new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+  );
+  expect(overrideSpy).toHaveBeenCalledWith({ showDefaults: false });
+
+  overrideSpy.mockClear();
+  document.querySelector('ul.bookmarks').dispatchEvent(
+    new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+  );
+  expect(overrideSpy).not.toHaveBeenCalled();
 });
 
 

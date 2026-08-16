@@ -47,7 +47,11 @@ browser.storage.onChanged.addListener(async (changes) => {
 // Contextual Menu
 /* ------------------------------------------------ */
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+// Firefox exposes browser.contextMenus only under the "contextMenus" permission
+// and browser.menus only under "menus" — they are NOT aliases of each other
+// despite offering the same API shape. The manifest declares "menus", so every
+// call here goes through that namespace.
+browser.menus.onClicked.addListener((info, tab) => {
   switch(info.menuItemId) {
     case 'putOnPile':
       addBookmarkandClose(tab, true);
@@ -59,15 +63,27 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 browser.runtime.onInstalled.addListener(() => {
-  browser.contextMenus.create({
+  browser.menus.create({
     id: 'putOnPile',
     title: browser.i18n.getMessage('putOnPileMessage'),
-    contexts: ['page', 'frame', 'image', 'page']
+    contexts: ['page', 'frame', 'image'],
+    // web pages only — keeps this item out of Pile's own sidebar
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
   });
-  browser.contextMenus.create({
+  browser.menus.create({
     id: 'putAllOnPile',
     title: browser.i18n.getMessage('putAllOnPileMessage'),
     contexts: ['tab']
+  });
+  // Shown in the Pile sidebar only, via menus.overrideContext in panel.js.
+  // The panel also retitles it per row (highlight vs. un-highlight) and
+  // handles the click; see "Highlighted bookmarks" there.
+  browser.menus.create({
+    id: 'toggle-highlight',
+    title: browser.i18n.getMessage('highlightBookmark'),
+    contexts: ['page', 'link'],
+    viewTypes: ['sidebar'],
+    documentUrlPatterns: [browser.runtime.getURL('sidebar/panel.html')]
   });
 });
 

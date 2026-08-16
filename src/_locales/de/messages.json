@@ -87,6 +87,12 @@
       "name": { "content": "$1" }
     }
   },
+  "highlightBookmark": {
+    "message": "Hervorheben"
+  },
+  "unhighlightBookmark": {
+    "message": "Hervorhebung entfernen"
+  },
   "folderExists": {
     "message": "Ein Ordner namens „$NAME$“ existiert bereits.",
     "placeholders": {

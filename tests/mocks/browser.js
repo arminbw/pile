@@ -51,6 +51,8 @@ export function createBrowserMock() {
   const onChangedListeners = [];
   const onMovedListeners = [];
   const onStorageChangedListeners = [];
+  const onMenuShownListeners = [];
+  const onMenuClickedListeners = [];
   const storageData = {};
 
   // Returns an { addListener, trigger } pair so tests can both register listeners
@@ -237,9 +239,19 @@ export function createBrowserMock() {
       setBadgeBackgroundColor: async () => {},
     },
 
-    contextMenus: {
-      onClicked: { addListener: () => {} },
-      create:    () => {},
+    // Firefox-only menus namespace — used both by the service worker (the two
+    // "put on Pile" items) and by the sidebar's highlight action. onClicked
+    // supports multiple listeners, matching real Firefox, since both register
+    // on it independently. getTargetElement returns null by default; tests
+    // override it to point at the row a simulated right-click targeted.
+    menus: {
+      create: () => {},
+      onShown: makeEvent(onMenuShownListeners),
+      onClicked: makeEvent(onMenuClickedListeners),
+      update: async () => {},
+      refresh: () => {},
+      overrideContext: () => {},
+      getTargetElement: () => null,
     },
 
     storage: {

@@ -37,6 +37,12 @@ li.bookmark:hover,
 li.bookmark:active {
   background-color: var(--color-bookmark-bg-hover);
 }
+/* user-highlighted bookmarks (via the right-click menu) carry an accent bar.
+   inset box-shadow instead of a border, so the row's layout doesn't shift
+   and it composes with the session shading and hover backgrounds */
+li.bookmark.highlighted {
+  box-shadow: inset 3px 0 0 var(--color-active);
+}
 /* the last bookmark of each shaded block gets a darker bottom-border to divide it from
    the next session (declared after .session-b so it wins the equal-specificity border tie) */
 li.bookmark.session-end {

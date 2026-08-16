@@ -105,6 +105,70 @@ async function openOrFocusBookmark(li) {
 
 
 /* ------------------------------------------------ */
+// Highlighted bookmarks
+/* ------------------------------------------------ */
+// The user can highlight a bookmark via the right-click menu. The menu item
+// itself is created once by the service worker; this page decides when the
+// native menu shows only Pile's items (menus.overrideContext in init()),
+// adjusts the item's wording to the row under the cursor (onShown), and
+// performs the toggle (onClicked).
+//
+// The highlighted ids live in storage.local ("pile-highlighted"), keyed by
+// bookmark id — a stable GUID in Firefox. The bookmarks themselves can't
+// carry the flag: the WebExtension API exposes neither tags nor any custom
+// metadata. A toggle only writes storage; the storage.onChanged listener
+// below applies the change to the DOM, so every open sidebar (this one
+// included) updates through the same path.
+
+let highlightedIds = new Set();
+
+async function toggleHighlight(li) {
+  const id = li.dataset.bookmarkid;
+  const next = new Set(highlightedIds);
+  if (next.has(id)) next.delete(id); else next.add(id);
+  await browser.storage.local.set({ 'pile-highlighted': [...next] });
+}
+
+// Written back only when ids actually disappeared, to avoid pointless writes.
+function pruneHighlightedIds(bookmarks) {
+  const existing = new Set(bookmarks.map(bookmark => bookmark.id));
+  const pruned = [...highlightedIds].filter(id => existing.has(id));
+  if (pruned.length === highlightedIds.size) return;
+  highlightedIds = new Set(pruned);
+  browser.storage.local.set({ 'pile-highlighted': pruned });
+}
+
+// The menu is about to show: name the action after the row's current state.
+// update() + refresh() inside onShown is the documented way to change a menu
+// that is already on screen.
+//
+// This registration runs at module load, before init() at the bottom of this
+// file. It must never be able to throw here: an error at this point would
+// abort the rest of the script and init() would never run, taking bookmark
+// rendering down with it for what is otherwise an optional, additive
+// feature. If browser.menus isn't available for any reason, the highlight
+// feature is simply unavailable — everything else still works.
+try {
+  browser.menus.onShown.addListener(async (info) => {
+    const li = browser.menus.getTargetElement(info.targetElementId)?.closest('li.bookmark');
+    if (!li) return; // menu opened in another window's sidebar
+    const key = highlightedIds.has(li.dataset.bookmarkid) ? 'unhighlightBookmark' : 'highlightBookmark';
+    await browser.menus.update('toggle-highlight', { title: browser.i18n.getMessage(key) });
+    browser.menus.refresh();
+  });
+
+  browser.menus.onClicked.addListener((info) => {
+    if (info.menuItemId !== 'toggle-highlight') return;
+    const li = browser.menus.getTargetElement(info.targetElementId)?.closest('li.bookmark');
+    if (!li) return; // the click belonged to another window's sidebar
+    toggleHighlight(li).catch(error => logError('toggleHighlight', error));
+  });
+} catch (error) {
+  logError('menus setup', error);
+}
+
+
+/* ------------------------------------------------ */
 // Render bookmarks
 /* ------------------------------------------------ */
 
@@ -115,6 +179,7 @@ function renderBookmark(bookmark) {
   li.setAttribute('data-title', bookmark.title.toLowerCase());
   li.setAttribute('data-url', bookmark.url);
   li.setAttribute('title', bookmark.title);
+  if (highlightedIds.has(bookmark.id)) li.classList.add('highlighted');
   let a = document.createElement('a');
   a.classList.add('link');
   a.setAttribute('href', bookmark.url);
@@ -156,11 +221,19 @@ browser.bookmarks.onCreated.addListener((id, bookmark) => {
 browser.bookmarks.onRemoved.addListener((id, removeInfo) => {
   if (id === pileFolderId) {
     pileFolderId = null;
+    if (highlightedIds.size > 0) {
+      highlightedIds = new Set();
+      browser.storage.local.set({ 'pile-highlighted': [] });
+    }
     fullRebuild([]);
     return;
   }
   if (removeInfo.parentId !== pileFolderId) return;
   getBookmarkElement(id)?.remove();
+  if (highlightedIds.has(id)) {
+    highlightedIds.delete(id);
+    browser.storage.local.set({ 'pile-highlighted': [...highlightedIds] });
+  }
   if (cleanupMode) updateCleanupCounter();
 });
 
@@ -286,6 +359,14 @@ browser.storage.onChanged.addListener( (changes, areaName) => {
   if (changes['pile-open-in-active-tab']) {
     openInActiveTab = changes['pile-open-in-active-tab'].newValue === true;
   }
+  // Single source of truth for highlights: every sidebar (including the one
+  // that made the change) applies the stored state to its rows from here.
+  if (changes['pile-highlighted'] && sidebarBookmarkList) {
+    highlightedIds = new Set(changes['pile-highlighted'].newValue ?? []);
+    for (const li of sidebarBookmarkList.children) {
+      li.classList.toggle('highlighted', highlightedIds.has(li.dataset.bookmarkid));
+    }
+  }
   if (changes['pile-session-enabled'] || changes['pile-session-gap-hours']) {
     applySessionSettings({
       'pile-session-enabled': changes['pile-session-enabled']?.newValue,
@@ -367,7 +448,9 @@ async function addBookmark() {
     return;
   }
   if (optimisticElement) return; // guard against unlikely race condition
-  if (sidebarBookmarkList.firstChild?.dataset.url === tab.url) {
+  // firstElementChild, not firstChild: the whitespace text node between <ul>
+  // and its first <li> in the HTML source has no .dataset and would throw.
+  if (sidebarBookmarkList.firstElementChild?.dataset.url === tab.url) {
     playCSSAnimation(addBookmarkButton, 'shaking', 'animation-shake-x');
     return;
   }
@@ -522,6 +605,25 @@ async function init() {
   searchStyle = document.createElement('style');
   document.head.appendChild(searchStyle);
 
+  // Right-click on a bookmark row: replace the browser's default menu with
+  // Pile's own items (just "Highlight"). overrideContext only works when
+  // called synchronously during the contextmenu event, which is why this
+  // lives here and not with the menus listeners above. Elsewhere in the
+  // sidebar chrome (toolbar, buttons) there is nothing a native context menu
+  // (Inspect, Save Page As, ...) could usefully offer, so it stays suppressed
+  // as it always has been.
+  contentArea.addEventListener('contextmenu', (event) => {
+    if (!event.target.closest('li.bookmark')) {
+      event.preventDefault();
+      return;
+    }
+    try {
+      browser.menus.overrideContext({ showDefaults: false });
+    } catch (error) {
+      logError('overrideContext', error);
+    }
+  });
+
   contentArea.addEventListener('click', (event) => {
     // A plain left-click on a bookmark link is Pile's to handle (see "Opening
     // bookmarks" at the top of this file). Modified clicks fall through to the
@@ -583,12 +685,6 @@ async function init() {
     }
   });
 
-  contentArea.addEventListener('contextmenu', function(e) {
-    if (!e.target.classList.contains('link')) {
-      e.preventDefault();
-    }
-  }, false);
-
   document.querySelectorAll('[data-localize-text]').forEach(el => {
     el.textContent = browser.i18n.getMessage(el.dataset.localizeText);
   });
@@ -599,12 +695,14 @@ async function init() {
 
   try {
     myWindowId = (await browser.windows.getCurrent()).id;
-    const obj = await browser.storage.local.get(['pile-theme', 'pile-open-in-active-tab', 'pile-session-enabled', 'pile-session-gap-hours']);
+    const obj = await browser.storage.local.get(['pile-theme', 'pile-open-in-active-tab', 'pile-session-enabled', 'pile-session-gap-hours', 'pile-highlighted']);
     if (obj['pile-theme']) changeTheme(obj['pile-theme']);
     openInActiveTab = obj['pile-open-in-active-tab'] === true;
+    highlightedIds = new Set(obj['pile-highlighted'] ?? []);
     applySessionSettings(obj);
     const response = await browser.runtime.sendMessage({ type: 'GET_BOOKMARKS_AND_FOLDERID' });
     pileFolderId = response.folderId;
+    pruneHighlightedIds(response.bookmarks); // drop ids of bookmarks deleted while no sidebar was open
     fullRebuild(response.bookmarks);
   } catch (error) {
     logError('init', error);
